@@ -3,159 +3,317 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NIELofc - Toko Cheat</title>
+<title>Panel Admin NIELofc</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Saira:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="icon" href="logo.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 <style>
-:root{--biru:#2563EB;--biru-glow:#3B82F6;--hitam:#050A14;--abu:#0F172A;}
-body{background:var(--hitam);color:#fff;font-family:'Saira', sans-serif;}
-h1, h2, h3,.font-black{font-family:'Rajdhani', sans-serif;letter-spacing:1.5px;text-transform:uppercase;font-weight:700;color:var(--biru-glow)}
-.glow-text{text-shadow:0 0 5px var(--biru-glow);animation: glow 2.5s ease-in-out infinite alternate;}
-@keyframes glow {from { opacity: 0.7; } to { opacity: 1; text-shadow:0 0 15px var(--biru-glow); }}
-.header{position:sticky;top:0;z-index:50;background:#000;border-bottom:2px solid var(--biru)}
-.banner{position:relative;height:200px;overflow:hidden;border-radius:0 0 16px 16px;border-bottom:2px solid var(--biru);background:#000}
-.banner img{position:absolute;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity 1s ease-in-out}
-.banner img.active{opacity:1}
-.card{background:var(--abu);border-radius:16px;transition:0.2s;border:1px solid var(--biru);padding:8px;cursor:pointer}
-.card:active{transform:scale(0.96);border-color:var(--biru-glow)}
-.card img{width:100%;height:120px;object-fit:cover;border-radius:12px;margin-bottom:8px;border:1px solid var(--biru)}
-.page{display:none}.page.active{display:block}
-.durasi-btn{border:1px solid var(--biru);padding:12px;border-radius:10px;cursor:pointer;text-align:center;font-weight:700;background:var(--abu)}
-.durasi-btn.active{border-color:var(--biru-glow);background:#2563EB30;box-shadow:0 0 8px var(--biru-glow)}
-.durasi-btn.disabled{opacity:0.4;cursor:not-allowed;background:#EF444430;border-color:#EF4444}
-.filter-btn{background:var(--abu);padding:8px 18px;border-radius:20px;font-size:13px;font-weight:800;white-space:nowrap;border:1px solid var(--biru);cursor:pointer}
-.filter-btn.active{background:var(--biru);color:#fff;box-shadow:0 0 8px var(--biru-glow)}
-.input{width:100%;background:var(--abu);padding:12px;border-radius:10px;border:1px solid var(--biru);color:#fff}
-.menu-btn{background:none;border:none;color:var(--biru-glow);font-size:24px;cursor:pointer;font-weight:900}
-.side-menu{position:fixed;top:0;right:-300px;width:280px;height:100%;background:#000;border-left:2px solid var(--biru);z-index:100;transition:0.3s;padding:20px;display:flex;flex-direction:column;gap:10px}
-.side-menu.active{right:0}
-.side-menu a{padding:14px;border-radius:10px;background:var(--abu);font-weight:800;text-align:center;border:1px solid var(--biru);cursor:pointer}
-.side-menu a:hover{background:var(--biru)}
-.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:#00080;z-index:99;display:none}
-.overlay.active{display:block}
-.stok-habis{color:#EF4444;font-size:11px;font-weight:800}
-.loading{text-align:center;padding:40px;color:var(--biru-glow)}
-.dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
-.dot{width:8px;height:8px;border-radius:50%;background:#2563EB50;transition:0.3s}
-.dot.active{background:var(--biru-glow)}
-.faq-box{background:var(--abu);border:1px solid var(--biru);border-radius:12px;padding:12px;margin-bottom:10px}
+body{font-family:'Poppins', sans-serif;color:#fff;overflow-x:hidden;background:#050A14;}
+h1,h2{font-family:'Orbitron', sans-serif;}
+.bg-anim{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;
+  background: radial-gradient(circle at 20% 20%, #2563EB33 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, #3B82F633 0%, transparent 50%),#050A14;
+  animation:bgMove 15s ease-in-out infinite alternate;}
+@keyframes bgMove{0%{background-position:0% 0%, 100% 100%;}100%{background-position:100% 100%, 0% 0%;}}
+@keyframes blink {0%,100%{box-shadow:0 0 5px #10B981;}50%{box-shadow:0 0 15px #10B981;}}
+@keyframes blinkOff {0%,100%{box-shadow:0 0 5px #EF4444;}50%{box-shadow:0 0 15px #EF4444;}}
+.card{background:#0F172A90;backdrop-filter:blur(10px);border:1px solid #2563EB;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 0 15px #2563EB40}
+.input{background:#050A14;border:1px solid #2563EB;border-radius:10px;padding:10px;width:100%;color:#fff;margin-bottom:10px}
+.btn{padding:10px 14px;border-radius:10px;font-weight:800;cursor:pointer;transition:0.2s}
+.btn:hover{transform:scale(1.03)}
+.btn-tambah{background:#2563EB;width:100%}
+.btn-proses{background:#F59E0B;width:100%}
+.btn-selesai{background:#10B981;width:100%}
+.btn-hapus{background:#EF4444}
+.btn-copy{background:#8B5CF6}
+.btn-excel{background:#16A34A}
+.btn-broadcast{background:#2563EB}
+.btn-danger{background:#DC2626;width:100%}
+.produk-btn{background:#1E293B;border:1px solid #2563EB;padding:8px 12px;border-radius:8px;margin:4px;cursor:pointer;font-size:14px}
+.produk-btn.active{background:#2563EB;box-shadow:0 0 10px #2563EB}
+.status{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:800}
+.pending{background:#F59E0B30;color:#F59E0B}
+.proses{background:#3B82F630;color:#3B82F6}
+.selesai{background:#10B98130;color:#10B981}
+.stat-box{background:#1E293B;border:1px solid #2563EB;border-radius:12px;padding:12px;text-align:center}
+.produk-card{position:relative;background:#1E293B;border:2px solid #2563EB;border-radius:12px;padding:10px}
+.indicator{position:absolute;top:8px;right:8px;width:12px;height:12px;border-radius:50%;}
+.indicator.on{background:#10B981;animation:blink 1.2s infinite;}
+.indicator.off{background:#EF4444;animation:blinkOff 1.2s infinite;}
+.toggle-btn{font-size:11px;padding:4px 8px;border-radius:6px;margin-top:6px}
+.game-tag{font-size:10px;padding:2px 6px;border-radius:6px;background:#2563EB30;color:#3B82F6;font-weight:700}
+.filter-btn-panel{background:#1E293B;padding:8px 14px;border-radius:20px;font-size:12px;font-weight:800;white-space:nowrap;border:1px solid #2563EB;cursor:pointer}
+.filter-btn-panel.active{background:#2563EB;color:#fff;box-shadow:0 0 8px #2563EB}
 </style>
 </head>
 <body>
+<div class="bg-anim"></div>
 
-<div class="header p-3 flex justify-between items-center">
-  <div>
-    <h1 class="text-2xl font-black glow-text">NIEL<span class="text-cyan-400">ofc</span></h1>
+<div class="max-w-3xl mx-auto p-4">
+  <h1 class="text-3xl font-black text-center mb-4 text-blue-400">PANEL ADMIN NIELofc</h1>
+
+  <!-- LOGIN -->
+  <div id="loginBox" class="card max-w-sm mx-auto">
+    <h2 class="font-bold text-lg mb-3 text-center">Login Admin</h2>
+    <input id="passAdmin" type="password" placeholder="Masukkan Password" class="input">
+    <button onclick="loginAdmin()" class="btn btn-tambah">MASUK</button>
   </div>
-  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+  <!-- PANEL -->
+  <div id="panelBox" class="hidden">
+    <!-- STATISTIK -->
+    <div class="grid grid-cols-3 gap-3 mb-4">
+      <div class="stat-box"><p class="text-xs text-gray-400">TOTAL</p><p id="totalAll" class="text-2xl font-bold">0</p></div>
+      <div class="stat-box"><p class="text-xs text-gray-400">ON</p><p id="totalOn" class="text-2xl font-bold text-green-400">0</p></div>
+      <div class="stat-box"><p class="text-xs text-gray-400">OFF</p><p id="totalOff" class="text-2xl font-bold text-red-400">0</p></div>
+    </div>
+
+    <!-- MANAJEMEN PRODUK -->
+    <div class="card">
+      <h2 class="font-bold mb-3">⚙️ Atur Status Produk</h2>
+      <div class="flex gap-2 overflow-x-auto pb-2 mb-3">
+        <button id="btn-all" class="filter-btn-panel active" onclick="filterPanel('semua')">SEMUA</button>
+        <button id="btn-freefire" class="filter-btn-panel" onclick="filterPanel('FREE FIRE')">FREE FIRE</button>
+        <button id="btn-pubg" class="filter-btn-panel" onclick="filterPanel('PUBG')">PUBG</button>
+        <button id="btn-8ball" class="filter-btn-panel" onclick="filterPanel('8 BALL')">8 BALL</button>
+        <button id="btn-sertifikat" class="filter-btn-panel" onclick="filterPanel('SERTIFIKAT IOS')">SERTIFIKAT IOS</button>
+      </div>
+      <div id="produkManager" class="grid grid-cols-2 gap-2"></div>
+    </div>
+
+    <!-- FORM PESAN -->
+    <div class="card">
+      <h2 class="font-bold mb-3">+ Tambah Pesanan Baru</h2>
+      <input id="nama" type="text" placeholder="Nama Pembeli" class="input">
+      <input id="nohp" type="text" placeholder="No WA 08xxx" class="input">
+      <p class="mb-2 font-semibold">Pilih Produk:</p>
+      <div id="produkList" class="flex flex-wrap mb-3"></div>
+      <input id="produk" type="hidden">
+      <input id="key" type="text" placeholder="Key / Kode - isi nanti saat selesai" class="input">
+      <button onclick="tambahOrder()" class="btn btn-tambah">SIMPAN PESAN</button>
+    </div>
+
+    <!-- SEARCH + EXPORT + BROADCAST + HAPUS SEMUA -->
+    <div class="card">
+      <input id="searchInput" type="text" onkeyup="render()" placeholder="🔍 Cari berdasarkan No WA / Nama / Produk" class="input mb-2">
+      <div class="grid grid-cols-3 gap-2">
+        <button onclick="exportExcel()" class="btn btn-excel">📊 EXCEL</button>
+        <button onclick="broadcastWA()" class="btn btn-broadcast">📢 BROADCAST</button>
+        <button onclick="hapusSemua()" class="btn btn-danger">🗑️ HAPUS</button>
+      </div>
+    </div>
+
+    <!-- LIST PESAN -->
+    <h2 class="font-bold mb-3">Daftar Pesanan</h2>
+    <div id="listOrder"></div>
+    <button onclick="logout()" class="btn bg-red-600 w-full mt-4">LOGOUT</button>
+  </div>
 </div>
-
-<div id="overlay" class="overlay" onclick="toggleMenu()"></div>
-<div id="sideMenu" class="side-menu">
-  <h3 class="text-xl font-bold mb-2 text-center">MENU</h3>
-  <a onclick="showPage('home');toggleMenu()">Home</a>
-  <a onclick="showPage('faq');toggleMenu()">FAQ</a>
-  <a href="https://wa.me/6285194336082" target="_blank">CS WhatsApp</a>
-  <a href="https://whatsapp.com/channel/0029VbCXLJx9hXF9QRZdRr12" target="_blank">Saluran WA</a>
-  <a href="https://t.me/nielllofcbinn" target="_blank">Telegram</a>
-</div>
-
-<div id="home" class="page active">
-  <div class="banner">
-    <img src="https://i.ibb.co.com/bMC635bG/F801-F624-F654-4-C43-9-F6-A-DC4416894-BA5.png" class="active">
-    <img src="https://i.ibb.co.com/d0Jb0TbJ/AB94-CFF3-E55-A-44-AB-8-CDE-D334337-B5-A92.png">
-    <img src="https://i.ibb.co.com/Gvfn9RBm/2-F44-B3-A4-A822-46-A8-B171-62-BABD63-AA2-D.png">
-    <div class="dots"><span class="dot active"></span><span class="dot"></span><span class="dot"></span></div>
-  </div>
-
-  <div class="p-3 flex gap-2 overflow-x-auto">
-    <button id="btn-semua" class="filter-btn active" onclick="filterProduk('semua')">SEMUA</button>
-    <button id="btn-freefire" class="filter-btn" onclick="filterProduk('freefire')">FREE FIRE</button>
-    <button id="btn-pubg" class="filter-btn" onclick="filterProduk('pubg')">PUBG</button>
-    <button id="btn-8ball" class="filter-btn" onclick="filterProduk('8ball')">8 BALL</button>
-    <button id="btn-sertifikat" class="filter-btn" onclick="filterProduk('sertifikat')">SERTIFIKAT IOS</button>
-  </div>
-
-  <div class="px-3 flex gap-2">
-    <a href="https://wa.me/6285194336082" target="_blank" class="w-full bg-green-500 py-2 rounded text-center font-bold text-sm">💬 ORDER ADMIN</a>
-    <a href="https://whatsapp.com/channel/0029VbCXLJx9hXF9QRZdRr12" target="_blank" class="w-full bg-blue-600 py-2 rounded text-center font-bold text-sm">📢 SALURAN</a>
-    <a href="https://t.me/nielllofcbinn" target="_blank" class="w-full bg-sky-500 py-2 rounded text-center font-bold text-sm">✈️ TELEGRAM</a>
-  </div>
-
-  <h3 class="px-3 font-bold text-lg italic mt-4">Produk</h3>
-  <div id="produkGrid" class="grid grid-cols-2 gap-3 p-3 pb-10"><div class="loading col-span-2">⏳ Loading produk...</div></div>
-</div>
-
-<div id="detail" class="page">
-  <div class="p-3 flex items-center gap-2 cursor-pointer" onclick="showPage('home')">← <b>KEMBALI</b></div>
-  <div class="p-3 pb-10">
-    <img id="detailImg" class="w-full h-48 object-cover bg-black rounded-2xl border-blue-500">
-    <h2 id="detailNama" class="text-2xl font-bold mt-2 italic"></h2>
-    <p id="detailGame" class="text-cyan-400 text-sm font-bold"></p>
-    <p id="detailDesc" class="text-xs text-gray-300 mt-2"></p>
-    <div class="mt-3"><label class="text-sm font-bold">1. NO WHATSAPP AKTIF</label><input id="nohp" type="number" placeholder="0812xxxx" class="input mt-1"></div>
-    <div class="mt-3"><label class="text-sm font-bold">2. PILIH DURASI</label><div id="durasiGrid" class="grid grid-cols-2 gap-2 mt-1"></div></div>
-    <button onclick="orderWA()" class="w-full bg-green-500 py-3 rounded mt-4 font-bold">ORDER VIA WHATSAPP</button>
-  </div>
-</div>
-
-<div id="faq" class="page"><div class="p-4 pb-10">
-  <h2 class="text-2xl font-bold mb-4 italic">FAQ</h2>
-  <div class="faq-box"><b>Q: Gimana cara order?</b><p class="text-sm text-gray-300">A: Klik tombol Order, isi no WA + pilih durasi, otomatis ke WA admin</p></div>
-  <div class="faq-box"><b>Q: Pembayaran kemana?</b><p class="text-sm text-gray-300">A: Dana, Ovo, QRIS. Admin kirim setelah bayar</p></div>
-  <div class="faq-box"><b>Q: Garansi?</b><p class="text-sm text-gray-300">A: Ada garansi ganti jika cheat tidak bisa dipakai saat masa aktif</p></div>
-  <div class="faq-box"><b>Q: Proses berapa lama?</b><p class="text-sm text-gray-300">A: 1-5 menit setelah pembayaran</p></div>
-</div></div>
 
 <script>
-const SHEET_URL = "https://sheetdb.io/api/v1/nic3xbjpcwkqq";
-let produk = {};
-let produkAktif = ""; let durasiAktif = {};
-const NO_WA = "6285194336082";
+const PASS_ADMIN = "220230";
+const LINK_GRUP = "https://chat.whatsapp.com/I3BS5SHHTmHAms0r8Augvw"; 
+const LINK_SALURAN = "https://whatsapp.com/channel/0029VbCXLJx9hXF9QRZdRr12";
 
-function toggleMenu(){ document.getElementById('sideMenu').classList.toggle('active'); document.getElementById('overlay').classList.toggle('active'); }
-function showPage(id){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+let produkData = JSON.parse(localStorage.getItem('produk_status_v9')) || [
+  {nama:"migul", on:true, game:"FREE FIRE"},
+  {nama:"hg proxy", on:true, game:"FREE FIRE"}, 
+  {nama:"silent cheat", on:true, game:"FREE FIRE"},
+  {nama:"drip", on:true, game:"FREE FIRE"}, 
+  {nama:"fluorite", on:false, game:"FREE FIRE"},
+  {nama:"gbox/esing", on:true, game:"SERTIFIKAT IOS"}, 
+  {nama:"king mod", on:false, game:"PUBG"},
+  {nama:"solana hax", on:true, game:"PUBG"}, 
+  {nama:"migul proxy", on:true, game:"FREE FIRE"}, 
+  {nama:"drip proxy", on:true, game:"FREE FIRE"},
+  {nama:"hg apk mod", on:true, game:"FREE FIRE"},
+  {nama:"prime hook", on:true, game:"FREE FIRE"},
+  {nama:"fluorite 8ball", on:true, game:"8 BALL"},
+  {nama:"king of shots basic", on:true, game:"8 BALL"},
+  {nama:"king of shots mod", on:true, game:"8 BALL"},
+  {nama:"king of shots premium", on:true, game:"8 BALL"},
+  {nama:"wizard 8ball", on:true, game:"8 BALL"}
+];
+
+let orders = JSON.parse(localStorage.getItem('panel_orders_v9')) || [];
+let produkPilih = '';
+let filterAktif = 'semua';
+
+function loginAdmin(){
+  if(document.getElementById('passAdmin').value == PASS_ADMIN){
+    document.getElementById('loginBox').classList.add('hidden');
+    document.getElementById('panelBox').classList.remove('hidden');
+    renderProdukManager(); renderProduk(); render();
+  } else { alert('Password salah!'); }
 }
-function filterProduk(kategori){ document.querySelectorAll('.filter-btn').forEach(btn=>btn.classList.remove('active')); document.getElementById('btn-'+kategori).classList.add('active'); renderProduk(kategori); }
-function pilihDurasi(el, i){ if(el.classList.contains('disabled')) return; document.querySelectorAll('.durasi-btn').forEach(e=>e.classList.remove('active')); el.classList.add('active'); durasiAktif = produk[produkAktif].durasi[i]; }
-function renderProduk(kategori = 'semua'){
-  const grid = document.getElementById('produkGrid'); grid.innerHTML = "";
-  for(let key in produk){
-    if(kategori == 'semua' || produk[key].kategori == kategori){
-      grid.innerHTML += `<div class="card" onclick="showProduct('${key}')"><img src="${produk[key].img}"><p class="text-base font-bold italic">${produk[key].nama}</p><p class="text-xs text-gray-400">${produk[key].game}</p></div>`;
-    }
+function logout(){ location.reload(); }
+function saveProduk(){ localStorage.setItem('produk_status_v9', JSON.stringify(produkData)); }
+function save(){ localStorage.setItem('panel_orders_v9', JSON.stringify(orders)); render(); }
+
+function toggleProduk(nama){
+  const p = produkData.find(x=>x.nama==nama);
+  p.on = !p.on; saveProduk(); renderProdukManager(); renderProduk();
+}
+
+function filterPanel(game){
+  filterAktif = game;
+  document.querySelectorAll('.filter-btn-panel').forEach(b=>b.classList.remove('active'));
+  document.getElementById('btn-'+game.toLowerCase().replace(/ /g, '')).classList.add('active');
+  renderProdukManager();
+}
+
+function renderProdukManager(){
+  const wrap = document.getElementById('produkManager');
+  wrap.innerHTML = '';
+  let dataFilter = produkData;
+  if(filterAktif != 'semua'){
+    dataFilter = produkData.filter(p => p.game == filterAktif);
   }
+  dataFilter.forEach(p=>{
+    wrap.innerHTML += `
+    <div class="produk-card">
+      <div class="indicator ${p.on?'on':'off'}"></div>
+      <p class="font-bold text-sm">${p.nama}</p>
+      <span class="game-tag">${p.game}</span>
+      <button onclick="toggleProduk('${p.nama}')" class="toggle-btn ${p.on?'bg-green-600':'bg-red-600'} w-full">
+        ${p.on?'ON':'OFF'}
+      </button>
+    </div>`;
+  });
+  document.getElementById('totalOn').innerText = produkData.filter(p=>p.on).length;
+  document.getElementById('totalOff').innerText = produkData.filter(p=>!p.on).length;
 }
-function showProduct(key){ produkAktif = key; const p = produk[key]; document.getElementById('detailImg').src = p.img; document.getElementById('detailNama').innerText = p.nama; document.getElementById('detailGame').innerText = p.game; document.getElementById('detailDesc').innerText = p.desc; let grid = ""; p.durasi.forEach((d,i)=>{ if(d.harga == "habis"){ grid += `<div class="durasi-btn disabled">${d.label}<br><b class="stok-habis">STOK HABIS</b></div>`; } else { grid += `<div class="durasi-btn" onclick="pilihDurasi(this, ${i})">${d.label}<br><b>Rp${d.harga.toLocaleString('id')}</b></div>`; } }); document.getElementById('durasiGrid').innerHTML = grid; durasiAktif = {}; showPage('detail'); }
 
-async function orderWA(){
+function renderProduk(){
+  const wrap = document.getElementById('produkList');
+  wrap.innerHTML = '';
+  produkData.filter(p=>p.on).forEach(p=>{
+    wrap.innerHTML += `<button type="button" onclick="pilihProduk('${p.nama}')" class="produk-btn">${p.nama} <span class="text-xs text-cyan-400">[${p.game}]</span></button>`;
+  });
+}
+
+function pilihProduk(p){
+  produkPilih = p; document.getElementById('produk').value = p;
+  document.querySelectorAll('.produk-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+function tambahOrder(){
+  const nama = document.getElementById('nama').value;
   const nohp = document.getElementById('nohp').value;
-  if(!nohp || nohp.length < 10){ alert('Isi No WA yang bener!'); return; }
-  if(!durasiAktif.label){ alert('Pilih Durasi dulu!'); return; }
-  let pesan = `Halo Admin NIELofc%0AProduk: ${produk[produkAktif].nama}%0ADurasi: ${durasiAktif.label}%0ANo WA: ${nohp}`;
-  window.open(`https://wa.me/${NO_WA}?text=${pesan}`, '_blank');
+  const produk = document.getElementById('produk').value;
+  const key = document.getElementById('key').value;
+  if(!nama || !nohp || !produk){ alert('Lengkapi Nama, No WA, dan Pilih Produk!'); return; }
+  orders.unshift({id:Date.now(), nama, nohp, produk, key, status:'pending', tanggal:new Date().toLocaleString('id')});
+  save();
+  document.getElementById('nama').value=''; document.getElementById('nohp').value=''; 
+  document.getElementById('produk').value=''; produkPilih=''; document.querySelectorAll('.produk-btn').forEach(b=>b.classList.remove('active'));
 }
 
-async function loadProdukDariSheet() {
-  try {
-    let res = await fetch(SHEET_URL); let rows = await res.json(); produk = {};
-    rows.forEach(row => {
-      let nama = row.Produk; let durasi = row.Durasi; let harga = row.Harga; let stok = row.Stok;
-      let kategori = row.Kategori || "freefire"; let gambar = row.Gambar || "https://i.ibb.co.com/fdSbRZws/D59-B08-CC-71-D9-4-CAC-9-A24-68-F271078-F7-B.png";
-      let deskripsi = row.Deskripsi || "Produk digital";
-      let keyProduk = nama.toLowerCase().replace(/ /g, "");
-      if(!produk[keyProduk]){ produk[keyProduk] = {nama: nama, img: gambar, kategori: kategori.toLowerCase(), game: kategori.toUpperCase(), desc: deskripsi, durasi: []} }
-      produk[keyProduk].durasi.push({label: durasi, harga: parseInt(stok) === 0? "habis" : parseInt(harga)})
-    });
-    renderProduk('semua');
-  } catch(err){ document.getElementById('produkGrid').innerHTML = '<p class="col-span-2 text-center text-red-400">Error: Cek sheetdb.io</p>'; }
+function copyKey(key){
+  navigator.clipboard.writeText(key);
+  alert('✅ Key berhasil di copy: ' + key);
 }
 
-let slideIndex = 0; function showSlide(){ const slides = document.querySelectorAll('.banner img'); const dots = document.querySelectorAll('.dot'); if(slides.length==0)return; slides.forEach(s=>s.classList.remove('active')); dots.forEach(d=>d.classList.remove('active')); slideIndex = (slideIndex + 1) % slides.length; slides[slideIndex].classList.add('active'); dots[slideIndex].classList.add('active'); } setInterval(showSlide, 3000);
+function prosesWA(id){
+  const o = orders.find(x=>x.id==id); o.status='proses';
+  const nomor = '62' + o.nohp.replace(/[^0-9]/g,'').replace(/^0/, '');
+  const pesan = `Halo ya 👋😁%0A%0ATerima kasih sudah order *${o.produk}* ✅🔥%0A%0A⏳ Pesanan kamu sedang KAMI PROSES %0AMohon tunggu sebentar ya 🙏💙%0A%0A     🟢 Admin NIELofc`;
+  window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank'); save();
+}
 
-window.onload = function(){ loadProdukDariSheet(); };
+function selesaiWA(id){
+  const o = orders.find(x=>x.id==id);
+  const keyBaru = document.getElementById('keyInput'+id).value;
+  if(!keyBaru){ alert('Isi key dulu!'); return; }
+  o.status='selesai'; o.key=keyBaru;
+  const nomor = '62' + o.nohp.replace(/[^0-9]/g,'').replace(/^0/, '');
+  const pesan = `✅ *PESAN SELESAI* ✅%0A%0A*Produk:* ${o.produk}%0A*KEY AKTIF:* \`${keyBaru}\`%0A%0A⚠️ *NOTE PENTING:*%0A1 KEY UNTUK 1 HP/DEVICE SAJA ‼️%0AJANGAN BERIKAN KEY KEPADA SIAPUN%0A%0A📢 *Join Grup Update:*%0A${LINK_GRUP}%0A%0A📢 *Follow Saluran Info:*%0A${LINK_SALURAN}%0A%0ATerima kasih sudah order di NIELofc 🙏💙`;
+  window.open(`https://wa.me/${nomor}?text=${pesan}`, '_blank'); save();
+}
+
+function hapus(id){ if(confirm('Yakin hapus?')){ orders = orders.filter(x=>x.id!=id); save(); } }
+function hapusSemua(){ if(confirm('YAKIN MAU HAPUS SEMUA DATA?')){ orders = []; save(); alert('✅ Semua data berhasil dihapus'); } }
+
+function exportExcel(){
+  if(orders.length == 0){ alert('Belum ada data untuk di export'); return; }
+  const data = orders.map(o => ({
+    'Tanggal': o.tanggal, 'Nama': o.nama, 'No WA': o.nohp,
+    'Produk': o.produk, 'Key': o.key || '-', 'Status': o.status
+  }));
+  const ws = XLSX.utils.json_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Data Pesanan");
+  XLSX.writeFile(wb, `Data-Pesanan-NIELofc-${new Date().toISOString().slice(0,10)}.xlsx`);
+  alert('✅ File Excel berhasil di download');
+}
+
+// FUNGSI BROADCAST VERSI AMAN 1 PER 1
+function broadcastWA(){
+  if(orders.length == 0){ alert('Belum ada data buyer'); return; }
+  
+  let pesan = prompt("Masukkan pesan broadcast:", "🔥 INFO PENTING 🔥\n\nRestock key baru sudah masuk!\nCek panel sekarang ya bosku 🙏\n\nAdmin NIELofc");
+  
+  if(pesan == null || pesan == "") return;
+
+  let uniqueNomor = [...new Set(orders.map(o => '62' + o.nohp.replace(/[^0-9]/g,'').replace(/^0/, '')))];
+  
+  let i = 0;
+  function kirimBerikutnya(){
+    if(i >= uniqueNomor.length){
+      alert("✅ Selesai broadcast ke " + uniqueNomor.length + " nomor");
+      return;
+    }
+
+    let nomor = uniqueNomor[i];
+    let url = `https://wa.me/${nomor}?text=${encodeURIComponent(pesan)}`;
+    window.open(url, '_blank');
+
+    i++;
+    setTimeout(() => {
+      if(confirm(`Sudah kirim ke ${i}/${uniqueNomor.length} orang. \n\nKlik OK untuk lanjut ke nomor berikutnya`)){
+        kirimBerikutnya();
+      } else {
+        alert("Broadcast dihentikan di nomor ke " + i);
+      }
+    }, 1500);
+  }
+  alert(`Akan kirim ke ${uniqueNomor.length} nomor.\n\nTips: Kirim > Balik ke panel > Klik OK > Ulangi`);
+  kirimBerikutnya();
+}
+
+function render(){
+  const wrap = document.getElementById('listOrder');
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  let data = orders.filter(o => 
+    o.nohp.toLowerCase().includes(search) || 
+    o.nama.toLowerCase().includes(search) || 
+    o.produk.toLowerCase().includes(search)
+  );
+  document.getElementById('totalAll').innerText = orders.length;
+
+  if(data.length==0){ wrap.innerHTML='<p class="text-gray-400 text-center">Data tidak ditemukan</p>'; return; }
+  wrap.innerHTML='';
+  data.forEach(o=>{
+    const nomor = '62' + o.nohp.replace(/[^0-9]/g,'').replace(/^0/, '');
+    let statusClass = o.status=='pending'?'pending':o.status=='proses'?'proses':'selesai';
+    wrap.innerHTML += `
+    <div class="card">
+      <div class="flex justify-between"><p class="font-bold text-lg">${o.produk}</p><span class="status ${statusClass}">${o.status}</span></div>
+      <p class="text-sm">Nama: <b>${o.nama}</b></p>
+      <p class="text-sm">WA: <b>${o.nohp}</b></p>
+      <p class="text-xs text-gray-400">${o.tanggal}</p>
+      ${o.key ? `<div class="flex gap-2 mt-1 items-center"><p class="text-sm text-green-400">Key: ${o.key}</p><button onclick="copyKey('${o.key}')" class="btn btn-copy text-xs px-2 py-1">COPY</button></div>` : ''}
+      <div class="mt-3 space-y-2">
+        ${o.status=='pending'? `<button onclick="prosesWA(${o.id})" class="btn btn-proses">1. PROSES + KIRIM WA</button>` : ''}
+        ${o.status!='selesai'? `<input id="keyInput${o.id}" type="text" placeholder="Tempel Key Disini" class="input"><button onclick="selesaiWA(${o.id})" class="btn btn-selesai">2. SELESAI + KIRIM KEY + LINK</button>` : ''}
+        <a href="https://wa.me/${nomor}" target="_blank" class="btn" style="background:#22C55E;display:block;text-align:center">CHAT LANGSUNG</a>
+        <button onclick="hapus(${o.id})" class="btn btn-hapus w-full">HAPUS</button>
+      </div>
+    </div>`;
+  });
+}
 </script>
 </body>
 </html>

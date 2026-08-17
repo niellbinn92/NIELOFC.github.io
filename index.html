@@ -45,7 +45,7 @@
     position: relative;
     width: 80px;
     height: 80px;
-    margin: 0 auto 32px;
+    margin: 0 auto 28px;
   }
   .spinner {
     width: 80px;
@@ -86,19 +86,36 @@
     color: #9CA3AF;
     line-height: 1.7;
     max-width: 360px;
-    margin: 0 auto 12px;
+    margin: 0 auto 28px;
   }
 
-  .estimasi {
-    display: inline-block;
-    background: rgba(124, 58, 237, 0.15);
-    border: 1px solid rgba(168, 85, 247, 0.35);
-    color: #C084FC;
-    font-size: 13px;
-    font-weight: 600;
-    padding: 8px 18px;
-    border-radius: 50px;
+  /* Countdown */
+  .countdown {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
     margin-bottom: 32px;
+  }
+  .time-box {
+    background: rgba(124, 58, 237, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 14px;
+    padding: 12px 10px;
+    min-width: 70px;
+  }
+  .time-box .number {
+    font-size: 26px;
+    font-weight: 800;
+    color: #C084FC;
+    line-height: 1.2;
+  }
+  .time-box .label {
+    font-size: 11px;
+    color: #9CA3AF;
+    font-weight: 600;
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
   }
 
   .btn {
@@ -162,8 +179,20 @@
       Mohon bersabar — kami akan segera kembali!
     </p>
 
-    <div class="estimasi">
-      ⏱ Estimasi: 1–2 Jam
+    <!-- COUNTDOWN -->
+    <div class="countdown">
+      <div class="time-box">
+        <div class="number" id="hours">00</div>
+        <div class="label">Jam</div>
+      </div>
+      <div class="time-box">
+        <div class="number" id="minutes">00</div>
+        <div class="label">Menit</div>
+      </div>
+      <div class="time-box">
+        <div class="number" id="seconds">00</div>
+        <div class="label">Detik</div>
+      </div>
     </div>
 
     <a href="https://wa.me/6285194336082" class="btn">
@@ -175,6 +204,41 @@
   <div class="footer">
     © 2026 <span>NIELofc</span> — Powered by <span>NIELofc Team</span>
   </div>
+
+<script>
+  // ==============================
+  // ATUR WAKTU SELESAI MAINTENANCE DI SINI
+  // Format: Tahun, Bulan (0-11), Tanggal, Jam, Menit
+  // Contoh di bawah = 2 jam dari sekarang
+  // ==============================
+  const selesai = new Date().getTime() + (2 * 60 * 60 * 1000); // 2 jam dari sekarang
+
+  // Kalau mau set waktu pasti, contoh:
+  // const selesai = new Date(2026, 7, 17, 20, 0, 0).getTime(); // 17 Agustus 2026 jam 20:00
+
+  function updateCountdown() {
+    const sekarang = new Date().getTime();
+    const jarak = selesai - sekarang;
+
+    if (jarak <= 0) {
+      document.getElementById("hours").innerText = "00";
+      document.getElementById("minutes").innerText = "00";
+      document.getElementById("seconds").innerText = "00";
+      return;
+    }
+
+    const jam = Math.floor(jarak / (1000 * 60 * 60));
+    const menit = Math.floor((jarak % (1000 * 60 * 60)) / (1000 * 60));
+    const detik = Math.floor((jarak % (1000 * 60)) / 1000);
+
+    document.getElementById("hours").innerText = jam.toString().padStart(2, "0");
+    document.getElementById("minutes").innerText = menit.toString().padStart(2, "0");
+    document.getElementById("seconds").innerText = detik.toString().padStart(2, "0");
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+</script>
 
 </body>
 </html>

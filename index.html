@@ -1,118 +1,311 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NIEL RESELER — Free Fire Cheat</title>
+
+  <title>NIELSTORE — Gaming Store</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-  <!-- PASSWORD LOCK -->
-  <div id="lockScreen" class="lock-screen">
-    <div class="lock-box">
-      <div class="lock-logo">NIEL<span>RESELER</span></div>
-      <p class="lock-desc">Masukkan password untuk akses</p>
-      <input type="password" id="passInput" class="lock-input" placeholder="Password" autocomplete="off">
-      <p class="lock-error hidden" id="lockError">Password salah</p>
-      <button class="lock-btn" onclick="checkPassword()">Masuk</button>
-    </div>
-  </div>
+  <!-- =========================
+       LOADING SCREEN
+  ========================== -->
 
-  <!-- LOADING -->
-  <div id="loadingScreen" class="loading-overlay hidden">
+  <div id="loadingScreen" class="loading-overlay">
     <div class="spinner"></div>
-    <p class="loading-text">Memuat produk...</p>
+    <p class="loading-text">Memuat NIELSTORE...</p>
   </div>
 
-  <!-- MAIN APP -->
-  <div id="mainApp" class="hidden">
-    <nav class="navbar">
-      <div class="nav-inner">
-        <div class="logo">NIEL<span>RESELER</span></div>
-        <div class="nav-links">
-          <a href="#" class="active" onclick="showCatalog(); return false;">Home</a>
-          <a href="#" onclick="showCatalog(); return false;">Produk</a>
-          <a href="#">Cek Pesanan</a>
-        </div>
-      </div>
-    </nav>
+  <!-- =========================
+       MAIN APP
+  ========================== -->
 
-    <main id="catalogView">
-      <div class="container">
-        <div class="filter-tabs">
-          <button class="tab active" data-filter="all" onclick="filterProducts('all')">Semua</button>
-          <button class="tab" data-filter="android" onclick="filterProducts('android')">Android</button>
-          <button class="tab" data-filter="ios" onclick="filterProducts('ios')">iOS</button>
-        </div>
-        <div class="product-grid" id="productGrid"></div>
-      </div>
-    </main>
+  <div id="mainApp">
 
-    <main id="detailView" class="hidden">
-      <div class="container detail-container">
-        <button class="back-btn" onclick="showCatalog()">← Kembali</button>
-        <div class="detail-layout">
-          <div class="detail-left">
-            <div class="detail-image" id="detailImage"></div>
-            <h1 class="detail-name" id="detailName"></h1>
-            <div class="detail-meta">
-              <span class="platform-badge" id="detailPlatform"></span>
-              <span class="rating" id="detailRating"></span>
-            </div>
-            <div class="detail-desc">
-              <h3>DESKRIPSI PRODUK</h3>
-              <ul id="detailDesc"></ul>
-            </div>
-          </div>
-          <div class="detail-right">
-            <div class="order-box">
-              <div class="order-section">
-                <div class="section-title"><span class="num">1</span> PILIH NOMINAL VOUCHER</div>
-                <div class="voucher-grid" id="voucherGrid"></div>
-              </div>
-              <div class="order-section">
-                <div class="section-title"><span class="num">2</span> PILIH PEMBAYARAN</div>
-                <div class="payment-option selected">
-                  <div class="pay-left">
-                    <span class="pay-icon">⚡</span>
-                    <div>
-                      <strong>QRIS (All Payment)</strong>
-                      <small>Gopay, OVO, Dana, LinkAja, BCA, dll</small>
-                    </div>
-                  </div>
-                  <div class="pay-check">✓</div>
-                </div>
-                <div class="payment-sub">
-                  <span>QRIS Instan — via AutoGoPay</span>
-                  <span class="gratis">Biaya Admin: <b>GRATIS</b></span>
-                </div>
-              </div>
-              <button class="btn-buy-now" id="btnOrder" onclick="processOrder()">Beli Sekarang</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
+```
+<!-- NAVBAR -->
 
-    <div class="modal-overlay" id="successModal">
-      <div class="modal">
-        <div class="success-icon">✓</div>
-        <h2>Pembayaran Berhasil!</h2>
-        <p>Key kamu sudah digenerate otomatis:</p>
-        <div class="key-box">
-          <code id="generatedKey"></code>
-          <button onclick="copyKey()">Salin</button>
-        </div>
-        <p class="key-note">Simpan key ini. Jangan bagikan ke orang lain.</p>
-        <button class="btn-primary" onclick="closeSuccess()">Selesai</button>
-      </div>
+<nav class="navbar">
+
+  <div class="nav-inner">
+
+    <div class="logo">
+      NIEL<span>STORE</span>
     </div>
+
+    <div class="nav-links">
+
+      <a
+        href="#"
+        class="active"
+        onclick="showCatalog(); return false;">
+        Home
+      </a>
+
+      <a
+        href="#"
+        onclick="showCatalog(); return false;">
+        Produk
+      </a>
+
+      <a href="#">
+        Cek Pesanan
+      </a>
+
+    </div>
+
   </div>
+
+</nav>
+
+
+<!-- =========================
+     CATALOG
+========================== -->
+
+<main id="catalogView">
+
+  <div class="container">
+
+    <div class="filter-tabs">
+
+      <button
+        class="tab active"
+        data-filter="all"
+        onclick="filterProducts('all')">
+        Semua
+      </button>
+
+      <button
+        class="tab"
+        data-filter="android"
+        onclick="filterProducts('android')">
+        Android
+      </button>
+
+      <button
+        class="tab"
+        data-filter="ios"
+        onclick="filterProducts('ios')">
+        iOS
+      </button>
+
+    </div>
+
+
+    <div
+      class="product-grid"
+      id="productGrid">
+    </div>
+
+  </div>
+
+</main>
+
+
+<!-- =========================
+     PRODUCT DETAIL
+========================== -->
+
+<main
+  id="detailView"
+  class="hidden">
+
+  <div class="container detail-container">
+
+    <button
+      class="back-btn"
+      onclick="showCatalog()">
+      ← Kembali
+    </button>
+
+
+    <div class="detail-layout">
+
+      <!-- LEFT -->
+
+      <div class="detail-left">
+
+        <div
+          class="detail-image"
+          id="detailImage">
+        </div>
+
+
+        <h1
+          class="detail-name"
+          id="detailName">
+        </h1>
+
+
+        <div class="detail-meta">
+
+          <span
+            class="platform-badge"
+            id="detailPlatform">
+          </span>
+
+          <span
+            class="rating"
+            id="detailRating">
+          </span>
+
+        </div>
+
+
+        <div class="detail-desc">
+
+          <h3>
+            DESKRIPSI PRODUK
+          </h3>
+
+          <ul id="detailDesc"></ul>
+
+        </div>
+
+      </div>
+
+
+      <!-- RIGHT -->
+
+      <div class="detail-right">
+
+        <div class="order-box">
+
+
+          <!-- VOUCHER -->
+
+          <div class="order-section">
+
+            <div class="section-title">
+
+              <span class="num">
+                1
+              </span>
+
+              PILIH NOMINAL VOUCHER
+
+            </div>
+
+
+            <div
+              class="voucher-grid"
+              id="voucherGrid">
+            </div>
+
+          </div>
+
+
+          <!-- PAYMENT -->
+
+          <div class="order-section">
+
+            <div class="section-title">
+
+              <span class="num">
+                2
+              </span>
+
+              PEMBAYARAN
+
+            </div>
+
+
+            <div class="payment-option selected">
+
+              <div class="pay-left">
+
+                <span class="pay-icon">
+                  ⚡
+                </span>
+
+                <div>
+
+                  <strong>
+                    QRIS
+                  </strong>
+
+                  <small>
+                    All Payment
+                  </small>
+
+                </div>
+
+              </div>
+
+
+              <div class="pay-check">
+                ✓
+              </div>
+
+            </div>
+
+
+            <div class="payment-sub">
+
+              <span>
+                Pembayaran otomatis via AutoGoPay
+              </span>
+
+              <span class="gratis">
+                Admin:
+                <b>GRATIS</b>
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- BUY BUTTON -->
+
+          <button
+            class="btn-buy-now"
+            id="btnOrder"
+            onclick="processOrder()">
+
+            Beli Sekarang
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<!-- =========================
+     MODAL
+========================== -->
+
+<div
+  class="modal-overlay"
+  id="successModal">
+</div>
+```
+
+  </div>
+
+  <!-- SCRIPT -->
 
   <script src="script.js"></script>
+
 </body>
 </html>

@@ -1,12 +1,28 @@
-const SHEET_CSV =
+/* =========================================================
+NIELSTORE
+GitHub Pages + Vercel Backend
+========================================================= */
+
+/* =========================================================
+URL BACKEND VERCEL
+========================================================= */
+
+const API_BASE =
+"https://nielofc-github-io.vercel.app";
+
+/* =========================================================
+GOOGLE SHEETS
+========================================================= */
+
 const SHEET_CSV =
 "https://docs.google.com/spreadsheets/d/1pjhTWEDAev2SkOyvkBkysL45X55GQUKGaBbEDe36P4g/export?format=csv";
 
-/* =========================
+/* =========================================================
 PRODUCT IMAGES
-========================= */
+========================================================= */
 
 const PRODUCT_IMAGES = {
+
 "DRIP CLIENT":
 "https://i.ibb.co/fdSbRZws/D59-B08-CC-71-D9-4-CAC-9-A24-68-F271078-F7-B.png",
 
@@ -18,13 +34,15 @@ const PRODUCT_IMAGES = {
 
 "HG PROXY":
 "https://i.ibb.co/Gv20LMPL/IMG-7800.png"
+
 };
 
-/* =========================
-FALLBACK LOGO
-========================= */
+/* =========================================================
+LOGO FALLBACK
+========================================================= */
 
 const LOGO_FALLBACK = {
+
 "DRIP CLIENT": {
 logo: "DRIP",
 color: "#e879f9"
@@ -44,14 +62,15 @@ color: "#ec4899"
 logo: "HG",
 color: "#f472b6"
 }
+
 };
 
-/* =========================
+/* =========================================================
 FALLBACK PRODUCTS
-Dipakai jika Google Sheet gagal
-========================= */
+========================================================= */
 
 const FALLBACK_PRODUCTS = [
+
 {
 id: 1,
 name: "DRIP CLIENT",
@@ -59,8 +78,7 @@ platform: "android",
 logo: "DRIP",
 logoColor: "#e879f9",
 image: PRODUCT_IMAGES["DRIP CLIENT"],
-rating: 5,
-reviews: 0,
+rating: 0,
 sold: "",
 priceFrom: 0,
 desc: [
@@ -70,7 +88,7 @@ text: "Produk DRIP CLIENT"
 },
 {
 icon: "✓",
-text: "Silakan cek harga pada pilihan voucher"
+text: "Harga akan dimuat dari katalog"
 }
 ],
 vouchers: []
@@ -83,8 +101,7 @@ platform: "android",
 logo: "DRIP",
 logoColor: "#c084fc",
 image: PRODUCT_IMAGES["DRIP PROXY"],
-rating: 5,
-reviews: 0,
+rating: 0,
 sold: "",
 priceFrom: 0,
 desc: [
@@ -94,7 +111,7 @@ text: "Produk DRIP PROXY"
 },
 {
 icon: "✓",
-text: "Silakan cek harga pada pilihan voucher"
+text: "Harga akan dimuat dari katalog"
 }
 ],
 vouchers: []
@@ -107,8 +124,7 @@ platform: "android",
 logo: "HG",
 logoColor: "#ec4899",
 image: PRODUCT_IMAGES["HG CHEAT"],
-rating: 5,
-reviews: 0,
+rating: 0,
 sold: "",
 priceFrom: 0,
 desc: [
@@ -118,7 +134,7 @@ text: "Produk HG CHEAT"
 },
 {
 icon: "✓",
-text: "Silakan cek harga pada pilihan voucher"
+text: "Harga akan dimuat dari katalog"
 }
 ],
 vouchers: []
@@ -131,8 +147,7 @@ platform: "android",
 logo: "HG",
 logoColor: "#f472b6",
 image: PRODUCT_IMAGES["HG PROXY"],
-rating: 5,
-reviews: 0,
+rating: 0,
 sold: "",
 priceFrom: 0,
 desc: [
@@ -142,289 +157,488 @@ text: "Produk HG PROXY"
 },
 {
 icon: "✓",
-text: "Silakan cek harga pada pilihan voucher"
+text: "Harga akan dimuat dari katalog"
 }
 ],
 vouchers: []
 }
+
 ];
 
-/* =========================
+/* =========================================================
 GLOBAL
-========================= */
+========================================================= */
 
-let products = [];
-let currentProduct = null;
-let selectedVoucher = null;
-let currentFilter = "all";
+let products =
+FALLBACK_PRODUCTS.slice();
 
-let currentTransactionId = null;
-let paymentCheckTimer = null;
-let orderProcessing = false;
+let currentProduct =
+null;
 
-/* =========================
-LOADING
-========================= */
+let selectedVoucher =
+null;
 
-function showLoading() {
-const el = document.getElementById("loadingScreen");
+let currentFilter =
+"all";
 
-if (el) {
-el.classList.remove("hidden");
-}
-}
+let currentTransactionId =
+null;
 
-function hideLoading() {
-const el = document.getElementById("loadingScreen");
+let paymentCheckTimer =
+null;
 
-if (el) {
-el.classList.add("hidden");
-}
-}
+let orderProcessing =
+false;
 
-/* =========================
-START APP
-========================= */
+/* =========================================================
+START
+========================================================= */
 
-function startApp() {
-const app = document.getElementById("mainApp");
-
-if (app) {
-app.classList.remove("hidden");
-}
-
-showLoading();
-
-/*
-
-* Loading TIDAK BOLEH menggantung.
-* Maksimal 3 detik akan hilang walaupun
-* Google Sheet bermasalah.
-  */
-
-const loadingTimeout = setTimeout(function () {
-hideLoading();
-}, 3000);
-
-loadProducts()
-.catch(function (error) {
-console.error("Google Sheet error:", error);
-
-```
-  /*
-   * Jangan biarkan website mati.
-   * Gunakan fallback product.
-   */
-
-  if (!products.length) {
-    products = FALLBACK_PRODUCTS.slice();
-  }
-
-  renderProducts();
-})
-.finally(function () {
-  clearTimeout(loadingTimeout);
-  hideLoading();
-});
-```
-
-}
-
-/* =========================
-DOM READY
-========================= */
-
-document.addEventListener("DOMContentLoaded", function () {
-startApp();
-});
-
-/* =========================
-RUPIAH
-========================= */
-
-function formatRupiah(num) {
-return "Rp " + Number(num).toLocaleString("id-ID");
-}
-
-/* =========================
-ESCAPE HTML
-========================= */
-
-function escapeHtml(value) {
-return String(value || "")
-.replace(/&/g, "&")
-.replace(/</g, "<")
-.replace(/>/g, ">")
-.replace(/"/g, """)
-.replace(/'/g, "'");
-}
-
-/* =========================
-CSV PARSER
-========================= */
-
-function parseCSV(text) {
-const lines = text.trim().split(/\r?\n/);
-
-if (lines.length < 2) {
-return [];
-}
-
-const headers = lines[0]
-.split(",")
-.map(function (h) {
-return h.trim().replace(/^"|"$/g, "");
-});
-
-return lines
-.slice(1)
-.filter(function (line) {
-return line.trim();
-})
-.map(function (line) {
-const cols = line.split(",").map(function (c) {
-return c.trim().replace(/^"|"$/g, "");
-});
-
-```
-  const obj = {};
-
-  headers.forEach(function (h, i) {
-    obj[h] = cols[i] || "";
-  });
-
-  return obj;
-});
-```
-
-}
-
-/* =========================
-LOAD PRODUCTS
-========================= */
-
-async function loadProducts() {
-try {
+document.addEventListener(
+"DOMContentLoaded",
+function () {
 
 ```
 /*
- * Timeout request 5 detik.
- * Jadi Google Sheet tidak bisa bikin
- * website loading terus.
+ * LANGSUNG TAMPIL
  */
 
-const controller = new AbortController();
+hideLoading();
 
-const timeout = setTimeout(function () {
-  controller.abort();
-}, 5000);
+renderProducts();
 
+/*
+ * Sheet diproses di background.
+ * Tidak menghambat website.
+ */
 
-let res;
+loadProductsBackground();
+```
+
+}
+);
+
+/* =========================================================
+LOADING
+========================================================= */
+
+function hideLoading() {
+
+const el =
+document.getElementById(
+"loadingScreen"
+);
+
+if (!el) {
+return;
+}
+
+el.classList.add(
+"hidden"
+);
+
+el.style.display =
+"none";
+
+}
+
+/* =========================================================
+SHEET BACKGROUND
+========================================================= */
+
+async function loadProductsBackground() {
+
+const controller =
+new AbortController();
+
+const timeout =
+setTimeout(
+function () {
+
+```
+    controller.abort();
+
+  },
+  4000
+);
+```
 
 try {
 
-  res = await fetch(
-    SHEET_CSV + "&t=" + Date.now(),
+```
+const response =
+  await fetch(
+    SHEET_CSV +
+    "&t=" +
+    Date.now(),
     {
-      method: "GET",
-      cache: "no-store",
-      signal: controller.signal
+      cache:
+        "no-store",
+
+      signal:
+        controller.signal
     }
   );
+
+
+if (!response.ok) {
+  throw new Error(
+    "HTTP " +
+    response.status
+  );
+}
+
+
+const text =
+  await response.text();
+
+
+if (!text.trim()) {
+  throw new Error(
+    "Sheet kosong"
+  );
+}
+
+
+const rows =
+  parseCSV(text);
+
+
+const loaded =
+  convertRowsToProducts(
+    rows
+  );
+
+
+if (!loaded.length) {
+  throw new Error(
+    "Produk tidak ditemukan"
+  );
+}
+
+
+/*
+ * Data asli berhasil.
+ */
+
+products =
+  loaded;
+
+
+renderProducts();
+
+
+console.log(
+  "Google Sheet berhasil dimuat."
+);
+```
+
+} catch (error) {
+
+```
+/*
+ * Sheet error tidak masalah.
+ * NIELSTORE tetap tampil.
+ */
+
+console.warn(
+  "Google Sheet gagal:",
+  error
+);
+```
 
 } finally {
 
-  clearTimeout(timeout);
+```
+clearTimeout(
+  timeout
+);
+
+hideLoading();
+```
+
+}
+
+}
+
+/* =========================================================
+CSV PARSER
+========================================================= */
+
+function parseCSV(text) {
+
+const rows = [];
+
+let row = [];
+
+let value = "";
+
+let inQuotes =
+false;
+
+for (
+let i = 0;
+i < text.length;
+i++
+) {
+
+```
+const char =
+  text[i];
+
+const next =
+  text[i + 1];
+
+
+if (
+  char === '"' &&
+  inQuotes &&
+  next === '"'
+) {
+
+  value += '"';
+
+  i++;
+
+  continue;
 
 }
 
 
-if (!res.ok) {
-  throw new Error(
-    "Google Sheet HTTP " + res.status
+if (
+  char === '"'
+) {
+
+  inQuotes =
+    !inQuotes;
+
+  continue;
+
+}
+
+
+if (
+  char === "," &&
+  !inQuotes
+) {
+
+  row.push(
+    value.trim()
   );
+
+  value = "";
+
+  continue;
+
 }
 
 
-const text = await res.text();
+if (
+  (
+    char === "\n" ||
+    char === "\r"
+  ) &&
+  !inQuotes
+) {
+
+  if (
+    char === "\r" &&
+    next === "\n"
+  ) {
+
+    i++;
+
+  }
 
 
-if (!text || !text.trim()) {
-  throw new Error(
-    "Google Sheet kosong"
+  row.push(
+    value.trim()
   );
+
+
+  if (
+    row.some(
+      function (cell) {
+        return cell !== "";
+      }
+    )
+  ) {
+
+    rows.push(
+      row
+    );
+
+  }
+
+
+  row = [];
+
+  value = "";
+
+  continue;
+
 }
 
 
-const rows = parseCSV(text);
+value += char;
+```
 
-
-if (!rows.length) {
-  throw new Error(
-    "Data produk tidak ditemukan"
-  );
 }
 
+if (
+value !== "" ||
+row.length
+) {
 
-const loadedProducts = rows
-  .map(function (row, idx) {
+```
+row.push(
+  value.trim()
+);
+```
 
-    const name =
-      (row.name || "")
-        .trim()
-        .toUpperCase();
+}
+
+if (row.length) {
+rows.push(row);
+}
+
+if (rows.length < 2) {
+return [];
+}
+
+const headers =
+rows[0].map(
+function (header) {
+
+```
+    return String(header)
+      .trim()
+      .toLowerCase();
+
+  }
+);
+```
+
+return rows
+.slice(1)
+.map(
+function (cells) {
+
+```
+    const obj = {};
 
 
-    if (!name) {
-      return null;
-    }
+    headers.forEach(
+      function (
+        header,
+        index
+      ) {
+
+        obj[header] =
+          cells[index] || "";
+
+      }
+    );
 
 
-    const platform =
-      (row.platform || "android")
-        .toLowerCase()
-        .trim();
+    return obj;
+
+  }
+);
+```
+
+}
+
+/* =========================================================
+CONVERT SHEET ROWS
+========================================================= */
+
+function convertRowsToProducts(
+rows
+) {
+
+const result = [];
+
+rows.forEach(
+function (
+row,
+index
+) {
+
+```
+  const name =
+    String(
+      row.name || ""
+    )
+    .trim()
+    .toUpperCase();
 
 
-    const rating =
-      parseFloat(row.rating) || 0;
+  if (!name) {
+    return;
+  }
 
 
-    const sold =
-      row.sold || "";
+  const platform =
+    String(
+      row.platform ||
+      "android"
+    )
+    .trim()
+    .toLowerCase();
 
 
-    const descRaw =
-      row.desc || "";
+  const rating =
+    parseFloat(
+      row.rating
+    ) || 0;
 
 
-    const desc = descRaw
+  const sold =
+    String(
+      row.sold || ""
+    ).trim();
+
+
+  const descRaw =
+    String(
+      row.desc || ""
+    ).trim();
+
+
+  const desc =
+    descRaw
 
       ? descRaw
           .split("|")
-          .map(function (d) {
+          .map(
+            function (text) {
 
-            return {
-              icon: "✓",
-              text: d.trim()
-            };
+              return {
+                icon: "✓",
+                text:
+                  text.trim()
+              };
 
-          })
-          .filter(function (d) {
-            return d.text;
-          })
+            }
+          )
+          .filter(
+            function (item) {
+              return item.text;
+            }
+          )
 
       : [
           {
             icon: "✓",
             text:
-              "Produk premium NIELSTORE"
+              "Produk NIELSTORE"
           }
         ];
 
 
-    const fixedCols = [
+  const fixed =
+    [
       "name",
       "platform",
       "logo",
@@ -434,34 +648,44 @@ const loadedProducts = rows
     ];
 
 
-    const vouchers = [];
+  const vouchers = [];
 
 
-    Object.keys(row).forEach(
+  Object.keys(row)
+    .forEach(
       function (key) {
 
         if (
-          fixedCols.indexOf(
+          fixed.includes(
             key.toLowerCase()
-          ) !== -1
+          )
         ) {
+
           return;
+
         }
 
 
-        const rawPrice =
-          String(row[key] || "");
+        const raw =
+          String(
+            row[key] || ""
+          ).trim();
 
 
         const price =
           parseInt(
-            rawPrice.replace(/\D/g, ""),
+            raw.replace(
+              /\D/g,
+              ""
+            ),
             10
           );
 
 
         if (
-          Number.isFinite(price) &&
+          Number.isFinite(
+            price
+          ) &&
           price > 0
         ) {
 
@@ -484,140 +708,159 @@ const loadedProducts = rows
     );
 
 
-    vouchers.sort(
-      function (a, b) {
+  vouchers.sort(
+    function (
+      a,
+      b
+    ) {
 
-        return (
-          (parseInt(a.duration) || 999) -
-          (parseInt(b.duration) || 999)
-        );
+      return (
+        (
+          parseInt(
+            a.duration
+          ) || 9999
+        ) -
+        (
+          parseInt(
+            b.duration
+          ) || 9999
+        )
+      );
 
-      }
-    );
+    }
+  );
 
 
-    const priceFrom =
-      vouchers.length
-        ? Math.min.apply(
-            null,
-            vouchers.map(function (v) {
+  const priceFrom =
+    vouchers.length
+      ? Math.min(
+          ...vouchers.map(
+            function (v) {
               return v.price;
-            })
+            }
           )
-        : 0;
+        )
+      : 0;
 
 
-    const img =
-      PRODUCT_IMAGES[name] || "";
-
-
-    const fallback =
-      LOGO_FALLBACK[name] || {
-        logo: name.slice(0, 4),
-        color: "#a855f7"
-      };
-
-
-    return {
-
-      id:
-        idx + 1,
-
-      name:
-        row.name.trim(),
-
-      platform:
-        platform,
-
+  const fallback =
+    LOGO_FALLBACK[name] ||
+    {
       logo:
-        row.logo ||
-        fallback.logo,
+        name.slice(
+          0,
+          4
+        ),
 
-      logoColor:
-        fallback.color,
-
-      image:
-        img,
-
-      rating:
-        rating,
-
-      reviews:
-        0,
-
-      sold:
-        sold,
-
-      priceFrom:
-        priceFrom,
-
-      desc:
-        desc,
-
-      vouchers:
-        vouchers
-
+      color:
+        "#a855f7"
     };
 
-  })
-  .filter(function (product) {
-    return product !== null;
+
+  result.push({
+
+    id:
+      index + 1,
+
+    name:
+      row.name.trim(),
+
+    platform:
+      platform,
+
+    logo:
+      row.logo ||
+      fallback.logo,
+
+    logoColor:
+      fallback.color,
+
+    image:
+      PRODUCT_IMAGES[name] ||
+      "",
+
+    rating:
+      rating,
+
+    sold:
+      sold,
+
+    priceFrom:
+      priceFrom,
+
+    desc:
+      desc,
+
+    vouchers:
+      vouchers
+
   });
 
-
-if (!loadedProducts.length) {
-  throw new Error(
-    "Tidak ada produk valid dari Sheet"
-  );
 }
-
-
-products =
-  loadedProducts;
-
-
-renderProducts();
 ```
 
-} catch (error) {
-
-```
-console.error(
-  "Gagal memuat Google Sheet:",
-  error
 );
 
-
-/*
- * FALLBACK
- *
- * Produk tetap ditampilkan supaya
- * NIELSTORE tidak blank.
- */
-
-products =
-  FALLBACK_PRODUCTS.slice();
-
-
-renderProducts();
-
-
-/*
- * Lempar error supaya startApp()
- * tetap tahu bahwa Sheet gagal,
- * tetapi website tidak ikut gagal.
- */
-
-throw error;
-```
+return result;
 
 }
 
+/* =========================================================
+RUPIAH
+========================================================= */
+
+function formatRupiah(
+number
+) {
+
+return (
+"Rp " +
+Number(
+number
+).toLocaleString(
+"id-ID"
+)
+);
+
 }
 
-/* =========================
-RENDER PRODUCTS
-========================= */
+/* =========================================================
+ESCAPE
+========================================================= */
+
+function escapeHtml(
+value
+) {
+
+return String(
+value || ""
+)
+.replace(
+/&/g,
+"&"
+)
+.replace(
+/</g,
+"<"
+)
+.replace(
+/>/g,
+">"
+)
+.replace(
+/"/g,
+"""
+)
+.replace(
+/'/g,
+"'"
+);
+
+}
+
+/* =========================================================
+RENDER
+========================================================= */
 
 function renderProducts() {
 
@@ -637,11 +880,13 @@ currentFilter === "all"
   ? products
 
   : products.filter(
-      function (p) {
+      function (product) {
+
         return (
-          p.platform ===
+          product.platform ===
           currentFilter
         );
+
       }
     );
 ```
@@ -650,16 +895,19 @@ if (!filtered.length) {
 
 ```
 grid.innerHTML =
+  `
+    <p
+      style="
+        color:var(--text-muted);
+        grid-column:1/-1;
+        text-align:center;
+        padding:3rem;
+      ">
 
-  '<p style="' +
-  'color:var(--text-muted);' +
-  'grid-column:1/-1;' +
-  'text-align:center;' +
-  'padding:3rem;">' +
+      Tidak ada produk.
 
-  "Tidak ada produk untuk filter ini." +
-
-  "</p>";
+    </p>
+  `;
 
 return;
 ```
@@ -668,181 +916,217 @@ return;
 
 grid.innerHTML =
 filtered
-.map(function (p) {
+.map(
+function (product) {
 
 ```
-    return (
+      return `
 
-      '<div class="product-card" ' +
-      'onclick="openDetail(' +
-      p.id +
-      ')">' +
+        <div
+          class="product-card"
+          onclick="openDetail(${product.id})">
 
+          <div
+            class="card-image ${
+              product.image
+                ? "has-img"
+                : ""
+            }"
+            style="${
+              product.image
+                ? ""
+                : "background:linear-gradient(135deg,#1a0a2e,#2d0a3a)"
+            }">
 
-        '<div class="card-image ' +
-        (p.image
-          ? "has-img"
-          : "") +
-        '" style="' +
+            <span class="platform">
 
-          (
-            p.image
-              ? ""
-              : "background:linear-gradient(135deg,#1a0a2e,#2d0a3a)"
-          ) +
+              ${escapeHtml(
+                product.platform
+                  .toUpperCase()
+              )}
 
-        '">' +
+            </span>
 
+            ${
+              product.image
 
-          '<span class="platform">' +
+                ? `
+                  <img
+                    src="${escapeHtml(
+                      product.image
+                    )}"
+                    alt="${escapeHtml(
+                      product.name
+                    )}"
+                    class="card-img"
+                    loading="lazy">
+                `
 
-          escapeHtml(
-            p.platform.toUpperCase()
-          ) +
+                : `
+                  <div
+                    class="logo-text"
+                    style="color:${product.logoColor}">
 
-          "</span>" +
+                    ${escapeHtml(
+                      product.logo
+                    )}
 
+                  </div>
+                `
+            }
 
-          (
-            p.image
-
-              ? '<img src="' +
-                escapeHtml(p.image) +
-                '" alt="' +
-                escapeHtml(p.name) +
-                '" class="card-img">'
-
-              : '<div class="logo-text" ' +
-                'style="color:' +
-                p.logoColor +
-                '">' +
-                escapeHtml(p.logo) +
-                "</div>"
-          ) +
-
-
-        "</div>" +
-
-
-        '<div class="card-body">' +
-
-
-          '<div class="card-name">' +
-
-          escapeHtml(
-            p.name
-          ) +
-
-          "</div>" +
+          </div>
 
 
-          '<div class="card-stats">' +
+          <div class="card-body">
 
-          '<span class="star">★</span> ' +
+            <div class="card-name">
 
-          (
-            p.rating
-              ? p.rating
-              : "—"
-          ) +
+              ${escapeHtml(
+                product.name
+              )}
 
-          (
-            p.sold
-              ? " · " +
-                escapeHtml(p.sold) +
-                " Terjual"
-              : ""
-          ) +
-
-          "</div>" +
+            </div>
 
 
-          '<div class="card-price">' +
+            <div class="card-stats">
 
-          "Mulai dari " +
+              <span class="star">
+                ★
+              </span>
 
-          "<strong>" +
+              ${
+                product.rating
+                  ? product.rating
+                  : "—"
+              }
 
-          (
-            p.priceFrom
-              ? formatRupiah(
-                  p.priceFrom
-                )
-              : "—"
-          ) +
+              ${
+                product.sold
+                  ? " · " +
+                    escapeHtml(
+                      product.sold
+                    ) +
+                    " Terjual"
+                  : ""
+              }
 
-          "</strong>" +
-
-          "</div>" +
-
-
-          '<button class="btn-beli" ' +
-          'onclick="event.stopPropagation();' +
-          'openDetail(' +
-          p.id +
-          ')">' +
-
-          "Beli Sekarang" +
-
-          "</button>" +
+            </div>
 
 
-        "</div>" +
+            <div class="card-price">
 
-      "</div>"
+              ${
+                product.priceFrom
+                  ? "Mulai dari "
+                  : ""
+              }
 
-    );
+              <strong>
 
-  })
+                ${
+                  product.priceFrom
+                    ? formatRupiah(
+                        product.priceFrom
+                      )
+                    : "Cek Produk"
+                }
+
+              </strong>
+
+            </div>
+
+
+            <button
+              class="btn-beli"
+              onclick="
+                event.stopPropagation();
+                openDetail(${product.id});
+              ">
+
+              Beli Sekarang
+
+            </button>
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+  )
   .join("");
 ```
 
 }
 
-/* =========================
+/* =========================================================
 FILTER
-========================= */
+========================================================= */
 
-function filterProducts(filter) {
+function filterProducts(
+filter
+) {
 
 currentFilter =
 filter;
 
 document
 .querySelectorAll(".tab")
-.forEach(function (tab) {
+.forEach(
+function (tab) {
 
 ```
-  tab.classList.toggle(
-    "active",
-    tab.dataset.filter === filter
-  );
+    tab.classList.toggle(
+      "active",
+      tab.dataset.filter ===
+      filter
+    );
 
-});
+  }
+);
 ```
 
 renderProducts();
 
 }
 
-/* =========================
-OPEN DETAIL
-========================= */
+/* =========================================================
+DETAIL
+========================================================= */
 
-function openDetail(id) {
+function openDetail(
+id
+) {
 
 currentProduct =
-products.find(function (p) {
-return p.id === id;
-});
+products.find(
+function (product) {
+
+```
+    return product.id === id;
+
+  }
+);
+```
 
 if (!currentProduct) {
+
+```
+alert(
+  "Produk tidak ditemukan."
+);
+
 return;
+```
+
 }
 
-selectedVoucher = null;
+selectedVoucher =
+null;
 
-const imgEl =
+const image =
 document.getElementById(
 "detailImage"
 );
@@ -850,42 +1134,38 @@ document.getElementById(
 if (currentProduct.image) {
 
 ```
-imgEl.style.background =
+image.style.background =
   "transparent";
 
 
-imgEl.innerHTML =
-
-  '<img src="' +
-  escapeHtml(
-    currentProduct.image
-  ) +
-  '" alt="' +
-  escapeHtml(
-    currentProduct.name
-  ) +
-  '" class="detail-img">';
+image.innerHTML =
+  `
+    <img
+      src="${escapeHtml(
+        currentProduct.image
+      )}"
+      alt="${escapeHtml(
+        currentProduct.name
+      )}"
+      class="detail-img">
+  `;
 ```
 
 } else {
 
 ```
-imgEl.style.background =
-  "linear-gradient(135deg,#1a0a2e,#2d0a3a)";
+image.innerHTML =
+  `
+    <div
+      class="logo-text"
+      style="color:${currentProduct.logoColor}">
 
+      ${escapeHtml(
+        currentProduct.logo
+      )}
 
-imgEl.innerHTML =
-
-  '<div class="logo-text" ' +
-  'style="color:' +
-  currentProduct.logoColor +
-  '">' +
-
-  escapeHtml(
-    currentProduct.logo
-  ) +
-
-  "</div>";
+    </div>
+  `;
 ```
 
 }
@@ -898,178 +1178,79 @@ currentProduct.name;
 document.getElementById(
 "detailPlatform"
 ).textContent =
-currentProduct.platform.toUpperCase();
+currentProduct.platform
+.toUpperCase();
 
 document.getElementById(
 "detailRating"
 ).innerHTML =
+` <span class="star">★</span>
+${
+currentProduct.rating
+? currentProduct.rating
+: "—"
+}
 
 ```
-'<span class="star">★</span> ' +
-
-(
-  currentProduct.rating ||
-  "—"
-) +
-
-(
-  currentProduct.sold
-    ? " · " +
-      escapeHtml(
-        currentProduct.sold
-      ) +
-      " Terjual"
-    : ""
-);
+  ${
+    currentProduct.sold
+      ? " · " +
+        escapeHtml(
+          currentProduct.sold
+        ) +
+        " Terjual"
+      : ""
+  }
+`;
 ```
 
 document.getElementById(
 "detailDesc"
 ).innerHTML =
+currentProduct.desc
+.map(
+function (item) {
 
 ```
-currentProduct.desc
+      return `
+        <li>
 
-  .map(function (d) {
+          <span
+            style="color:var(--green)">
 
-    return (
+            ✓
 
-      "<li>" +
+          </span>
 
-      '<span style="color:var(--green)">' +
+          ${escapeHtml(
+            item.text
+          )}
 
-      escapeHtml(d.icon) +
+        </li>
+      `;
 
-      "</span> " +
-
-      escapeHtml(d.text) +
-
-      "</li>"
-
-    );
-
-  })
+    }
+  )
   .join("");
 ```
 
-const voucherGrid =
-document.getElementById(
-"voucherGrid"
-);
-
-if (!currentProduct.vouchers.length) {
-
-```
-voucherGrid.innerHTML =
-
-  '<p style="color:var(--text-muted);' +
-  'font-size:.9rem;">' +
-
-  "Harga sedang tidak tersedia." +
-
-  "</p>";
-```
-
-} else {
-
-```
-voucherGrid.innerHTML =
-
-  currentProduct.vouchers
-    .map(function (v, i) {
-
-      return (
-
-        '<div class="voucher-item ' +
-
-        (!v.stock
-          ? "out-of-stock"
-          : "") +
-
-        '" data-index="' +
-        i +
-        '" ' +
-
-        (
-          v.stock
-            ? 'onclick="selectVoucher(' +
-              i +
-              ')"'
-            : ""
-        ) +
-
-        ">" +
-
-
-          '<div class="duration">' +
-
-          escapeHtml(
-            v.duration
-          ) +
-
-          "</div>" +
-
-
-          '<div class="price">' +
-
-          (
-            v.stock
-              ? formatRupiah(v.price)
-              : "—"
-          ) +
-
-          "</div>" +
-
-
-          (
-            !v.stock
-
-              ? '<div class="stock-label">' +
-                "STOK HABIS" +
-                "</div>"
-
-              : '<div class="reseller">' +
-                "HARGA RESELLER" +
-                "</div>"
-          ) +
-
-
-        "</div>"
-
-      );
-
-    })
-    .join("");
-
-
-const firstAvailable =
-  currentProduct.vouchers.findIndex(
-    function (v) {
-      return v.stock;
-    }
-  );
-
-
-if (firstAvailable >= 0) {
-  selectVoucher(
-    firstAvailable
-  );
-}
-```
-
-}
+renderVouchers();
 
 document
 .getElementById(
 "catalogView"
 )
-.classList.add("hidden");
+.classList.add(
+"hidden"
+);
 
 document
 .getElementById(
 "detailView"
 )
-.classList.remove("hidden");
+.classList.remove(
+"hidden"
+);
 
 window.scrollTo(
 0,
@@ -1078,39 +1259,145 @@ window.scrollTo(
 
 }
 
-/* =========================
-SELECT VOUCHER
-========================= */
+/* =========================================================
+VOUCHER
+========================================================= */
 
-function selectVoucher(index) {
+function renderVouchers() {
 
-if (!currentProduct) {
+const grid =
+document.getElementById(
+"voucherGrid"
+);
+
+if (!grid) {
 return;
 }
 
+if (
+!currentProduct ||
+!currentProduct.vouchers.length
+) {
+
+```
+grid.innerHTML =
+  `
+    <p
+      style="
+        color:var(--text-muted);
+        font-size:.9rem;
+      ">
+
+      Harga belum tersedia.
+
+    </p>
+  `;
+
+return;
+```
+
+}
+
+grid.innerHTML =
+currentProduct.vouchers
+.map(
+function (
+voucher,
+index
+) {
+
+```
+      return `
+
+        <div
+          class="voucher-item"
+          data-index="${index}"
+          onclick="selectVoucher(${index})">
+
+          <div class="duration">
+
+            ${escapeHtml(
+              voucher.duration
+            )}
+
+          </div>
+
+          <div class="price">
+
+            ${formatRupiah(
+              voucher.price
+            )}
+
+          </div>
+
+          <div class="reseller">
+
+            HARGA RESELLER
+
+          </div>
+
+        </div>
+
+      `;
+
+    }
+  )
+  .join("");
+```
+
+selectVoucher(0);
+
+}
+
+/* =========================================================
+SELECT VOUCHER
+========================================================= */
+
+function selectVoucher(
+index
+) {
+
+if (
+!currentProduct ||
+!currentProduct.vouchers[index]
+) {
+
+```
+return;
+```
+
+}
+
 selectedVoucher =
-currentProduct.vouchers[index];
+currentProduct.vouchers[
+index
+];
 
 document
 .querySelectorAll(
 ".voucher-item"
 )
-.forEach(function (el, i) {
+.forEach(
+function (
+item,
+itemIndex
+) {
 
 ```
-  el.classList.toggle(
-    "selected",
-    i === index
-  );
+    item.classList.toggle(
+      "selected",
+      itemIndex === index
+    );
 
-});
+  }
+);
 ```
 
 }
 
-/* =========================
-PROCESS ORDER
-========================= */
+/* =========================================================
+CREATE PAYMENT
+========================================================= */
 
 async function processOrder() {
 
@@ -1118,11 +1405,11 @@ if (orderProcessing) {
 return;
 }
 
-if (!selectedVoucher) {
+if (!currentProduct) {
 
 ```
 alert(
-  "Pilih nominal voucher dulu!"
+  "Produk tidak ditemukan."
 );
 
 return;
@@ -1130,11 +1417,11 @@ return;
 
 }
 
-if (!currentProduct) {
+if (!selectedVoucher) {
 
 ```
 alert(
-  "Produk tidak ditemukan."
+  "Pilih nominal voucher dulu!"
 );
 
 return;
@@ -1167,6 +1454,7 @@ try {
 ```
 const response =
   await fetch(
+    API_BASE +
     "/api/create-payment",
     {
 
@@ -1194,6 +1482,25 @@ const response =
 
     }
   );
+
+
+const contentType =
+  response.headers.get(
+    "content-type"
+  ) || "";
+
+
+if (
+  !contentType.includes(
+    "application/json"
+  )
+) {
+
+  throw new Error(
+    "Backend pembayaran tidak memberikan response JSON."
+  );
+
+}
 
 
 const data =
@@ -1242,7 +1549,7 @@ startPaymentPolling();
 
 ```
 console.error(
-  "Order error:",
+  "Create payment error:",
   error
 );
 
@@ -1275,155 +1582,183 @@ if (button) {
 
 }
 
-/* =========================
+/* =========================================================
 PAYMENT MODAL
-========================= */
+========================================================= */
 
-function showPaymentModal(payment) {
+function showPaymentModal(
+payment
+) {
 
 const modal =
 document.getElementById(
 "successModal"
 );
 
-if (!modal) {
-return;
-}
-
 const amount =
 payment.amount ||
-(
-selectedVoucher
-? selectedVoucher.price
-: 0
-);
-
-const checkoutUrl =
-payment.checkout_url || "";
+selectedVoucher.price;
 
 const qrUrl =
-payment.qr_url || "";
+payment.qr_url ||
+"";
+
+const checkoutUrl =
+payment.checkout_url ||
+"";
 
 const qrString =
-payment.qr_string || "";
+payment.qr_string ||
+"";
 
-let qrContent = "";
+let content =
+"";
 
 if (qrUrl) {
 
 ```
-qrContent =
-
-  '<img src="' +
-  escapeHtml(qrUrl) +
-  '" alt="QRIS" ' +
-  'style="width:260px;' +
-  'max-width:100%;' +
-  'border-radius:12px;">';
+content =
+  `
+    <img
+      src="${escapeHtml(
+        qrUrl
+      )}"
+      alt="QRIS"
+      style="
+        width:260px;
+        max-width:100%;
+        border-radius:12px;
+      ">
+  `;
 ```
 
 } else if (qrString) {
 
 ```
-qrContent =
+content =
+  `
+    <div
+      style="
+        background:#fff;
+        color:#111;
+        padding:15px;
+        border-radius:10px;
+        font-size:12px;
+        word-break:break-all;
+      ">
 
-  '<div style="' +
-  'padding:15px;' +
-  'background:#fff;' +
-  'color:#111;' +
-  'border-radius:10px;' +
-  'word-break:break-all;' +
-  'font-size:12px;">' +
+      ${escapeHtml(
+        qrString
+      )}
 
-  escapeHtml(qrString) +
-
-  "</div>";
+    </div>
+  `;
 ```
 
 } else {
 
 ```
-qrContent =
-
-  '<div style="' +
-  'padding:25px;' +
-  'color:var(--text-muted);">' +
-
-  "QRIS sedang diproses..." +
-
-  "</div>";
+content =
+  `
+    <p>
+      QRIS sedang diproses...
+    </p>
+  `;
 ```
 
 }
 
 modal.innerHTML =
+` <div class="modal">
 
 ```
-'<div class="modal">' +
+    <div
+      class="success-icon"
+      style="font-size:30px;">
 
-  '<div class="success-icon" ' +
-  'style="font-size:30px;">' +
-  "⌛" +
-  "</div>" +
+      ⌛
 
-  "<h2>Menunggu Pembayaran</h2>" +
+    </div>
 
-  "<p>Silakan selesaikan pembayaran QRIS.</p>" +
+    <h2>
+      Menunggu Pembayaran
+    </h2>
 
-  '<div style="' +
-  'margin:15px 0;' +
-  'font-size:1.25rem;' +
-  'font-weight:800;">' +
+    <p>
+      Silakan selesaikan pembayaran QRIS.
+    </p>
 
-  formatRupiah(amount) +
+    <div
+      style="
+        margin:15px 0;
+        font-size:1.25rem;
+        font-weight:800;
+      ">
 
-  "</div>" +
+      ${formatRupiah(
+        amount
+      )}
 
-  '<div style="' +
-  'display:flex;' +
-  'justify-content:center;' +
-  'margin:15px 0;">' +
+    </div>
 
-  qrContent +
+    <div
+      style="
+        display:flex;
+        justify-content:center;
+        margin:15px 0;
+      ">
 
-  "</div>" +
+      ${content}
 
-  (
-    checkoutUrl
+    </div>
 
-      ? '<a href="' +
-        escapeHtml(checkoutUrl) +
-        '" target="_blank" ' +
-        'rel="noopener noreferrer" ' +
-        'class="btn-primary" ' +
-        'style="display:block;' +
-        'text-align:center;' +
-        'text-decoration:none;' +
-        'margin-bottom:10px;">' +
+    ${
+      checkoutUrl
 
-        "Buka Halaman Pembayaran" +
+        ? `
+          <a
+            href="${escapeHtml(
+              checkoutUrl
+            )}"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn-primary"
+            style="
+              display:block;
+              text-align:center;
+              text-decoration:none;
+              margin-bottom:10px;
+            ">
 
-        "</a>"
+            Buka Pembayaran
 
-      : ""
-  ) +
+          </a>
+        `
 
-  '<p id="paymentStatusText" ' +
-  'style="color:var(--text-muted);' +
-  'font-size:.85rem;">' +
+        : ""
+    }
 
-  "Menunggu konfirmasi pembayaran..." +
+    <p
+      id="paymentStatusText"
+      style="
+        color:var(--text-muted);
+        font-size:.85rem;
+      ">
 
-  "</p>" +
+      Menunggu konfirmasi pembayaran...
 
-  '<button class="btn-primary" ' +
-  'onclick="cancelPaymentModal()">' +
+    </p>
 
-  "Tutup" +
+    <button
+      class="btn-primary"
+      onclick="cancelPaymentModal()">
 
-  "</button>" +
+      Tutup
 
-"</div>";
+    </button>
+
+  </div>
+`;
 ```
 
 modal.classList.add(
@@ -1432,9 +1767,9 @@ modal.classList.add(
 
 }
 
-/* =========================
-PAYMENT POLLING
-========================= */
+/* =========================================================
+POLLING
+========================================================= */
 
 function startPaymentPolling() {
 
@@ -1467,9 +1802,9 @@ paymentCheckTimer =
 
 }
 
-/* =========================
+/* =========================================================
 CHECK PAYMENT
-========================= */
+========================================================= */
 
 async function checkPaymentStatus() {
 
@@ -1482,6 +1817,7 @@ try {
 ```
 const response =
   await fetch(
+    API_BASE +
     "/api/check-payment",
     {
 
@@ -1505,6 +1841,23 @@ const response =
   );
 
 
+const contentType =
+  response.headers.get(
+    "content-type"
+  ) || "";
+
+
+if (
+  !contentType.includes(
+    "application/json"
+  )
+) {
+
+  return;
+
+}
+
+
 const data =
   await response.json();
 
@@ -1513,11 +1866,6 @@ if (
   !response.ok ||
   !data.success
 ) {
-
-  console.warn(
-    "Payment check:",
-    data.message
-  );
 
   return;
 
@@ -1536,17 +1884,15 @@ const status =
   ).toLowerCase();
 
 
-console.log(
-  "Payment status:",
-  status
-);
-
-
 if (
-  status === "settlement" ||
-  status === "paid" ||
-  status === "success" ||
-  status === "completed"
+  [
+    "settlement",
+    "paid",
+    "success",
+    "completed"
+  ].includes(
+    status
+  )
 ) {
 
   stopPaymentPolling();
@@ -1559,10 +1905,14 @@ if (
 
 
 if (
-  status === "expire" ||
-  status === "expired" ||
-  status === "cancel" ||
-  status === "cancelled"
+  [
+    "expire",
+    "expired",
+    "cancel",
+    "cancelled"
+  ].includes(
+    status
+  )
 ) {
 
   stopPaymentPolling();
@@ -1591,8 +1941,8 @@ if (statusText) {
 } catch (error) {
 
 ```
-console.error(
-  "Gagal cek pembayaran:",
+console.warn(
+  "Check payment error:",
   error
 );
 ```
@@ -1601,9 +1951,9 @@ console.error(
 
 }
 
-/* =========================
+/* =========================================================
 PAYMENT SUCCESS
-========================= */
+========================================================= */
 
 function paymentSuccess() {
 
@@ -1616,46 +1966,54 @@ const key =
 generateKey();
 
 modal.innerHTML =
+` <div class="modal">
 
 ```
-'<div class="modal">' +
+    <div class="success-icon">
+      ✓
+    </div>
 
-  '<div class="success-icon">' +
-  "✓" +
-  "</div>" +
+    <h2>
+      Pembayaran Berhasil!
+    </h2>
 
-  "<h2>Pembayaran Berhasil!</h2>" +
+    <p>
+      Pembayaran kamu telah dikonfirmasi.
+    </p>
 
-  "<p>Pembayaran kamu telah dikonfirmasi.</p>" +
+    <p style="margin-top:15px;">
+      Key kamu:
+    </p>
 
-  '<p style="margin-top:15px;">' +
-  "Key kamu:" +
-  "</p>" +
+    <div class="key-box">
 
-  '<div class="key-box">' +
+      <code id="generatedKey">
+        ${escapeHtml(key)}
+      </code>
 
-    '<code id="generatedKey">' +
-    escapeHtml(key) +
-    "</code>" +
+      <button
+        onclick="copyKey()">
 
-    '<button onclick="copyKey()">' +
-    "Salin" +
-    "</button>" +
+        Salin
 
-  "</div>" +
+      </button>
 
-  '<p class="key-note">' +
-  "Simpan key ini. Jangan bagikan ke orang lain." +
-  "</p>" +
+    </div>
 
-  '<button class="btn-primary" ' +
-  'onclick="closeSuccess()">' +
+    <p class="key-note">
+      Simpan key ini. Jangan bagikan ke orang lain.
+    </p>
 
-  "Selesai" +
+    <button
+      class="btn-primary"
+      onclick="closeSuccess()">
 
-  "</button>" +
+      Selesai
 
-"</div>";
+    </button>
+
+  </div>
+`;
 ```
 
 modal.classList.add(
@@ -1664,9 +2022,9 @@ modal.classList.add(
 
 }
 
-/* =========================
-PAYMENT EXPIRED
-========================= */
+/* =========================================================
+EXPIRED
+========================================================= */
 
 function paymentExpired() {
 
@@ -1676,29 +2034,35 @@ document.getElementById(
 );
 
 modal.innerHTML =
+` <div class="modal">
 
 ```
-'<div class="modal">' +
+    <div
+      class="success-icon"
+      style="color:#ef4444;">
 
-  '<div class="success-icon" ' +
-  'style="color:#ef4444;">' +
+      ×
 
-  "×" +
+    </div>
 
-  "</div>" +
+    <h2>
+      Pembayaran Kedaluwarsa
+    </h2>
 
-  "<h2>Pembayaran Kedaluwarsa</h2>" +
+    <p>
+      Pembayaran tidak berhasil diselesaikan.
+    </p>
 
-  "<p>Pembayaran tidak berhasil diselesaikan.</p>" +
+    <button
+      class="btn-primary"
+      onclick="cancelPaymentModal()">
 
-  '<button class="btn-primary" ' +
-  'onclick="cancelPaymentModal()">' +
+      Tutup
 
-  "Tutup" +
+    </button>
 
-  "</button>" +
-
-"</div>";
+  </div>
+`;
 ```
 
 modal.classList.add(
@@ -1707,9 +2071,9 @@ modal.classList.add(
 
 }
 
-/* =========================
+/* =========================================================
 CANCEL MODAL
-========================= */
+========================================================= */
 
 function cancelPaymentModal() {
 
@@ -1738,9 +2102,9 @@ modal.innerHTML =
 
 }
 
-/* =========================
+/* =========================================================
 GENERATE KEY
-========================= */
+========================================================= */
 
 function generateKey() {
 
@@ -1785,68 +2149,72 @@ return key;
 
 }
 
-/* =========================
+/* =========================================================
 COPY KEY
-========================= */
+========================================================= */
 
 function copyKey() {
 
-const keyEl =
+const element =
 document.getElementById(
 "generatedKey"
 );
 
-if (!keyEl) {
+if (!element) {
 return;
 }
 
 navigator.clipboard
 .writeText(
-keyEl.textContent
+element.textContent.trim()
 )
-.then(function () {
+.then(
+function () {
 
 ```
-  const btn =
-    document.querySelector(
-      ".key-box button"
+    const button =
+      document.querySelector(
+        ".key-box button"
+      );
+
+
+    if (!button) {
+      return;
+    }
+
+
+    button.textContent =
+      "Tersalin!";
+
+
+    setTimeout(
+      function () {
+
+        button.textContent =
+          "Salin";
+
+      },
+      2000
     );
 
-
-  if (!btn) {
-    return;
   }
+)
+.catch(
+  function () {
 
+    alert(
+      "Gagal menyalin key."
+    );
 
-  btn.textContent =
-    "Tersalin!";
-
-
-  setTimeout(
-    function () {
-
-      btn.textContent =
-        "Salin";
-
-    },
-    2000
-  );
-
-})
-.catch(function () {
-
-  alert(
-    "Gagal menyalin key."
-  );
-
-});
+  }
+);
 ```
 
 }
 
-/* =========================
+/* =========================================================
 CLOSE SUCCESS
-========================= */
+========================================================= */
 
 function closeSuccess() {
 
@@ -1877,9 +2245,9 @@ showCatalog();
 
 }
 
-/* =========================
+/* =========================================================
 SHOW CATALOG
-========================= */
+========================================================= */
 
 function showCatalog() {
 
@@ -1921,6 +2289,18 @@ catalog.classList.remove(
 window.scrollTo(
 0,
 0
+);
+
+}
+
+/* =========================================================
+CHECK ORDERS
+========================================================= */
+
+function showOrders() {
+
+alert(
+"Fitur cek pesanan belum tersedia."
 );
 
 }

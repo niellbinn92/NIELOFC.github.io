@@ -1,5 +1,6 @@
 const SHEET_CSV =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vRkatuDzhZWvyAoFvfWU3w4S7KmlbKJjGOkUy0-vcE3Xt-0D7V-6mMZAw99BVsF7qcGZdhodRAvhcLz/pub?output=csv";
+const SHEET_CSV =
+"https://docs.google.com/spreadsheets/d/1pjhTWEDAev2SkOyvkBkysL45X55GQUKGaBbEDe36P4g/export?format=csv";
 
 /* =========================
 PRODUCT IMAGES

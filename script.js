@@ -1,21 +1,30 @@
 /* =========================================================
 NIELSTORE
-GitHub Pages + Vercel Backend
+FULL FINAL VERSION
+
+WEBSITE:
+GitHub Pages
+
+BACKEND:
+Vercel
+
+PAYMENT:
+AutoGoPay
 ========================================================= */
 
 /* =========================================================
-URL BACKEND VERCEL
+BACKEND VERCEL
 ========================================================= */
 
 const API_BASE =
 "https://nielofc-github-io.vercel.app";
 
 /* =========================================================
-GOOGLE SHEETS
+GOOGLE SHEET
 ========================================================= */
 
 const SHEET_CSV =
-"https://docs.google.com/spreadsheets/d/1pjhTWEDAev2SkOyvkBkysL45X55GQUKGaBbEDe36P4g/export?format=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTAVstHFd3fsdtwy2JxULO--QM2ILEECMZFAUTaBQY5eQ4NQYq3ogkEuqEwPkjDLZuiHbFvrGoyiIlC/pub?output=csv";
 
 /* =========================================================
 PRODUCT IMAGES
@@ -38,7 +47,7 @@ const PRODUCT_IMAGES = {
 };
 
 /* =========================================================
-LOGO FALLBACK
+FALLBACK LOGO
 ========================================================= */
 
 const LOGO_FALLBACK = {
@@ -67,106 +76,240 @@ color: "#f472b6"
 
 /* =========================================================
 FALLBACK PRODUCTS
+DIPAKAI AGAR TOKO TETAP MUNCUL
+SAAT GOOGLE SHEET GAGAL
 ========================================================= */
 
 const FALLBACK_PRODUCTS = [
 
 {
 id: 1,
-name: "DRIP CLIENT",
-platform: "android",
-logo: "DRIP",
-logoColor: "#e879f9",
-image: PRODUCT_IMAGES["DRIP CLIENT"],
-rating: 0,
-sold: "",
-priceFrom: 0,
+
+```
+name:
+  "DRIP CLIENT",
+
+platform:
+  "android",
+
+logo:
+  "DRIP",
+
+logoColor:
+  "#e879f9",
+
+image:
+  PRODUCT_IMAGES["DRIP CLIENT"],
+
+rating:
+  0,
+
+sold:
+  "",
+
+priceFrom:
+  0,
+
 desc: [
-{
-icon: "✓",
-text: "Produk DRIP CLIENT"
-},
-{
-icon: "✓",
-text: "Harga akan dimuat dari katalog"
-}
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Produk DRIP CLIENT"
+
+  },
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Harga mengikuti data katalog"
+
+  }
+
 ],
-vouchers: []
+
+vouchers:
+  []
+```
+
 },
 
 {
 id: 2,
-name: "DRIP PROXY",
-platform: "android",
-logo: "DRIP",
-logoColor: "#c084fc",
-image: PRODUCT_IMAGES["DRIP PROXY"],
-rating: 0,
-sold: "",
-priceFrom: 0,
+
+```
+name:
+  "DRIP PROXY",
+
+platform:
+  "android",
+
+logo:
+  "DRIP",
+
+logoColor:
+  "#c084fc",
+
+image:
+  PRODUCT_IMAGES["DRIP PROXY"],
+
+rating:
+  0,
+
+sold:
+  "",
+
+priceFrom:
+  0,
+
 desc: [
-{
-icon: "✓",
-text: "Produk DRIP PROXY"
-},
-{
-icon: "✓",
-text: "Harga akan dimuat dari katalog"
-}
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Produk DRIP PROXY"
+
+  },
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Harga mengikuti data katalog"
+
+  }
+
 ],
-vouchers: []
+
+vouchers:
+  []
+```
+
 },
 
 {
 id: 3,
-name: "HG CHEAT",
-platform: "android",
-logo: "HG",
-logoColor: "#ec4899",
-image: PRODUCT_IMAGES["HG CHEAT"],
-rating: 0,
-sold: "",
-priceFrom: 0,
+
+```
+name:
+  "HG CHEAT",
+
+platform:
+  "android",
+
+logo:
+  "HG",
+
+logoColor:
+  "#ec4899",
+
+image:
+  PRODUCT_IMAGES["HG CHEAT"],
+
+rating:
+  0,
+
+sold:
+  "",
+
+priceFrom:
+  0,
+
 desc: [
-{
-icon: "✓",
-text: "Produk HG CHEAT"
-},
-{
-icon: "✓",
-text: "Harga akan dimuat dari katalog"
-}
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Produk HG CHEAT"
+
+  },
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Harga mengikuti data katalog"
+
+  }
+
 ],
-vouchers: []
+
+vouchers:
+  []
+```
+
 },
 
 {
 id: 4,
-name: "HG PROXY",
-platform: "android",
-logo: "HG",
-logoColor: "#f472b6",
-image: PRODUCT_IMAGES["HG PROXY"],
-rating: 0,
-sold: "",
-priceFrom: 0,
+
+```
+name:
+  "HG PROXY",
+
+platform:
+  "android",
+
+logo:
+  "HG",
+
+logoColor:
+  "#f472b6",
+
+image:
+  PRODUCT_IMAGES["HG PROXY"],
+
+rating:
+  0,
+
+sold:
+  "",
+
+priceFrom:
+  0,
+
 desc: [
-{
-icon: "✓",
-text: "Produk HG PROXY"
-},
-{
-icon: "✓",
-text: "Harga akan dimuat dari katalog"
-}
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Produk HG PROXY"
+
+  },
+
+  {
+    icon:
+      "✓",
+
+    text:
+      "Harga mengikuti data katalog"
+
+  }
+
 ],
-vouchers: []
+
+vouchers:
+  []
+```
+
 }
 
 ];
 
 /* =========================================================
-GLOBAL
+GLOBAL VARIABLES
 ========================================================= */
 
 let products =
@@ -191,65 +334,73 @@ let orderProcessing =
 false;
 
 /* =========================================================
-START
+DOCUMENT READY
 ========================================================= */
 
 document.addEventListener(
 "DOMContentLoaded",
+
 function () {
 
 ```
 /*
- * LANGSUNG TAMPIL
+ * LANGSUNG RENDER WEBSITE
  */
 
 hideLoading();
 
 renderProducts();
 
+
 /*
- * Sheet diproses di background.
- * Tidak menghambat website.
+ * GOOGLE SHEET
+ * DIPROSES DI BACKGROUND
  */
 
-loadProductsBackground();
+loadProductsInBackground();
 ```
 
 }
 );
 
 /* =========================================================
-LOADING
+HIDE LOADING
 ========================================================= */
 
 function hideLoading() {
 
-const el =
+const loading =
 document.getElementById(
 "loadingScreen"
 );
 
-if (!el) {
+if (!loading) {
 return;
 }
 
-el.classList.add(
+loading.classList.add(
 "hidden"
 );
 
-el.style.display =
+loading.style.display =
 "none";
 
 }
 
 /* =========================================================
-SHEET BACKGROUND
+GOOGLE SHEET BACKGROUND
 ========================================================= */
 
-async function loadProductsBackground() {
+async function loadProductsInBackground() {
 
 const controller =
 new AbortController();
+
+/*
+
+* Timeout 5 detik.
+* Setelah itu dianggap gagal.
+  */
 
 const timeout =
 setTimeout(
@@ -259,7 +410,9 @@ function () {
     controller.abort();
 
   },
-  4000
+
+  5000
+
 );
 ```
 
@@ -268,24 +421,35 @@ try {
 ```
 const response =
   await fetch(
+
     SHEET_CSV +
     "&t=" +
     Date.now(),
+
     {
+      method:
+        "GET",
+
       cache:
         "no-store",
 
       signal:
         controller.signal
+
     }
+
   );
 
 
 if (!response.ok) {
+
   throw new Error(
-    "HTTP " +
+
+    "Google Sheet HTTP " +
     response.status
+
   );
+
 }
 
 
@@ -294,9 +458,11 @@ const text =
 
 
 if (!text.trim()) {
+
   throw new Error(
-    "Sheet kosong"
+    "Google Sheet kosong"
   );
+
 }
 
 
@@ -304,32 +470,43 @@ const rows =
   parseCSV(text);
 
 
-const loaded =
+if (!rows.length) {
+
+  throw new Error(
+    "Data Google Sheet tidak ditemukan"
+  );
+
+}
+
+
+const loadedProducts =
   convertRowsToProducts(
     rows
   );
 
 
-if (!loaded.length) {
+if (!loadedProducts.length) {
+
   throw new Error(
-    "Produk tidak ditemukan"
+    "Format produk Google Sheet tidak valid"
   );
+
 }
 
 
 /*
- * Data asli berhasil.
+ * DATA SHEET BERHASIL
  */
 
 products =
-  loaded;
+  loadedProducts;
 
 
 renderProducts();
 
 
 console.log(
-  "Google Sheet berhasil dimuat."
+  "NIELSTORE: Google Sheet berhasil dimuat."
 );
 ```
 
@@ -337,12 +514,12 @@ console.log(
 
 ```
 /*
- * Sheet error tidak masalah.
- * NIELSTORE tetap tampil.
+ * JANGAN MATIKAN WEBSITE.
+ * Fallback tetap dipakai.
  */
 
 console.warn(
-  "Google Sheet gagal:",
+  "NIELSTORE: Google Sheet gagal.",
   error
 );
 ```
@@ -354,6 +531,7 @@ clearTimeout(
   timeout
 );
 
+
 hideLoading();
 ```
 
@@ -363,6 +541,7 @@ hideLoading();
 
 /* =========================================================
 CSV PARSER
+MENDUKUNG KOMMA DI DALAM QUOTE
 ========================================================= */
 
 function parseCSV(text) {
@@ -373,7 +552,7 @@ let row = [];
 
 let value = "";
 
-let inQuotes =
+let insideQuotes =
 false;
 
 for (
@@ -386,13 +565,18 @@ i++
 const char =
   text[i];
 
+
 const next =
   text[i + 1];
 
 
+/*
+ * DOUBLE QUOTE
+ */
+
 if (
   char === '"' &&
-  inQuotes &&
+  insideQuotes &&
   next === '"'
 ) {
 
@@ -405,21 +589,27 @@ if (
 }
 
 
-if (
-  char === '"'
-) {
+/*
+ * QUOTE START / END
+ */
 
-  inQuotes =
-    !inQuotes;
+if (char === '"') {
+
+  insideQuotes =
+    !insideQuotes;
 
   continue;
 
 }
 
 
+/*
+ * COMMA
+ */
+
 if (
   char === "," &&
-  !inQuotes
+  !insideQuotes
 ) {
 
   row.push(
@@ -433,12 +623,16 @@ if (
 }
 
 
+/*
+ * NEW LINE
+ */
+
 if (
   (
     char === "\n" ||
     char === "\r"
   ) &&
-  !inQuotes
+  !insideQuotes
 ) {
 
   if (
@@ -459,7 +653,11 @@ if (
   if (
     row.some(
       function (cell) {
-        return cell !== "";
+
+        return (
+          cell !== ""
+        );
+
       }
     )
   ) {
@@ -485,6 +683,11 @@ value += char;
 
 }
 
+/*
+
+* LAST ROW
+  */
+
 if (
 value !== "" ||
 row.length
@@ -499,19 +702,36 @@ row.push(
 }
 
 if (row.length) {
-rows.push(row);
+
+```
+rows.push(
+  row
+);
+```
+
 }
 
 if (rows.length < 2) {
+
+```
 return [];
+```
+
 }
+
+/*
+
+* HEADER
+  */
 
 const headers =
 rows[0].map(
 function (header) {
 
 ```
-    return String(header)
+    return String(
+      header
+    )
       .trim()
       .toLowerCase();
 
@@ -519,13 +739,19 @@ function (header) {
 );
 ```
 
+/*
+
+* OBJECT ROW
+  */
+
 return rows
 .slice(1)
 .map(
 function (cells) {
 
 ```
-    const obj = {};
+    const object =
+      {};
 
 
     headers.forEach(
@@ -534,14 +760,15 @@ function (cells) {
         index
       ) {
 
-        obj[header] =
-          cells[index] || "";
+        object[header] =
+          cells[index] ||
+          "";
 
       }
     );
 
 
-    return obj;
+    return object;
 
   }
 );
@@ -550,7 +777,7 @@ function (cells) {
 }
 
 /* =========================================================
-CONVERT SHEET ROWS
+CONVERT SHEET TO PRODUCTS
 ========================================================= */
 
 function convertRowsToProducts(
@@ -566,27 +793,41 @@ index
 ) {
 
 ```
+  /*
+   * NAME
+   */
+
   const name =
     String(
       row.name || ""
     )
-    .trim()
-    .toUpperCase();
+      .trim()
+      .toUpperCase();
 
 
   if (!name) {
+
     return;
+
   }
 
+
+  /*
+   * PLATFORM
+   */
 
   const platform =
     String(
       row.platform ||
       "android"
     )
-    .trim()
-    .toLowerCase();
+      .trim()
+      .toLowerCase();
 
+
+  /*
+   * RATING
+   */
 
   const rating =
     parseFloat(
@@ -594,59 +835,106 @@ index
     ) || 0;
 
 
+  /*
+   * SOLD
+   */
+
   const sold =
     String(
       row.sold || ""
-    ).trim();
+    )
+      .trim();
 
 
-  const descRaw =
+  /*
+   * DESCRIPTION
+   */
+
+  const descriptionRaw =
     String(
       row.desc || ""
-    ).trim();
+    )
+      .trim();
 
 
-  const desc =
-    descRaw
+  const description =
 
-      ? descRaw
-          .split("|")
-          .map(
-            function (text) {
+    descriptionRaw
 
-              return {
-                icon: "✓",
-                text:
-                  text.trim()
-              };
+      ?
 
-            }
-          )
-          .filter(
-            function (item) {
-              return item.text;
-            }
-          )
+      descriptionRaw
+        .split("|")
+        .map(
+          function (
+            item
+          ) {
 
-      : [
-          {
-            icon: "✓",
-            text:
-              "Produk NIELSTORE"
+            return {
+
+              icon:
+                "✓",
+
+              text:
+                item.trim()
+
+            };
+
           }
-        ];
+        )
+        .filter(
+          function (
+            item
+          ) {
+
+            return (
+              item.text
+            );
+
+          }
+        )
+
+      :
+
+      [
+
+        {
+
+          icon:
+            "✓",
+
+          text:
+            "Produk premium NIELSTORE"
+
+        }
+
+      ];
 
 
-  const fixed =
-    [
-      "name",
-      "platform",
-      "logo",
-      "rating",
-      "sold",
-      "desc"
-    ];
+  /*
+   * FIXED COLUMNS
+   */
 
+  const fixedColumns = [
+
+    "name",
+
+    "platform",
+
+    "logo",
+
+    "rating",
+
+    "sold",
+
+    "desc"
+
+  ];
+
+
+  /*
+   * VOUCHER
+   */
 
   const vouchers = [];
 
@@ -655,8 +943,13 @@ index
     .forEach(
       function (key) {
 
+
+        /*
+         * SKIP FIXED COLUMN
+         */
+
         if (
-          fixed.includes(
+          fixedColumns.includes(
             key.toLowerCase()
           )
         ) {
@@ -666,21 +959,34 @@ index
         }
 
 
-        const raw =
+        const rawPrice =
           String(
             row[key] || ""
-          ).trim();
+          )
+            .trim();
+
+
+        /*
+         * AMBIL ANGKA
+         */
+
+        const cleanPrice =
+          rawPrice.replace(
+            /\D/g,
+            ""
+          );
 
 
         const price =
           parseInt(
-            raw.replace(
-              /\D/g,
-              ""
-            ),
+            cleanPrice,
             10
           );
 
+
+        /*
+         * HANYA HARGA VALID
+         */
 
         if (
           Number.isFinite(
@@ -708,54 +1014,88 @@ index
     );
 
 
+  /*
+   * SORT VOUCHER
+   */
+
   vouchers.sort(
     function (
       a,
       b
     ) {
 
+      const aNum =
+        parseInt(
+          a.duration
+        ) || 9999;
+
+
+      const bNum =
+        parseInt(
+          b.duration
+        ) || 9999;
+
+
       return (
-        (
-          parseInt(
-            a.duration
-          ) || 9999
-        ) -
-        (
-          parseInt(
-            b.duration
-          ) || 9999
-        )
+        aNum -
+        bNum
       );
 
     }
   );
 
 
+  /*
+   * HARGA TERENDAH
+   */
+
   const priceFrom =
     vouchers.length
-      ? Math.min(
-          ...vouchers.map(
-            function (v) {
-              return v.price;
-            }
-          )
-        )
-      : 0;
 
+      ?
+
+      Math.min(
+        ...vouchers.map(
+          function (
+            voucher
+          ) {
+
+            return (
+              voucher.price
+            );
+
+          }
+        )
+      )
+
+      :
+
+      0;
+
+
+  /*
+   * FALLBACK LOGO
+   */
 
   const fallback =
     LOGO_FALLBACK[name] ||
     {
+
       logo:
-        name.slice(
+        name.substring(
           0,
           4
         ),
 
       color:
         "#a855f7"
+
     };
 
+
+  /*
+   * PUSH PRODUCT
+   */
 
   result.push({
 
@@ -789,7 +1129,7 @@ index
       priceFrom,
 
     desc:
-      desc,
+      description,
 
     vouchers:
       vouchers
@@ -814,18 +1154,23 @@ number
 ) {
 
 return (
+
+```
 "Rp " +
+
 Number(
-number
+  number
 ).toLocaleString(
-"id-ID"
+  "id-ID"
 )
+```
+
 );
 
 }
 
 /* =========================================================
-ESCAPE
+ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(
@@ -835,31 +1180,38 @@ value
 return String(
 value || ""
 )
+
+```
 .replace(
-/&/g,
-"&"
+  /&/g,
+  "&amp;"
 )
+
 .replace(
-/</g,
-"<"
+  /</g,
+  "&lt;"
 )
+
 .replace(
-/>/g,
-">"
+  />/g,
+  "&gt;"
 )
+
 .replace(
-/"/g,
-"""
+  /"/g,
+  "&quot;"
 )
+
 .replace(
-/'/g,
-"'"
+  /'/g,
+  "&#039;"
 );
+```
 
 }
 
 /* =========================================================
-RENDER
+RENDER PRODUCTS
 ========================================================= */
 
 function renderProducts() {
@@ -877,24 +1229,36 @@ const filtered =
 currentFilter === "all"
 
 ```
-  ? products
+  ?
 
-  : products.filter(
-      function (product) {
+  products
 
-        return (
-          product.platform ===
-          currentFilter
-        );
+  :
 
-      }
-    );
+  products.filter(
+    function (
+      product
+    ) {
+
+      return (
+        product.platform ===
+        currentFilter
+      );
+
+    }
+  );
 ```
+
+/*
+
+* EMPTY
+  */
 
 if (!filtered.length) {
 
 ```
 grid.innerHTML =
+
   `
     <p
       style="
@@ -914,17 +1278,31 @@ return;
 
 }
 
+/*
+
+* PRODUCTS
+  */
+
 grid.innerHTML =
-filtered
-.map(
-function (product) {
 
 ```
+filtered
+  .map(
+    function (
+      product
+    ) {
+
+
       return `
 
         <div
           class="product-card"
-          onclick="openDetail(${product.id})">
+          onclick="
+            openDetail(${product.id});
+          ">
+
+
+          <!-- IMAGE -->
 
           <div
             class="card-image ${
@@ -938,6 +1316,7 @@ function (product) {
                 : "background:linear-gradient(135deg,#1a0a2e,#2d0a3a)"
             }">
 
+
             <span class="platform">
 
               ${escapeHtml(
@@ -947,10 +1326,14 @@ function (product) {
 
             </span>
 
+
             ${
               product.image
 
-                ? `
+                ?
+
+                `
+
                   <img
                     src="${escapeHtml(
                       product.image
@@ -960,25 +1343,37 @@ function (product) {
                     )}"
                     class="card-img"
                     loading="lazy">
+
                 `
 
-                : `
+                :
+
+                `
+
                   <div
                     class="logo-text"
-                    style="color:${product.logoColor}">
+                    style="
+                      color:${product.logoColor};
+                    ">
 
                     ${escapeHtml(
                       product.logo
                     )}
 
                   </div>
+
                 `
             }
+
 
           </div>
 
 
+
+          <!-- BODY -->
+
           <div class="card-body">
+
 
             <div class="card-name">
 
@@ -987,6 +1382,7 @@ function (product) {
               )}
 
             </div>
+
 
 
             <div class="card-stats">
@@ -1003,38 +1399,53 @@ function (product) {
 
               ${
                 product.sold
-                  ? " · " +
-                    escapeHtml(
-                      product.sold
-                    ) +
-                    " Terjual"
-                  : ""
+                  ?
+
+                  " · " +
+                  escapeHtml(
+                    product.sold
+                  ) +
+                  " Terjual"
+
+                  :
+
+                  ""
               }
 
             </div>
+
 
 
             <div class="card-price">
 
               ${
                 product.priceFrom
-                  ? "Mulai dari "
-                  : ""
+                  ?
+                  "Mulai dari "
+                  :
+                  ""
               }
 
               <strong>
 
                 ${
                   product.priceFrom
-                    ? formatRupiah(
-                        product.priceFrom
-                      )
-                    : "Cek Produk"
+
+                    ?
+
+                    formatRupiah(
+                      product.priceFrom
+                    )
+
+                    :
+
+                    "Cek Produk"
                 }
 
               </strong>
 
             </div>
+
 
 
             <button
@@ -1048,7 +1459,9 @@ function (product) {
 
             </button>
 
+
           </div>
+
 
         </div>
 
@@ -1073,9 +1486,13 @@ currentFilter =
 filter;
 
 document
-.querySelectorAll(".tab")
+.querySelectorAll(
+".tab"
+)
 .forEach(
-function (tab) {
+function (
+tab
+) {
 
 ```
     tab.classList.toggle(
@@ -1093,7 +1510,7 @@ renderProducts();
 }
 
 /* =========================================================
-DETAIL
+OPEN DETAIL
 ========================================================= */
 
 function openDetail(
@@ -1102,10 +1519,15 @@ id
 
 currentProduct =
 products.find(
-function (product) {
+function (
+product
+) {
 
 ```
-    return product.id === id;
+    return (
+      product.id ===
+      id
+    );
 
   }
 );
@@ -1126,6 +1548,11 @@ return;
 selectedVoucher =
 null;
 
+/*
+
+* IMAGE
+  */
+
 const image =
 document.getElementById(
 "detailImage"
@@ -1139,7 +1566,9 @@ image.style.background =
 
 
 image.innerHTML =
+
   `
+
     <img
       src="${escapeHtml(
         currentProduct.image
@@ -1148,32 +1577,54 @@ image.innerHTML =
         currentProduct.name
       )}"
       class="detail-img">
+
   `;
 ```
 
-} else {
+}
+
+else {
 
 ```
+image.style.background =
+  "linear-gradient(135deg,#1a0a2e,#2d0a3a)";
+
+
 image.innerHTML =
+
   `
+
     <div
       class="logo-text"
-      style="color:${currentProduct.logoColor}">
+      style="
+        color:${currentProduct.logoColor};
+      ">
 
       ${escapeHtml(
         currentProduct.logo
       )}
 
     </div>
+
   `;
 ```
 
 }
 
+/*
+
+* NAME
+  */
+
 document.getElementById(
 "detailName"
 ).textContent =
 currentProduct.name;
+
+/*
+
+* PLATFORM
+  */
 
 document.getElementById(
 "detailPlatform"
@@ -1181,38 +1632,66 @@ document.getElementById(
 currentProduct.platform
 .toUpperCase();
 
+/*
+
+* RATING
+  */
+
 document.getElementById(
 "detailRating"
 ).innerHTML =
-` <span class="star">★</span>
-${
-currentProduct.rating
-? currentProduct.rating
-: "—"
-}
 
 ```
+`
+
+  <span class="star">
+    ★
+  </span>
+
+  ${
+    currentProduct.rating
+      ?
+      currentProduct.rating
+      :
+      "—"
+  }
+
   ${
     currentProduct.sold
-      ? " · " +
-        escapeHtml(
-          currentProduct.sold
-        ) +
-        " Terjual"
-      : ""
+      ?
+
+      " · " +
+      escapeHtml(
+        currentProduct.sold
+      ) +
+      " Terjual"
+
+      :
+
+      ""
   }
+
 `;
 ```
+
+/*
+
+* DESCRIPTION
+  */
 
 document.getElementById(
 "detailDesc"
 ).innerHTML =
-currentProduct.desc
-.map(
-function (item) {
 
 ```
+currentProduct.desc
+  .map(
+    function (
+      item
+    ) {
+
       return `
+
         <li>
 
           <span
@@ -1227,6 +1706,7 @@ function (item) {
           )}
 
         </li>
+
       `;
 
     }
@@ -1234,7 +1714,17 @@ function (item) {
   .join("");
 ```
 
+/*
+
+* VOUCHER
+  */
+
 renderVouchers();
+
+/*
+
+* CHANGE VIEW
+  */
 
 document
 .getElementById(
@@ -1260,7 +1750,7 @@ window.scrollTo(
 }
 
 /* =========================================================
-VOUCHER
+RENDER VOUCHERS
 ========================================================= */
 
 function renderVouchers() {
@@ -1281,7 +1771,9 @@ if (
 
 ```
 grid.innerHTML =
+
   `
+
     <p
       style="
         color:var(--text-muted);
@@ -1291,6 +1783,7 @@ grid.innerHTML =
       Harga belum tersedia.
 
     </p>
+
   `;
 
 return;
@@ -1299,20 +1792,24 @@ return;
 }
 
 grid.innerHTML =
-currentProduct.vouchers
-.map(
-function (
-voucher,
-index
-) {
 
 ```
+currentProduct.vouchers
+  .map(
+    function (
+      voucher,
+      index
+    ) {
+
       return `
 
         <div
           class="voucher-item"
           data-index="${index}"
-          onclick="selectVoucher(${index})">
+          onclick="
+            selectVoucher(${index});
+          ">
+
 
           <div class="duration">
 
@@ -1322,6 +1819,7 @@ index
 
           </div>
 
+
           <div class="price">
 
             ${formatRupiah(
@@ -1330,11 +1828,13 @@ index
 
           </div>
 
+
           <div class="reseller">
 
             HARGA RESELLER
 
           </div>
+
 
         </div>
 
@@ -1345,7 +1845,14 @@ index
   .join("");
 ```
 
-selectVoucher(0);
+/*
+
+* PILIH VOUCHER PERTAMA
+  */
+
+selectVoucher(
+0
+);
 
 }
 
@@ -1386,7 +1893,8 @@ itemIndex
 ```
     item.classList.toggle(
       "selected",
-      itemIndex === index
+      itemIndex ===
+      index
     );
 
   }
@@ -1396,7 +1904,7 @@ itemIndex
 }
 
 /* =========================================================
-CREATE PAYMENT
+PROCESS ORDER
 ========================================================= */
 
 async function processOrder() {
@@ -1429,6 +1937,27 @@ return;
 
 }
 
+/*
+
+* CEGAH PRODUK FALLBACK
+* TANPA HARGA
+  */
+
+if (
+!selectedVoucher.price ||
+selectedVoucher.price < 1
+) {
+
+```
+alert(
+  "Harga produk belum tersedia. Coba refresh halaman."
+);
+
+return;
+```
+
+}
+
 orderProcessing =
 true;
 
@@ -1452,18 +1981,26 @@ button.textContent =
 try {
 
 ```
+/*
+ * CREATE PAYMENT
+ */
+
 const response =
   await fetch(
+
     API_BASE +
     "/api/create-payment",
+
     {
 
       method:
         "POST",
 
       headers: {
+
         "Content-Type":
           "application/json"
+
       },
 
       body:
@@ -1481,8 +2018,13 @@ const response =
         })
 
     }
+
   );
 
+
+/*
+ * CEK CONTENT TYPE
+ */
 
 const contentType =
   response.headers.get(
@@ -1497,15 +2039,25 @@ if (
 ) {
 
   throw new Error(
-    "Backend pembayaran tidak memberikan response JSON."
+
+    "Backend Vercel belum memberikan response JSON."
+
   );
 
 }
 
 
+/*
+ * JSON
+ */
+
 const data =
   await response.json();
 
+
+/*
+ * API ERROR
+ */
 
 if (
   !response.ok ||
@@ -1513,16 +2065,26 @@ if (
 ) {
 
   throw new Error(
+
     data.message ||
     "Gagal membuat pembayaran."
+
   );
 
 }
 
 
+/*
+ * PAYMENT DATA
+ */
+
 const payment =
   data.data || {};
 
+
+/*
+ * TRANSACTION
+ */
 
 currentTransactionId =
   payment.transaction_id;
@@ -1531,16 +2093,26 @@ currentTransactionId =
 if (!currentTransactionId) {
 
   throw new Error(
+
     "Transaction ID tidak ditemukan."
+
   );
 
 }
 
 
+/*
+ * SHOW QRIS
+ */
+
 showPaymentModal(
   payment
 );
 
+
+/*
+ * CHECK STATUS
+ */
 
 startPaymentPolling();
 ```
@@ -1549,14 +2121,16 @@ startPaymentPolling();
 
 ```
 console.error(
-  "Create payment error:",
+  "NIELSTORE payment error:",
   error
 );
 
 
 alert(
+
   error.message ||
   "Gagal membuat pembayaran."
+
 );
 ```
 
@@ -1583,7 +2157,7 @@ if (button) {
 }
 
 /* =========================================================
-PAYMENT MODAL
+SHOW PAYMENT MODAL
 ========================================================= */
 
 function showPaymentModal(
@@ -1595,30 +2169,47 @@ document.getElementById(
 "successModal"
 );
 
+if (!modal) {
+return;
+}
+
 const amount =
 payment.amount ||
-selectedVoucher.price;
+(
+selectedVoucher
+?
+selectedVoucher.price
+:
+0
+);
 
 const qrUrl =
 payment.qr_url ||
-"";
-
-const checkoutUrl =
-payment.checkout_url ||
 "";
 
 const qrString =
 payment.qr_string ||
 "";
 
-let content =
+const checkoutUrl =
+payment.checkout_url ||
 "";
+
+let paymentContent =
+"";
+
+/*
+
+* QR IMAGE
+  */
 
 if (qrUrl) {
 
 ```
-content =
+paymentContent =
+
   `
+
     <img
       src="${escapeHtml(
         qrUrl
@@ -1628,23 +2219,35 @@ content =
         width:260px;
         max-width:100%;
         border-radius:12px;
+        display:block;
       ">
+
   `;
 ```
 
-} else if (qrString) {
+}
+
+/*
+
+* QR STRING
+  */
+
+else if (qrString) {
 
 ```
-content =
+paymentContent =
+
   `
+
     <div
       style="
+        padding:15px;
         background:#fff;
         color:#111;
-        padding:15px;
         border-radius:10px;
         font-size:12px;
         word-break:break-all;
+        max-width:320px;
       ">
 
       ${escapeHtml(
@@ -1652,26 +2255,52 @@ content =
       )}
 
     </div>
-  `;
-```
 
-} else {
-
-```
-content =
-  `
-    <p>
-      QRIS sedang diproses...
-    </p>
   `;
 ```
 
 }
 
-modal.innerHTML =
-` <div class="modal">
+/*
+
+* NO QR
+  */
+
+else {
 
 ```
+paymentContent =
+
+  `
+
+    <div
+      style="
+        padding:25px;
+        color:var(--text-muted);
+      ">
+
+      QRIS sedang diproses...
+
+    </div>
+
+  `;
+```
+
+}
+
+/*
+
+* MODAL HTML
+  */
+
+modal.innerHTML =
+
+```
+`
+
+  <div class="modal">
+
+
     <div
       class="success-icon"
       style="font-size:30px;">
@@ -1680,13 +2309,16 @@ modal.innerHTML =
 
     </div>
 
+
     <h2>
       Menunggu Pembayaran
     </h2>
 
+
     <p>
       Silakan selesaikan pembayaran QRIS.
     </p>
+
 
     <div
       style="
@@ -1701,6 +2333,7 @@ modal.innerHTML =
 
     </div>
 
+
     <div
       style="
         display:flex;
@@ -1708,14 +2341,18 @@ modal.innerHTML =
         margin:15px 0;
       ">
 
-      ${content}
+      ${paymentContent}
 
     </div>
+
 
     ${
       checkoutUrl
 
-        ? `
+        ?
+
+        `
+
           <a
             href="${escapeHtml(
               checkoutUrl
@@ -1733,10 +2370,15 @@ modal.innerHTML =
             Buka Pembayaran
 
           </a>
+
         `
 
-        : ""
+        :
+
+        ""
+
     }
+
 
     <p
       id="paymentStatusText"
@@ -1749,15 +2391,20 @@ modal.innerHTML =
 
     </p>
 
+
     <button
       class="btn-primary"
-      onclick="cancelPaymentModal()">
+      onclick="
+        cancelPaymentModal();
+      ">
 
       Tutup
 
     </button>
 
+
   </div>
+
 `;
 ```
 
@@ -1768,7 +2415,7 @@ modal.classList.add(
 }
 
 /* =========================================================
-POLLING
+START PAYMENT POLLING
 ========================================================= */
 
 function startPaymentPolling() {
@@ -1779,20 +2426,36 @@ checkPaymentStatus();
 
 paymentCheckTimer =
 setInterval(
-checkPaymentStatus,
-5000
+
+```
+  function () {
+
+    checkPaymentStatus();
+
+  },
+
+  5000
+
 );
+```
 
 }
 
+/* =========================================================
+STOP POLLING
+========================================================= */
+
 function stopPaymentPolling() {
 
-if (paymentCheckTimer) {
+if (
+paymentCheckTimer
+) {
 
 ```
 clearInterval(
   paymentCheckTimer
 );
+
 
 paymentCheckTimer =
   null;
@@ -1817,16 +2480,20 @@ try {
 ```
 const response =
   await fetch(
+
     API_BASE +
     "/api/check-payment",
+
     {
 
       method:
         "POST",
 
       headers: {
+
         "Content-Type":
           "application/json"
+
       },
 
       body:
@@ -1838,8 +2505,13 @@ const response =
         })
 
     }
+
   );
 
+
+/*
+ * CONTENT TYPE
+ */
 
 const contentType =
   response.headers.get(
@@ -1857,6 +2529,10 @@ if (
 
 }
 
+
+/*
+ * JSON
+ */
 
 const data =
   await response.json();
@@ -1876,53 +2552,85 @@ const payment =
   data.data || {};
 
 
+/*
+ * STATUS
+ */
+
 const status =
   String(
+
     payment.transaction_status ||
     payment.status ||
     ""
-  ).toLowerCase();
 
+  )
+    .toLowerCase()
+    .trim();
+
+
+console.log(
+  "NIELSTORE payment status:",
+  status
+);
+
+
+/*
+ * SUCCESS
+ */
 
 if (
-  [
-    "settlement",
-    "paid",
-    "success",
-    "completed"
-  ].includes(
-    status
-  )
+
+  status === "settlement" ||
+
+  status === "paid" ||
+
+  status === "success" ||
+
+  status === "completed"
+
 ) {
 
   stopPaymentPolling();
+
 
   paymentSuccess();
 
+
   return;
 
 }
 
 
+/*
+ * EXPIRED
+ */
+
 if (
-  [
-    "expire",
-    "expired",
-    "cancel",
-    "cancelled"
-  ].includes(
-    status
-  )
+
+  status === "expire" ||
+
+  status === "expired" ||
+
+  status === "cancel" ||
+
+  status === "cancelled"
+
 ) {
 
   stopPaymentPolling();
 
+
   paymentExpired();
+
 
   return;
 
 }
 
+
+/*
+ * PENDING
+ */
 
 const statusText =
   document.getElementById(
@@ -1942,8 +2650,10 @@ if (statusText) {
 
 ```
 console.warn(
-  "Check payment error:",
+
+  "NIELSTORE check payment error:",
   error
+
 );
 ```
 
@@ -1962,57 +2672,98 @@ document.getElementById(
 "successModal"
 );
 
+/*
+
+* KEY
+  */
+
 const key =
 generateKey();
 
 modal.innerHTML =
-` <div class="modal">
 
 ```
+`
+
+  <div class="modal">
+
+
     <div class="success-icon">
+
       ✓
+
     </div>
 
+
     <h2>
+
       Pembayaran Berhasil!
+
     </h2>
 
+
     <p>
+
       Pembayaran kamu telah dikonfirmasi.
+
     </p>
 
-    <p style="margin-top:15px;">
+
+    <p
+      style="margin-top:15px;">
+
       Key kamu:
+
     </p>
+
 
     <div class="key-box">
 
-      <code id="generatedKey">
-        ${escapeHtml(key)}
+
+      <code
+        id="generatedKey">
+
+        ${escapeHtml(
+          key
+        )}
+
       </code>
 
+
       <button
-        onclick="copyKey()">
+        onclick="
+          copyKey();
+        ">
 
         Salin
 
       </button>
 
+
     </div>
 
+
     <p class="key-note">
-      Simpan key ini. Jangan bagikan ke orang lain.
+
+      Simpan key ini.
+      Jangan bagikan ke orang lain.
+
     </p>
+
 
     <button
       class="btn-primary"
-      onclick="closeSuccess()">
+      onclick="
+        closeSuccess();
+      ">
 
       Selesai
 
     </button>
 
+
   </div>
+
 `;
 ```
 
@@ -2023,7 +2774,7 @@ modal.classList.add(
 }
 
 /* =========================================================
-EXPIRED
+PAYMENT EXPIRED
 ========================================================= */
 
 function paymentExpired() {
@@ -2034,9 +2785,13 @@ document.getElementById(
 );
 
 modal.innerHTML =
-` <div class="modal">
 
 ```
+`
+
+  <div class="modal">
+
+
     <div
       class="success-icon"
       style="color:#ef4444;">
@@ -2045,23 +2800,34 @@ modal.innerHTML =
 
     </div>
 
+
     <h2>
+
       Pembayaran Kedaluwarsa
+
     </h2>
 
+
     <p>
+
       Pembayaran tidak berhasil diselesaikan.
+
     </p>
+
 
     <button
       class="btn-primary"
-      onclick="cancelPaymentModal()">
+      onclick="
+        cancelPaymentModal();
+      ">
 
       Tutup
 
     </button>
 
+
   </div>
+
 `;
 ```
 
@@ -2072,7 +2838,7 @@ modal.classList.add(
 }
 
 /* =========================================================
-CANCEL MODAL
+CANCEL PAYMENT MODAL
 ========================================================= */
 
 function cancelPaymentModal() {
@@ -2087,18 +2853,16 @@ document.getElementById(
 "successModal"
 );
 
-if (modal) {
+if (!modal) {
+return;
+}
 
-```
 modal.classList.remove(
-  "active"
+"active"
 );
 
 modal.innerHTML =
-  "";
-```
-
-}
+"";
 
 }
 
@@ -2115,19 +2879,20 @@ let key =
 "NIEL-";
 
 for (
-let i = 0;
-i < 4;
-i++
+let group = 0;
+group < 4;
+group++
 ) {
 
 ```
 for (
-  let j = 0;
-  j < 4;
-  j++
+  let i = 0;
+  i < 4;
+  i++
 ) {
 
   key +=
+
     chars[
       Math.floor(
         Math.random() *
@@ -2138,8 +2903,12 @@ for (
 }
 
 
-if (i < 3) {
+if (
+  group < 3
+) {
+
   key += "-";
+
 }
 ```
 
@@ -2155,60 +2924,158 @@ COPY KEY
 
 function copyKey() {
 
-const element =
+const keyElement =
 document.getElementById(
 "generatedKey"
 );
 
-if (!element) {
+if (!keyElement) {
 return;
 }
 
+const text =
+keyElement.textContent.trim();
+
+/*
+
+* CLIPBOARD MODERN
+  */
+
+if (
+navigator.clipboard &&
+navigator.clipboard.writeText
+) {
+
+```
 navigator.clipboard
-.writeText(
-element.textContent.trim()
-)
-.then(
+  .writeText(
+    text
+  )
+  .then(
+    function () {
+
+      showCopied();
+
+    }
+  )
+  .catch(
+    function () {
+
+      fallbackCopy(
+        text
+      );
+
+    }
+  );
+
+
+return;
+```
+
+}
+
+/*
+
+* FALLBACK
+  */
+
+fallbackCopy(
+text
+);
+
+}
+
+/* =========================================================
+FALLBACK COPY
+========================================================= */
+
+function fallbackCopy(
+text
+) {
+
+const textarea =
+document.createElement(
+"textarea"
+);
+
+textarea.value =
+text;
+
+textarea.style.position =
+"fixed";
+
+textarea.style.opacity =
+"0";
+
+document.body.appendChild(
+textarea
+);
+
+textarea.select();
+
+try {
+
+```
+document.execCommand(
+  "copy"
+);
+
+
+showCopied();
+```
+
+} catch (
+error
+) {
+
+```
+alert(
+  "Gagal menyalin key."
+);
+```
+
+}
+
+document.body.removeChild(
+textarea
+);
+
+}
+
+/* =========================================================
+COPIED MESSAGE
+========================================================= */
+
+function showCopied() {
+
+const button =
+document.querySelector(
+".key-box button"
+);
+
+if (!button) {
+return;
+}
+
+const original =
+button.textContent;
+
+button.textContent =
+"Tersalin!";
+
+setTimeout(
 function () {
 
 ```
-    const button =
-      document.querySelector(
-        ".key-box button"
-      );
+  button.textContent =
+    original || "Salin";
 
+},
 
-    if (!button) {
-      return;
-    }
-
-
-    button.textContent =
-      "Tersalin!";
-
-
-    setTimeout(
-      function () {
-
-        button.textContent =
-          "Salin";
-
-      },
-      2000
-    );
-
-  }
-)
-.catch(
-  function () {
-
-    alert(
-      "Gagal menyalin key."
-    );
-
-  }
-);
+2000
 ```
+
+);
 
 }
 
@@ -2234,6 +3101,7 @@ if (modal) {
 modal.classList.remove(
   "active"
 );
+
 
 modal.innerHTML =
   "";

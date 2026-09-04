@@ -4,12 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>NIELSTORE — Gaming Store</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet">
@@ -19,26 +17,20 @@
 
 <body>
 
-  <!-- =========================
-       LOADING SCREEN
-  ========================== -->
+  <!-- LOADING -->
 
-  <div id="loadingScreen" class="loading-overlay">
+  <div id="loadingScreen" class="loading-overlay hidden">
     <div class="spinner"></div>
     <p class="loading-text">Memuat NIELSTORE...</p>
   </div>
 
-  <!-- =========================
-       MAIN APP
-  ========================== -->
+  <!-- APP -->
 
   <div id="mainApp">
 
 ```
 <!-- NAVBAR -->
-
 <nav class="navbar">
-
   <div class="nav-inner">
 
     <div class="logo">
@@ -46,7 +38,6 @@
     </div>
 
     <div class="nav-links">
-
       <a
         href="#"
         class="active"
@@ -60,21 +51,18 @@
         Produk
       </a>
 
-      <a href="#">
+      <a
+        href="#"
+        onclick="showOrders(); return false;">
         Cek Pesanan
       </a>
-
     </div>
 
   </div>
-
 </nav>
 
 
-<!-- =========================
-     CATALOG
-========================== -->
-
+<!-- CATALOG -->
 <main id="catalogView">
 
   <div class="container">
@@ -106,8 +94,19 @@
 
 
     <div
-      class="product-grid"
-      id="productGrid">
+      id="productGrid"
+      class="product-grid">
+    </div>
+
+
+    <div
+      id="sheetStatus"
+      style="
+        text-align:center;
+        margin:15px 0;
+        font-size:.8rem;
+        color:var(--text-muted);
+      ">
     </div>
 
   </div>
@@ -115,10 +114,7 @@
 </main>
 
 
-<!-- =========================
-     PRODUCT DETAIL
-========================== -->
-
+<!-- DETAIL -->
 <main
   id="detailView"
   class="hidden">
@@ -134,8 +130,6 @@
 
     <div class="detail-layout">
 
-      <!-- LEFT -->
-
       <div class="detail-left">
 
         <div
@@ -143,12 +137,10 @@
           id="detailImage">
         </div>
 
-
         <h1
           class="detail-name"
           id="detailName">
         </h1>
-
 
         <div class="detail-meta">
 
@@ -164,7 +156,6 @@
 
         </div>
 
-
         <div class="detail-desc">
 
           <h3>
@@ -178,50 +169,33 @@
       </div>
 
 
-      <!-- RIGHT -->
-
       <div class="detail-right">
 
         <div class="order-box">
 
-
           <!-- VOUCHER -->
-
           <div class="order-section">
 
             <div class="section-title">
-
-              <span class="num">
-                1
-              </span>
-
+              <span class="num">1</span>
               PILIH NOMINAL VOUCHER
-
             </div>
 
-
             <div
-              class="voucher-grid"
-              id="voucherGrid">
+              id="voucherGrid"
+              class="voucher-grid">
             </div>
 
           </div>
 
 
           <!-- PAYMENT -->
-
           <div class="order-section">
 
             <div class="section-title">
-
-              <span class="num">
-                2
-              </span>
-
+              <span class="num">2</span>
               PEMBAYARAN
-
             </div>
-
 
             <div class="payment-option selected">
 
@@ -232,7 +206,6 @@
                 </span>
 
                 <div>
-
                   <strong>
                     QRIS
                   </strong>
@@ -240,18 +213,15 @@
                   <small>
                     All Payment
                   </small>
-
                 </div>
 
               </div>
-
 
               <div class="pay-check">
                 ✓
               </div>
 
             </div>
-
 
             <div class="payment-sub">
 
@@ -269,11 +239,9 @@
           </div>
 
 
-          <!-- BUY BUTTON -->
-
           <button
-            class="btn-buy-now"
             id="btnOrder"
+            class="btn-buy-now"
             onclick="processOrder()">
 
             Beli Sekarang
@@ -291,19 +259,14 @@
 </main>
 
 
-<!-- =========================
-     MODAL
-========================== -->
-
+<!-- MODAL -->
 <div
-  class="modal-overlay"
-  id="successModal">
+  id="successModal"
+  class="modal-overlay">
 </div>
 ```
 
   </div>
-
-  <!-- SCRIPT -->
 
   <script src="script.js"></script>
 

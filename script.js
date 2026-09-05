@@ -7,25 +7,13 @@ const PRODUCT_IMAGES = {
   "DRIP APK MOD":
     "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
 
-  "DRIP APK":
-    "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
-
   "DRIP PROXY":
-    "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
-
-  "DRIP CLIENT":
     "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
 
   "HG APKMOD":
     "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
 
-  "HG APK MOD":
-    "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
-
   "HG PROXY":
-    "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
-
-  "HG CHEAT":
     "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
 
   "MIGUL LITE":
@@ -41,19 +29,9 @@ const LOGO_FALLBACK = {
     color: "#e879f9"
   },
 
-  "DRIP APK": {
-    logo: "DRIP",
-    color: "#e879f9"
-  },
-
   "DRIP PROXY": {
     logo: "DRIP",
     color: "#c084fc"
-  },
-
-  "DRIP CLIENT": {
-    logo: "DRIP",
-    color: "#e879f9"
   },
 
   "HG APKMOD": {
@@ -61,19 +39,9 @@ const LOGO_FALLBACK = {
     color: "#ec4899"
   },
 
-  "HG APK MOD": {
-    logo: "HG",
-    color: "#ec4899"
-  },
-
   "HG PROXY": {
     logo: "HG",
     color: "#f472b6"
-  },
-
-  "HG CHEAT": {
-    logo: "HG",
-    color: "#ec4899"
   },
 
   "MIGUL LITE": {

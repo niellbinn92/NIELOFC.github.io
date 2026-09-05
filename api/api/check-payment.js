@@ -7,7 +7,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { transaction_id } = req.body || {};
+    const {
+      transaction_id,
+      order_id,
+      product,
+      duration,
+      amount,
+      key
+    } = req.body || {};
 
     if (!transaction_id) {
       return res.status(400).json({
@@ -39,17 +46,116 @@ export default async function handler(req, res) {
       });
     }
 
+    const paymentData = data.data || {};
+
+    const paymentStatus = String(
+      paymentData.status ||
+      paymentData.payment_status ||
+      paymentData.transaction_status ||
+      ""
+    ).toLowerCase();
+
+    const paidStatuses = [
+      "paid",
+      "success",
+      "settlement",
+      "completed",
+      "lunas"
+    ];
+
+    const isPaid = paidStatuses.includes(paymentStatus);
+
+    if (isPaid) {
+      if (!order_id || !product || !duration || !amount || !key) {
+        return res.status(400).json({
+          success: false,
+          message: "Pembayaran berhasil, tetapi data order belum lengkap",
+          payment: paymentData
+        });
+      }
+
+      const saveResponse = await fetch(
+        `${getBaseUrl(req)}/api/save-order`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            order_id,
+            product,
+            duration,
+            amount: Number(amount),
+            transaction_id,
+            status: "PAID",
+            key
+          })
+        }
+      );
+
+      const saveText = await saveResponse.text();
+
+      let saveData;
+
+      try {
+        saveData = JSON.parse(saveText);
+      } catch {
+        saveData = {
+          success: false,
+          message: saveText || "Respons save-order tidak valid"
+        };
+      }
+
+      if (!saveResponse.ok || !saveData.success) {
+        console.error("SAVE ORDER FAILED:", saveData);
+
+        return res.status(500).json({
+          success: false,
+          message: "Pembayaran berhasil, tetapi order gagal disimpan",
+          payment: paymentData
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        paid: true,
+        data: paymentData,
+        order: {
+          order_id,
+          product,
+          duration,
+          amount: Number(amount),
+          transaction_id,
+          status: "PAID",
+          key
+        }
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      data: data.data
+      paid: false,
+      data: paymentData
     });
 
   } catch (error) {
-    console.error(error);
+    console.error("CHECK PAYMENT ERROR:", error);
 
     return res.status(500).json({
       success: false,
       message: "Server error"
     });
   }
+}
+
+function getBaseUrl(req) {
+  const protocol =
+    req.headers["x-forwarded-proto"] ||
+    (req.headers.host && req.headers.host.includes("localhost")
+      ? "http"
+      : "https");
+
+  const host = req.headers.host;
+
+  return `${protocol}://${host}`;
 }

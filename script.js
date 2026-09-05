@@ -1,7 +1,7 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 
 const SHEET_CSV =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vTAVstHFd3fsdtwy2JxULO--QM2ILEECMZFAUTaBQY5eQ4NQYq3ogkEuqEwPkjDLZuiHbFvrGoyiIlC/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 const PRODUCT_IMAGES = {
 "DRIP CLIENT":

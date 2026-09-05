@@ -3,24 +3,34 @@ const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
-
 const PRODUCT_IMAGES = {
-  "DRIP CLIENT":
-    "https://i.ibb.co/fdSbRZws/D59-B08-CC-71-D9-4-CAC-9-A24-68-F271078-F7-B.png",
+  "DRIP APK":
+    "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
 
   "DRIP PROXY":
-    "https://i.ibb.co/fdSbRZws/D59-B08-CC-71-D9-4-CAC-9-A24-68-F271078-F7-B.png",
+    "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
 
-  "HG CHEAT":
-    "https://i.ibb.co/Gv20LMPL/IMG-7800.png",
+  "DRIP CLIENT":
+    "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+
+  "HG APKMOD":
+    "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
 
   "HG PROXY":
-    "https://i.ibb.co/Gv20LMPL/IMG-7800.png"
+    "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+
+  "HG CHEAT":
+    "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+
+  "MIGUL LITE":
+    "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png",
+
+  "MIGUL PRO":
+    "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png"
 };
 
-
 const LOGO_FALLBACK = {
-  "DRIP CLIENT": {
+  "DRIP APK": {
     logo: "DRIP",
     color: "#e879f9"
   },
@@ -30,7 +40,12 @@ const LOGO_FALLBACK = {
     color: "#c084fc"
   },
 
-  "HG CHEAT": {
+  "DRIP CLIENT": {
+    logo: "DRIP",
+    color: "#e879f9"
+  },
+
+  "HG APKMOD": {
     logo: "HG",
     color: "#ec4899"
   },
@@ -38,9 +53,23 @@ const LOGO_FALLBACK = {
   "HG PROXY": {
     logo: "HG",
     color: "#f472b6"
+  },
+
+  "HG CHEAT": {
+    logo: "HG",
+    color: "#ec4899"
+  },
+
+  "MIGUL LITE": {
+    logo: "MIGUL",
+    color: "#a855f7"
+  },
+
+  "MIGUL PRO": {
+    logo: "MIGUL",
+    color: "#c084fc"
   }
 };
-
 
 let products = [];
 let currentProduct = null;
@@ -74,10 +103,11 @@ function renderProductsMessage(message) {
 
   grid.innerHTML =
     '<p style="' +
-    'grid-column:1/-1;' +
-    'text-align:center;' +
-    'padding:3rem;' +
-    'color:var(--text-muted);">' +
+    "grid-column:1/-1;" +
+    "text-align:center;" +
+    "padding:3rem;" +
+    "color:var(--text-muted);" +
+    '">' +
     escapeHtml(message) +
     "</p>";
 }
@@ -485,18 +515,18 @@ function createFallbackProducts() {
 
     {
       id: 1,
-      name: "DRIP CLIENT",
+      name: "DRIP APK",
       platform: "android",
       logo: "DRIP",
       logoColor: "#e879f9",
-      image: PRODUCT_IMAGES["DRIP CLIENT"],
+      image: PRODUCT_IMAGES["DRIP APK"],
       rating: 0,
       sold: "",
       priceFrom: 0,
       desc: [
         {
           icon: "✓",
-          text: "Produk DRIP CLIENT"
+          text: "Produk DRIP APK"
         }
       ],
       vouchers: []
@@ -523,18 +553,18 @@ function createFallbackProducts() {
 
     {
       id: 3,
-      name: "HG CHEAT",
+      name: "HG APKMOD",
       platform: "android",
       logo: "HG",
       logoColor: "#ec4899",
-      image: PRODUCT_IMAGES["HG CHEAT"],
+      image: PRODUCT_IMAGES["HG APKMOD"],
       rating: 0,
       sold: "",
       priceFrom: 0,
       desc: [
         {
           icon: "✓",
-          text: "Produk HG CHEAT"
+          text: "Produk HG APKMOD"
         }
       ],
       vouchers: []
@@ -554,6 +584,44 @@ function createFallbackProducts() {
         {
           icon: "✓",
           text: "Produk HG PROXY"
+        }
+      ],
+      vouchers: []
+    },
+
+    {
+      id: 5,
+      name: "MIGUL LITE",
+      platform: "android",
+      logo: "MIGUL",
+      logoColor: "#a855f7",
+      image: PRODUCT_IMAGES["MIGUL LITE"],
+      rating: 0,
+      sold: "",
+      priceFrom: 0,
+      desc: [
+        {
+          icon: "✓",
+          text: "Produk MIGUL LITE"
+        }
+      ],
+      vouchers: []
+    },
+
+    {
+      id: 6,
+      name: "MIGUL PRO",
+      platform: "android",
+      logo: "MIGUL",
+      logoColor: "#c084fc",
+      image: PRODUCT_IMAGES["MIGUL PRO"],
+      rating: 0,
+      sold: "",
+      priceFrom: 0,
+      desc: [
+        {
+          icon: "✓",
+          text: "Produk MIGUL PRO"
         }
       ],
       vouchers: []
@@ -953,10 +1021,6 @@ function renderVouchers() {
               ${formatRupiah(
                 voucher.price
               )}
-            </div>
-
-            <div class="reseller">
-              HARGA RESELLER
             </div>
 
           </div>

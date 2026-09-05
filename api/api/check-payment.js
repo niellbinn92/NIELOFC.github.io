@@ -1,4 +1,18 @@
 export default async function handler(req, res) {
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  // Preflight
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Hanya POST
   if (req.method !== "POST") {
     return res.status(405).json({
       success: false,
@@ -28,7 +42,8 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.AUTOGOPAY_API_KEY}`,
+          "Authorization":
+            `Bearer ${process.env.AUTOGOPAY_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -42,18 +57,24 @@ export default async function handler(req, res) {
     if (!response.ok || !data.success) {
       return res.status(400).json({
         success: false,
-        message: data.message || "Gagal mengecek pembayaran"
+        message:
+          data.message ||
+          "Gagal mengecek pembayaran"
       });
     }
 
-    const paymentData = data.data || {};
+    const paymentData =
+      data.data || {};
 
-    const paymentStatus = String(
-      paymentData.status ||
-      paymentData.payment_status ||
-      paymentData.transaction_status ||
-      ""
-    ).toLowerCase();
+    const paymentStatus =
+      String(
+        paymentData.transaction_status ||
+        paymentData.status ||
+        paymentData.payment_status ||
+        ""
+      )
+        .toLowerCase()
+        .trim();
 
     const paidStatuses = [
       "paid",
@@ -63,23 +84,56 @@ export default async function handler(req, res) {
       "lunas"
     ];
 
-    const isPaid = paidStatuses.includes(paymentStatus);
+    const isPaid =
+      paidStatuses.includes(
+        paymentStatus
+      );
 
-    if (isPaid) {
-      if (!order_id || !product || !duration || !amount || !key) {
-        return res.status(400).json({
-          success: false,
-          message: "Pembayaran berhasil, tetapi data order belum lengkap",
-          payment: paymentData
-        });
-      }
+    // BELUM BAYAR
+    if (!isPaid) {
+      return res.status(200).json({
+        success: true,
+        paid: false,
+        data: paymentData
+      });
+    }
 
-      const saveResponse = await fetch(
-        `${getBaseUrl(req)}/api/save-order`,
+    // SUDAH BAYAR
+    if (
+      !order_id ||
+      !product ||
+      !duration ||
+      !amount ||
+      !key
+    ) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Pembayaran berhasil, tetapi data order belum lengkap",
+        data: paymentData
+      });
+    }
+
+    const googleScriptUrl =
+      process.env.GOOGLE_SCRIPT_URL;
+
+    if (!googleScriptUrl) {
+      return res.status(500).json({
+        success: false,
+        message:
+          "GOOGLE_SCRIPT_URL belum tersedia"
+      });
+    }
+
+    // Simpan ke Google Sheet
+    const saveResponse =
+      await fetch(
+        googleScriptUrl,
         {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type":
+              "application/json"
           },
           body: JSON.stringify({
             order_id,
@@ -93,69 +147,64 @@ export default async function handler(req, res) {
         }
       );
 
-      const saveText = await saveResponse.text();
+    const saveText =
+      await saveResponse.text();
 
-      let saveData;
+    let saveData;
 
-      try {
-        saveData = JSON.parse(saveText);
-      } catch {
-        saveData = {
-          success: false,
-          message: saveText || "Respons save-order tidak valid"
-        };
-      }
+    try {
+      saveData =
+        JSON.parse(saveText);
+    } catch {
+      saveData = {
+        success: false,
+        message:
+          saveText ||
+          "Respons Google Script tidak valid"
+      };
+    }
 
-      if (!saveResponse.ok || !saveData.success) {
-        console.error("SAVE ORDER FAILED:", saveData);
+    if (
+      !saveResponse.ok ||
+      !saveData.success
+    ) {
+      console.error(
+        "SAVE ORDER FAILED:",
+        saveData
+      );
 
-        return res.status(500).json({
-          success: false,
-          message: "Pembayaran berhasil, tetapi order gagal disimpan",
-          payment: paymentData
-        });
-      }
-
-      return res.status(200).json({
-        success: true,
-        paid: true,
-        data: paymentData,
-        order: {
-          order_id,
-          product,
-          duration,
-          amount: Number(amount),
-          transaction_id,
-          status: "PAID",
-          key
-        }
+      return res.status(500).json({
+        success: false,
+        message:
+          "Pembayaran berhasil, tetapi order gagal disimpan",
+        data: paymentData
       });
     }
 
     return res.status(200).json({
       success: true,
-      paid: false,
-      data: paymentData
+      paid: true,
+      data: paymentData,
+      order: {
+        order_id,
+        product,
+        duration,
+        amount: Number(amount),
+        transaction_id,
+        status: "PAID",
+        key
+      }
     });
 
   } catch (error) {
-    console.error("CHECK PAYMENT ERROR:", error);
+    console.error(
+      "CHECK PAYMENT ERROR:",
+      error
+    );
 
     return res.status(500).json({
       success: false,
       message: "Server error"
     });
   }
-}
-
-function getBaseUrl(req) {
-  const protocol =
-    req.headers["x-forwarded-proto"] ||
-    (req.headers.host && req.headers.host.includes("localhost")
-      ? "http"
-      : "https");
-
-  const host = req.headers.host;
-
-  return `${protocol}://${host}`;
 }

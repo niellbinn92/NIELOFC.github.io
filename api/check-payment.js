@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Cek status pembayaran ke AutoGoPay
+    // Cek pembayaran ke AutoGoPay
     const response = await fetch(
       "https://v1-gateway.autogopay.site/qris/status",
       {
@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       return res.status(400).json({
         success: false,
         message:
-          data.message ||
+          data?.message ||
           "Gagal mengecek pembayaran"
       });
     }
@@ -75,14 +75,18 @@ export default async function handler(req, res) {
       .toLowerCase()
       .trim();
 
-    const isPaid =
-      status === "settlement" ||
-      status === "paid" ||
-      status === "success" ||
-      status === "completed" ||
-      status === "lunas";
+    const paidStatuses = [
+      "settlement",
+      "paid",
+      "success",
+      "completed",
+      "lunas"
+    ];
 
-    // Belum dibayar
+    const isPaid =
+      paidStatuses.includes(status);
+
+    // Belum bayar
     if (!isPaid) {
       return res.status(200).json({
         success: true,
@@ -91,97 +95,98 @@ export default async function handler(req, res) {
       });
     }
 
-    // Sudah dibayar tetapi data order tidak lengkap
-    if (
-      !order_id ||
-      !product ||
-      !duration ||
-      !amount ||
-      !key
-    ) {
-      return res.status(400).json({
-        success: false,
-        message:
-          "Pembayaran berhasil, tetapi data order belum lengkap",
-        data: payment
-      });
-    }
+    // =========================
+    // SUDAH BAYAR
+    // =========================
 
-    // URL Google Apps Script
-    const googleScriptUrl =
-      process.env.GOOGLE_SCRIPT_URL;
+    let saved = false;
+    let saveMessage = "";
 
-    if (!googleScriptUrl) {
-      return res.status(500).json({
-        success: false,
-        message:
-          "GOOGLE_SCRIPT_URL belum tersedia"
-      });
-    }
-
-    // Simpan order ke Google Sheet
-    const saveResponse = await fetch(
-      googleScriptUrl,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          order_id,
-          product,
-          duration,
-          amount: Number(amount),
-          transaction_id,
-          status: "PAID",
-          key
-        })
-      }
-    );
-
-    const saveText = await saveResponse.text();
-
-    let saveData;
-
+    // Coba simpan ke Google Sheet
     try {
-      saveData = JSON.parse(saveText);
-    } catch {
-      saveData = {
-        success: false,
-        message:
-          saveText ||
-          "Respons Google Script tidak valid"
-      };
-    }
+      const googleScriptUrl =
+        process.env.GOOGLE_SCRIPT_URL;
 
-    if (!saveResponse.ok || !saveData.success) {
+      if (googleScriptUrl) {
+        const saveResponse =
+          await fetch(
+            googleScriptUrl,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+              body: JSON.stringify({
+                order_id: order_id || "",
+                product: product || "",
+                duration: duration || "",
+                amount: Number(amount) || 0,
+                transaction_id,
+                status: "PAID",
+                key: key || ""
+              })
+            }
+          );
+
+        const saveText =
+          await saveResponse.text();
+
+        let saveData = {};
+
+        try {
+          saveData =
+            JSON.parse(saveText);
+        } catch {
+          saveData = {
+            success: false,
+            message: saveText
+          };
+        }
+
+        saved =
+          saveResponse.ok &&
+          saveData.success === true;
+
+        if (!saved) {
+          saveMessage =
+            saveData.message ||
+            "Gagal menyimpan order";
+        }
+      } else {
+        saveMessage =
+          "GOOGLE_SCRIPT_URL belum tersedia";
+      }
+
+    } catch (saveError) {
       console.error(
-        "SAVE ORDER FAILED:",
-        saveData
+        "GOOGLE SHEET ERROR:",
+        saveError
       );
 
-      return res.status(500).json({
-        success: false,
-        message:
-          "Pembayaran berhasil, tetapi order gagal disimpan",
-        data: payment
-      });
+      saveMessage =
+        "Gagal menyimpan ke Google Sheet";
     }
 
-    // Berhasil bayar + berhasil simpan
+    // PENTING:
+    // Pembayaran tetap dianggap sukses
+    // dan key tetap dikembalikan.
     return res.status(200).json({
       success: true,
       paid: true,
-      saved: true,
+      saved: saved,
+      save_message: saveMessage,
+
       data: payment,
+
       order: {
-        order_id,
-        product,
-        duration,
-        amount: Number(amount),
+        order_id: order_id || null,
+        product: product || null,
+        duration: duration || null,
+        amount: Number(amount) || 0,
         transaction_id,
         status: "PAID",
-        key
+        key: key || null
       }
     });
 

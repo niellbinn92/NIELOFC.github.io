@@ -27,65 +27,32 @@
     </div>
 
     <div class="nav-links">
-      <a
-        href="#"
-        class="active"
-        onclick="showCatalog(); return false;">
-        Home
-      </a>
-
-      <a
-        href="#"
-        onclick="showCatalog(); return false;">
-        Produk
-      </a>
-
-      <a
-        href="#"
-        onclick="showOrders(); return false;">
-        Cek Pesanan
-      </a>
+      <a href="#" class="active" onclick="showCatalog(); return false;">Home</a>
+      <a href="#" onclick="showCatalog(); return false;">Produk</a>
+      <a href="#" onclick="showOrders(); return false;">Cek Pesanan</a>
     </div>
 
   </div>
 </nav>
 
-
 <main id="catalogView">
-
   <div class="container">
 
     <div class="filter-tabs">
-
-      <button
-        class="tab active"
-        data-filter="all"
-        onclick="filterProducts('all')">
+      <button class="tab active" data-filter="all" onclick="filterProducts('all')">
         Semua
       </button>
 
-      <button
-        class="tab"
-        data-filter="android"
-        onclick="filterProducts('android')">
+      <button class="tab" data-filter="android" onclick="filterProducts('android')">
         Android
       </button>
 
-      <button
-        class="tab"
-        data-filter="ios"
-        onclick="filterProducts('ios')">
+      <button class="tab" data-filter="ios" onclick="filterProducts('ios')">
         iOS
       </button>
-
     </div>
 
-
-    <div
-      id="productGrid"
-      class="product-grid">
-    </div>
-
+    <div id="productGrid" class="product-grid"></div>
 
     <div
       id="sheetStatus"
@@ -98,63 +65,35 @@
     </div>
 
   </div>
-
 </main>
 
-
-<main
-  id="detailView"
-  class="hidden">
+<main id="detailView" class="hidden">
 
   <div class="container detail-container">
 
-    <button
-      class="back-btn"
-      onclick="showCatalog()">
+    <button class="back-btn" onclick="showCatalog()">
       ← Kembali
     </button>
-
 
     <div class="detail-layout">
 
       <div class="detail-left">
 
-        <div
-          class="detail-image"
-          id="detailImage">
-        </div>
+        <div class="detail-image" id="detailImage"></div>
 
-        <h1
-          class="detail-name"
-          id="detailName">
-        </h1>
+        <h1 class="detail-name" id="detailName"></h1>
 
         <div class="detail-meta">
-
-          <span
-            class="platform-badge"
-            id="detailPlatform">
-          </span>
-
-          <span
-            class="rating"
-            id="detailRating">
-          </span>
-
+          <span class="platform-badge" id="detailPlatform"></span>
+          <span class="rating" id="detailRating"></span>
         </div>
 
         <div class="detail-desc">
-
-          <h3>
-            DESKRIPSI PRODUK
-          </h3>
-
+          <h3>DESKRIPSI PRODUK</h3>
           <ul id="detailDesc"></ul>
-
         </div>
 
       </div>
-
 
       <div class="detail-right">
 
@@ -167,13 +106,9 @@
               PILIH NOMINAL VOUCHER
             </div>
 
-            <div
-              id="voucherGrid"
-              class="voucher-grid">
-            </div>
+            <div id="voucherGrid" class="voucher-grid"></div>
 
           </div>
-
 
           <div class="order-section">
 
@@ -186,9 +121,7 @@
 
               <div class="pay-left">
 
-                <span class="pay-icon">
-                  ⚡
-                </span>
+                <span class="pay-icon">⚡</span>
 
                 <div>
                   <strong>QRIS</strong>
@@ -197,9 +130,7 @@
 
               </div>
 
-              <div class="pay-check">
-                ✓
-              </div>
+              <div class="pay-check">✓</div>
 
             </div>
 
@@ -218,7 +149,6 @@
 
           </div>
 
-
           <button
             id="btnOrder"
             class="btn-buy-now"
@@ -236,11 +166,7 @@
 
 </main>
 
-
-<div
-  id="successModal"
-  class="modal-overlay">
-</div>
+<div id="successModal" class="modal-overlay"></div>
 ```
 
   </div>

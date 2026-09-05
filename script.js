@@ -140,7 +140,7 @@ controller = new AbortController();
 ```
 timeoutId = setTimeout(function () {
   controller.abort();
-}, 5000);
+}, 10000);
 
 const response = await fetch(
   SHEET_CSV + "&t=" + Date.now(),
@@ -172,8 +172,7 @@ if (!rows.length) {
   throw new Error("Data Google Sheet kosong");
 }
 
-const loadedProducts =
-  convertRowsToProducts(rows);
+const loadedProducts = convertRowsToProducts(rows);
 
 if (!loadedProducts.length) {
   throw new Error("Data produk tidak terbaca");
@@ -187,11 +186,11 @@ renderProducts();
 } catch (error) {
 
 ```
-console.error(
-  "Google Sheet error:",
-  error
-);
+console.error("Google Sheet error:", error);
 
+/*
+ * Tetap tampilkan produk walaupun Google Sheet gagal.
+ */
 products = createFallbackProducts();
 
 renderProducts();
@@ -219,10 +218,11 @@ let value = "";
 let insideQuotes = false;
 
 for (let i = 0; i < text.length; i++) {
+
+```
 const char = text[i];
 const next = text[i + 1];
 
-```
 if (
   char === '"' &&
   insideQuotes &&
@@ -238,10 +238,7 @@ if (char === '"') {
   continue;
 }
 
-if (
-  char === "," &&
-  !insideQuotes
-) {
+if (char === "," && !insideQuotes) {
   row.push(value.trim());
   value = "";
   continue;
@@ -252,10 +249,7 @@ if (
   !insideQuotes
 ) {
 
-  if (
-    char === "\r" &&
-    next === "\n"
-  ) {
+  if (char === "\r" && next === "\n") {
     i++;
   }
 
@@ -280,10 +274,7 @@ value += char;
 
 }
 
-if (
-value !== "" ||
-row.length > 0
-) {
+if (value !== "" || row.length > 0) {
 row.push(value.trim());
 }
 
@@ -346,8 +337,7 @@ const rawName =
   row.nama ||
   "";
 
-const name =
-  normalizeProductName(rawName);
+const name = normalizeProductName(rawName);
 
 if (!name) {
   return;
@@ -426,9 +416,7 @@ const vouchers = [];
 Object.keys(row).forEach(function (key) {
 
   if (
-    fixedColumns.indexOf(
-      key.toLowerCase()
-    ) !== -1
+    fixedColumns.indexOf(key.toLowerCase()) !== -1
   ) {
     return;
   }
@@ -454,11 +442,13 @@ Object.keys(row).forEach(function (key) {
     Number.isFinite(price) &&
     price > 0
   ) {
+
     vouchers.push({
       duration: key.trim(),
       price: price,
       stock: true
     });
+
   }
 
 });
@@ -490,8 +480,7 @@ result.push({
       row.nama
     ).trim(),
 
-  platform:
-    platform,
+  platform: platform,
 
   logo:
     row.logo ||
@@ -503,20 +492,15 @@ result.push({
   image:
     PRODUCT_IMAGES[name] || "",
 
-  rating:
-    rating,
+  rating: rating,
 
-  sold:
-    sold,
+  sold: sold,
 
-  priceFrom:
-    priceFrom,
+  priceFrom: priceFrom,
 
-  desc:
-    desc,
+  desc: desc,
 
-  vouchers:
-    vouchers
+  vouchers: vouchers
 });
 ```
 
@@ -539,32 +523,37 @@ return match
 }
 
 /* =========================
-FALLBACK
+FALLBACK PRODUCTS
 ========================= */
 
 function createFallbackProducts() {
 return [
-
-```
 {
-  id: 1,
-  name: "DRIP APK MOD",
-  platform: "android",
-  logo: "DRIP",
-  logoColor: "#e879f9",
-  image: PRODUCT_IMAGES["DRIP APK MOD"],
-  rating: 0,
-  sold: "",
-  priceFrom: 0,
-  desc: [
-    {
-      icon: "✓",
-      text: "Produk DRIP APK MOD"
-    }
-  ],
-  vouchers: []
+id: 1,
+name: "DRIP APK MOD",
+platform: "android",
+logo: "DRIP",
+logoColor: "#e879f9",
+image: PRODUCT_IMAGES["DRIP APK MOD"],
+rating: 0,
+sold: "",
+priceFrom: 0,
+desc: [
+{
+icon: "✓",
+text: "Produk DRIP APK MOD"
+}
+],
+vouchers: [
+{
+duration: "1 Day",
+price: 38000,
+stock: true
+}
+]
 },
 
+```
 {
   id: 2,
   name: "DRIP PROXY",
@@ -581,7 +570,13 @@ return [
       text: "Produk DRIP PROXY"
     }
   ],
-  vouchers: []
+  vouchers: [
+    {
+      duration: "1 Day",
+      price: 38000,
+      stock: true
+    }
+  ]
 },
 
 {
@@ -600,7 +595,13 @@ return [
       text: "Produk HG APKMOD"
     }
   ],
-  vouchers: []
+  vouchers: [
+    {
+      duration: "1 Day",
+      price: 38000,
+      stock: true
+    }
+  ]
 },
 
 {
@@ -619,7 +620,13 @@ return [
       text: "Produk HG PROXY"
     }
   ],
-  vouchers: []
+  vouchers: [
+    {
+      duration: "1 Day",
+      price: 38000,
+      stock: true
+    }
+  ]
 },
 
 {
@@ -638,7 +645,13 @@ return [
       text: "Produk MIGUL LITE"
     }
   ],
-  vouchers: []
+  vouchers: [
+    {
+      duration: "1 Day",
+      price: 38000,
+      stock: true
+    }
+  ]
 },
 
 {
@@ -657,7 +670,13 @@ return [
       text: "Produk MIGUL PRO"
     }
   ],
-  vouchers: []
+  vouchers: [
+    {
+      duration: "1 Day",
+      price: 38000,
+      stock: true
+    }
+  ]
 }
 ```
 
@@ -681,8 +700,7 @@ ESCAPE HTML
 
 function escapeHtml(value) {
 return String(
-value === null ||
-value === undefined
+value === null || value === undefined
 ? ""
 : value
 )
@@ -694,14 +712,12 @@ value === undefined
 }
 
 /* =========================
-RENDER
+RENDER PRODUCTS
 ========================= */
 
 function renderProducts() {
 const grid =
-document.getElementById(
-"productGrid"
-);
+document.getElementById("productGrid");
 
 if (!grid) {
 return;
@@ -711,10 +727,7 @@ const filtered =
 currentFilter === "all"
 ? products
 : products.filter(function (product) {
-return (
-product.platform ===
-currentFilter
-);
+return product.platform === currentFilter;
 });
 
 if (!filtered.length) {
@@ -740,9 +753,7 @@ filtered.map(function (product) {
 
       <div
         class="card-image ${
-          product.image
-            ? "has-img"
-            : ""
+          product.image ? "has-img" : ""
         }"
         style="${
           product.image
@@ -825,7 +836,6 @@ filtered.map(function (product) {
           }
 
           <strong>
-
             ${
               product.priceFrom
                 ? formatRupiah(
@@ -833,7 +843,6 @@ filtered.map(function (product) {
                   )
                 : "Cek Produk"
             }
-
           </strong>
 
         </div>
@@ -899,15 +908,12 @@ return;
 selectedVoucher = null;
 
 const image =
-document.getElementById(
-"detailImage"
-);
+document.getElementById("detailImage");
 
 if (currentProduct.image) {
 
 ```
-image.style.background =
-  "transparent";
+image.style.background = "transparent";
 
 image.innerHTML = `
   <img
@@ -1004,9 +1010,7 @@ VOUCHERS
 
 function renderVouchers() {
 const grid =
-document.getElementById(
-"voucherGrid"
-);
+document.getElementById("voucherGrid");
 
 if (!grid) {
 return;
@@ -1014,6 +1018,7 @@ return;
 
 if (
 !currentProduct ||
+!currentProduct.vouchers ||
 !currentProduct.vouchers.length
 ) {
 
@@ -1075,6 +1080,7 @@ function selectVoucher(index) {
 
 if (
 !currentProduct ||
+!currentProduct.vouchers ||
 !currentProduct.vouchers[index]
 ) {
 return;
@@ -1129,9 +1135,7 @@ return;
 orderProcessing = true;
 
 const button =
-document.getElementById(
-"btnOrder"
-);
+document.getElementById("btnOrder");
 
 if (button) {
 button.disabled = true;
@@ -1420,7 +1424,6 @@ paymentCheckTimer = null;
 ```
 
 }
-
 }
 
 /* =========================
@@ -1479,7 +1482,6 @@ const status =
     .toLowerCase()
     .trim();
 
-
 if (
   status === "settlement" ||
   status === "paid" ||
@@ -1493,7 +1495,6 @@ if (
 
   return;
 }
-
 
 if (
   status === "expire" ||
@@ -1509,17 +1510,14 @@ if (
   return;
 }
 
-
 const statusText =
   document.getElementById(
     "paymentStatusText"
   );
 
 if (statusText) {
-
   statusText.textContent =
     "Menunggu pembayaran...";
-
 }
 ```
 
@@ -1679,8 +1677,7 @@ function cancelPaymentModal() {
 
 stopPaymentPolling();
 
-currentTransactionId =
-null;
+currentTransactionId = null;
 
 const modal =
 document.getElementById(
@@ -1691,12 +1688,9 @@ if (!modal) {
 return;
 }
 
-modal.classList.remove(
-"active"
-);
+modal.classList.remove("active");
 
-modal.innerHTML =
-"";
+modal.innerHTML = "";
 }
 
 /* =========================
@@ -1708,8 +1702,7 @@ function generateKey() {
 const chars =
 "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-let key =
-"NIEL-";
+let key = "NIEL-";
 
 for (
 let group = 0;
@@ -1731,7 +1724,6 @@ for (
         chars.length
       )
     ];
-
 }
 
 if (group < 3) {
@@ -1771,14 +1763,10 @@ navigator.clipboard.writeText
 navigator.clipboard
   .writeText(text)
   .then(function () {
-
     showCopied();
-
   })
   .catch(function () {
-
     fallbackCopy(text);
-
   });
 ```
 
@@ -1802,27 +1790,19 @@ document.createElement(
 "textarea"
 );
 
-textarea.value =
-text;
+textarea.value = text;
 
-textarea.style.position =
-"fixed";
+textarea.style.position = "fixed";
+textarea.style.opacity = "0";
 
-textarea.style.opacity =
-"0";
-
-document.body.appendChild(
-textarea
-);
+document.body.appendChild(textarea);
 
 textarea.select();
 
 try {
 
 ```
-document.execCommand(
-  "copy"
-);
+document.execCommand("copy");
 
 showCopied();
 ```
@@ -1830,16 +1810,12 @@ showCopied();
 } catch (error) {
 
 ```
-alert(
-  "Gagal menyalin key."
-);
+alert("Gagal menyalin key.");
 ```
 
 }
 
-document.body.removeChild(
-textarea
-);
+document.body.removeChild(textarea);
 }
 
 /* =========================
@@ -1881,8 +1857,7 @@ function closeSuccess() {
 
 stopPaymentPolling();
 
-currentTransactionId =
-null;
+currentTransactionId = null;
 
 const modal =
 document.getElementById(
@@ -1896,8 +1871,7 @@ modal.classList.remove(
   "active"
 );
 
-modal.innerHTML =
-  "";
+modal.innerHTML = "";
 ```
 
 }
@@ -1913,8 +1887,7 @@ function showCatalog() {
 
 stopPaymentPolling();
 
-currentTransactionId =
-null;
+currentTransactionId = null;
 
 const detail =
 document.getElementById(
@@ -1927,21 +1900,14 @@ document.getElementById(
 );
 
 if (detail) {
-detail.classList.add(
-"hidden"
-);
+detail.classList.add("hidden");
 }
 
 if (catalog) {
-catalog.classList.remove(
-"hidden"
-);
+catalog.classList.remove("hidden");
 }
 
-window.scrollTo(
-0,
-0
-);
+window.scrollTo(0, 0);
 }
 
 /* =========================

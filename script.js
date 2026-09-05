@@ -1084,27 +1084,27 @@ async function checkPaymentStatus() {
   }
 
   try {
+    const response =
+      await fetch(
+        API_BASE +
+        "/api/check-payment",
+        {
+          method: "POST",
 
-  const response =
-    await fetch(
-      API_BASE +
-      "/api/check-payment",
-  method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-  headers: {
-    "Content-Type": "application/json"
-  },
-
-  body: JSON.stringify({
-    transaction_id: currentTransactionId,
-    order_id: currentOrderId,
-    product: currentProduct.name,
-    duration: selectedVoucher.duration,
-    amount: selectedVoucher.price,
-    key: currentOrderKey
-  })
-}
-);
+          body: JSON.stringify({
+            transaction_id: currentTransactionId,
+            order_id: currentOrderId,
+            product: currentProduct.name,
+            duration: selectedVoucher.duration,
+            amount: selectedVoucher.price,
+            key: currentOrderKey
+          })
+        }
+      );
 
     if (!response.ok) {
       return;
@@ -1135,7 +1135,6 @@ async function checkPaymentStatus() {
       status === "success" ||
       status === "completed"
     ) {
-
       stopPaymentPolling();
 
       paymentSuccess();
@@ -1149,7 +1148,6 @@ async function checkPaymentStatus() {
       status === "cancel" ||
       status === "cancelled"
     ) {
-
       stopPaymentPolling();
 
       paymentExpired();
@@ -1168,14 +1166,12 @@ async function checkPaymentStatus() {
     }
 
   } catch (error) {
-
     console.warn(
       "Payment status error:",
       error
     );
   }
 }
-
 
  function paymentSuccess() {
   const modal =

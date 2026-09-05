@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -17,163 +18,165 @@
 
   <div id="mainApp">
 
-    <nav class="navbar">
-      <div class="nav-inner">
+```
+<nav class="navbar">
+  <div class="nav-inner">
 
-        <div class="logo">
-          NIEL<span>STORE</span>
-        </div>
+    <div class="logo">
+      NIEL<span>STORE</span>
+    </div>
 
-        <div class="nav-links">
-          <a href="#" class="active" onclick="showCatalog(); return false;">Home</a>
-          <a href="#" onclick="showCatalog(); return false;">Produk</a>
-          <a href="#" onclick="showOrders(); return false;">Cek Pesanan</a>
-        </div>
+    <div class="nav-links">
+      <a href="#" class="active" onclick="showCatalog(); return false;">Home</a>
+      <a href="#" onclick="showCatalog(); return false;">Produk</a>
+      <a href="#" onclick="showOrders(); return false;">Cek Pesanan</a>
+    </div>
 
-      </div>
-    </nav>
+  </div>
+</nav>
 
-    <main id="catalogView">
+<main id="catalogView">
 
-      <div class="container">
+  <div class="container">
 
-        <div class="filter-tabs">
+    <div class="filter-tabs">
 
-          <button
-            class="tab active"
-            data-filter="all"
-            onclick="filterProducts('all')">
-            Semua
-          </button>
+      <button
+        class="tab active"
+        data-filter="all"
+        onclick="filterProducts('all')">
+        Semua
+      </button>
 
-          <button
-            class="tab"
-            data-filter="android"
-            onclick="filterProducts('android')">
-            Android
-          </button>
+      <button
+        class="tab"
+        data-filter="android"
+        onclick="filterProducts('android')">
+        Android
+      </button>
 
-          <button
-            class="tab"
-            data-filter="ios"
-            onclick="filterProducts('ios')">
-            iOS
-          </button>
+      <button
+        class="tab"
+        data-filter="ios"
+        onclick="filterProducts('ios')">
+        iOS
+      </button>
 
-        </div>
+    </div>
 
-        <div id="productGrid" class="product-grid"></div>
-
-      </div>
-
-    </main>
-
-    <main id="detailView" class="hidden">
-
-      <div class="container detail-container">
-
-        <button class="back-btn" onclick="showCatalog()">
-          ← Kembali
-        </button>
-
-        <div class="detail-layout">
-
-          <div class="detail-left">
-
-            <div class="detail-image" id="detailImage"></div>
-
-            <h1 class="detail-name" id="detailName"></h1>
-
-            <div class="detail-meta">
-              <span class="platform-badge" id="detailPlatform"></span>
-              <span class="rating" id="detailRating"></span>
-            </div>
-
-            <div class="detail-desc">
-              <h3>DESKRIPSI PRODUK</h3>
-              <ul id="detailDesc"></ul>
-            </div>
-
-          </div>
-
-          <div class="detail-right">
-
-            <div class="order-box">
-
-              <div class="order-section">
-
-                <div class="section-title">
-                  <span class="num">1</span>
-                  PILIH NOMINAL VOUCHER
-                </div>
-
-                <div id="voucherGrid" class="voucher-grid"></div>
-
-              </div>
-
-              <div class="order-section">
-
-                <div class="section-title">
-                  <span class="num">2</span>
-                  PEMBAYARAN
-                </div>
-
-                <div class="payment-option selected">
-
-                  <div class="pay-left">
-
-                    <span class="pay-icon">⚡</span>
-
-                    <div>
-                      <strong>QRIS</strong>
-                      <small>All Payment</small>
-                    </div>
-
-                  </div>
-
-                  <div class="pay-check">
-                    ✓
-                  </div>
-
-                </div>
-
-                <div class="payment-sub">
-
-                  <span>
-                    Pembayaran otomatis via AutoGoPay
-                  </span>
-
-                  <span class="gratis">
-                    Admin:
-                    <b>GRATIS</b>
-                  </span>
-
-                </div>
-
-              </div>
-
-              <button
-                id="btnOrder"
-                class="btn-buy-now"
-                onclick="processOrder()">
-                Beli Sekarang
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </main>
-
-    <div id="successModal" class="modal-overlay"></div>
+    <div id="productGrid" class="product-grid"></div>
 
   </div>
 
-  <script src="script.js?v=10"></script>
+</main>
+
+<main id="detailView" class="hidden">
+
+  <div class="container detail-container">
+
+    <button class="back-btn" onclick="showCatalog()">
+      ← Kembali
+    </button>
+
+    <div class="detail-layout">
+
+      <div class="detail-left">
+
+        <div class="detail-image" id="detailImage"></div>
+
+        <h1 class="detail-name" id="detailName"></h1>
+
+        <div class="detail-meta">
+          <span class="platform-badge" id="detailPlatform"></span>
+          <span class="rating" id="detailRating"></span>
+        </div>
+
+        <div class="detail-desc">
+          <h3>DESKRIPSI PRODUK</h3>
+          <ul id="detailDesc"></ul>
+        </div>
+
+      </div>
+
+      <div class="detail-right">
+
+        <div class="order-box">
+
+          <div class="order-section">
+
+            <div class="section-title">
+              <span class="num">1</span>
+              PILIH NOMINAL VOUCHER
+            </div>
+
+            <div id="voucherGrid" class="voucher-grid"></div>
+
+          </div>
+
+          <div class="order-section">
+
+            <div class="section-title">
+              <span class="num">2</span>
+              PEMBAYARAN
+            </div>
+
+            <div class="payment-option selected">
+
+              <div class="pay-left">
+
+                <span class="pay-icon">⚡</span>
+
+                <div>
+                  <strong>QRIS</strong>
+                  <small>All Payment</small>
+                </div>
+
+              </div>
+
+              <div class="pay-check">
+                ✓
+              </div>
+
+            </div>
+
+            <div class="payment-sub">
+
+              <span>
+                Pembayaran otomatis via AutoGoPay
+              </span>
+
+              <span class="gratis">
+                Admin:
+                <b>GRATIS</b>
+              </span>
+
+            </div>
+
+          </div>
+
+          <button
+            id="btnOrder"
+            class="btn-buy-now"
+            onclick="processOrder()">
+            Beli Sekarang
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</main>
+
+<div id="successModal" class="modal-overlay"></div>
+```
+
+  </div>
+
+  <script src="script.js?v=11"></script>
 
 </body>
 </html>

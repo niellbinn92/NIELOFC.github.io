@@ -25,9 +25,9 @@ let selectedVoucher = null;
 let currentFilter = "all";
 let currentTransactionId = null;
 let currentOrderId = null;
+let currentOrderKey = null;
 let paymentCheckTimer = null;
 let orderProcessing = false;
-
 function normalizeName(value) {
   return String(value || "")
     .trim()
@@ -845,10 +845,13 @@ async function processOrder() {
   orderProcessing =
     true;
 
-  currentOrderId =
-    generateOrderId();
+ currentOrderId =
+  generateOrderId();
 
-  const button =
+currentOrderKey =
+  generateKey();
+
+const button =
     document.getElementById(
       "btnOrder"
     );
@@ -1082,24 +1085,26 @@ async function checkPaymentStatus() {
 
   try {
 
-    const response =
-      await fetch(
-        API_BASE +
-        "/api/check-payment",
-        {
-          method: "POST",
+  const response =
+    await fetch(
+      API_BASE +
+      "/api/check-payment",
+  method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
+  headers: {
+    "Content-Type": "application/json"
+  },
 
-          body: JSON.stringify({
-            transaction_id:
-              currentTransactionId
-          })
-        }
-      );
+  body: JSON.stringify({
+    transaction_id: currentTransactionId,
+    order_id: currentOrderId,
+    product: currentProduct.name,
+    duration: selectedVoucher.duration,
+    amount: selectedVoucher.price,
+    key: currentOrderKey
+  })
+}
+);
 
     if (!response.ok) {
       return;
@@ -1171,7 +1176,8 @@ async function checkPaymentStatus() {
   }
 }
 
-function paymentSuccess() {
+
+ function paymentSuccess() {
   const modal =
     document.getElementById(
       "successModal"
@@ -1182,8 +1188,7 @@ function paymentSuccess() {
   }
 
   const key =
-    generateKey();
-
+    currentOrderKey;
   modal.innerHTML =
     "<div class=\"modal\">" +
 

@@ -1,13 +1,34 @@
 export default async function handler(req, res) {
+  // CORS
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization"
+  );
+
+  // Preflight request
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  // Hanya POST
   if (req.method !== "POST") {
-    return res.status(405).json({ success: false, message: "Method not allowed" });
+    return res.status(405).json({
+      success: false,
+      message: "Method not allowed"
+    });
   }
 
   try {
     const { amount } = req.body || {};
     const numericAmount = Number(amount);
 
-    if (!Number.isInteger(numericAmount) || numericAmount < 1 || numericAmount > 10000000) {
+    if (
+      !Number.isInteger(numericAmount) ||
+      numericAmount < 1 ||
+      numericAmount > 10000000
+    ) {
       return res.status(400).json({
         success: false,
         message: "Nominal pembayaran tidak valid"
@@ -19,7 +40,8 @@ export default async function handler(req, res) {
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.AUTOGOPAY_API_KEY}`,
+          "Authorization":
+            `Bearer ${process.env.AUTOGOPAY_API_KEY}`,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -33,7 +55,9 @@ export default async function handler(req, res) {
     if (!response.ok || !data.success) {
       return res.status(400).json({
         success: false,
-        message: data.message || "Gagal membuat pembayaran"
+        message:
+          data.message ||
+          "Gagal membuat pembayaran"
       });
     }
 
@@ -43,7 +67,10 @@ export default async function handler(req, res) {
     });
 
   } catch (error) {
-    console.error(error);
+    console.error(
+      "CREATE PAYMENT ERROR:",
+      error
+    );
 
     return res.status(500).json({
       success: false,

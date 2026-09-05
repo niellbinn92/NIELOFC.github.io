@@ -1,409 +1,595 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 
 const SHEET_CSV =
-  "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
+"https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 const PRODUCT_IMAGES = {
-  "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
-  "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
-  "HG APKMOD": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
-  "HG PROXY": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
-  "MIGUL LITE": "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png",
-  "MIGUL PRO": "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png"
+"DRIP APKMOD":
+"https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+
+"DRIP PROXY":
+"https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+
+"HG APKMOD":
+"https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+
+"HG PROXY":
+"https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+
+"MIGUL LITE":
+"https://i.ibb.co.com/wNhJG1H5/IMG-8976.png",
+
+"MIGUL PRO":
+"https://i.ibb.co.com/wNhJG1H5/IMG-8976.png"
 };
 
 const LOGO_FALLBACK = {
-  "DRIP APKMOD": { logo: "DRIP", color: "#e879f9" },
-  "DRIP PROXY": { logo: "DRIP", color: "#c084fc" },
-  "HG APKMOD": { logo: "HG", color: "#ec4899" },
-  "HG PROXY": { logo: "HG", color: "#f472b6" },
-  "MIGUL LITE": { logo: "MIGUL", color: "#a855f7" },
-  "MIGUL PRO": { logo: "MIGUL", color: "#c084fc" }
+"DRIP APKMOD": {
+logo: "DRIP",
+color: "#e879f9"
+},
+
+"DRIP PROXY": {
+logo: "DRIP",
+color: "#c084fc"
+},
+
+"HG APKMOD": {
+logo: "HG",
+color: "#ec4899"
+},
+
+"HG PROXY": {
+logo: "HG",
+color: "#f472b6"
+},
+
+"MIGUL LITE": {
+logo: "MIGUL",
+color: "#a855f7"
+},
+
+"MIGUL PRO": {
+logo: "MIGUL",
+color: "#c084fc"
+}
 };
 
 let products = [];
 let currentProduct = null;
 let selectedVoucher = null;
 let currentFilter = "all";
+
 let currentTransactionId = null;
+let currentOrderId = null;
+
 let paymentCheckTimer = null;
 let orderProcessing = false;
 
-
 /* ========================================
-   START
+START
 ======================================== */
 
 document.addEventListener("DOMContentLoaded", function () {
-  loadProducts();
+loadProducts();
 });
 
-
 /* ========================================
-   HELPERS
+HELPERS
 ======================================== */
 
 function normalizeProductName(name) {
-  return String(name || "")
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, " ");
+return String(name || "")
+.trim()
+.toUpperCase()
+.replace(/\s+/g, " ");
 }
-
 
 function escapeHtml(value) {
-  return String(value == null ? "" : value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+return String(
+value === null || value === undefined
+? ""
+: value
+)
+.replace(/&/g, "&")
+.replace(/</g, "<")
+.replace(/>/g, ">")
+.replace(/"/g, """)
+.replace(/'/g, "'");
 }
-
 
 function formatRupiah(number) {
-  return "Rp " + Number(number || 0).toLocaleString("id-ID");
+return (
+"Rp " +
+Number(number || 0).toLocaleString("id-ID")
+);
 }
-
 
 function durationNumber(value) {
-  const match = String(value || "").match(/\d+/);
+const match =
+String(value || "").match(/\d+/);
 
-  return match
-    ? parseInt(match[0], 10)
-    : 999999;
+return match
+? parseInt(match[0], 10)
+: 999999;
 }
-
-
-function getProductImage(row, normalizedName) {
-  const sheetImage = String(
-    row.image ||
-    row.img ||
-    ""
-  ).trim();
-
-  if (sheetImage) {
-    return sheetImage;
-  }
-
-  return PRODUCT_IMAGES[normalizedName] || "";
-}
-
 
 /* ========================================
-   CSV
+GENERATE ORDER ID
 ======================================== */
 
-function parseCSV(text) {
-  const rows = [];
+function generateOrderId() {
+const chars =
+"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-  let row = [];
-  let value = "";
-  let insideQuotes = false;
+let id = "NIEL-";
 
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    const next = text[i + 1];
-
-    if (
-      char === '"' &&
-      insideQuotes &&
-      next === '"'
-    ) {
-      value += '"';
-      i++;
-      continue;
-    }
-
-    if (char === '"') {
-      insideQuotes = !insideQuotes;
-      continue;
-    }
-
-    if (char === "," && !insideQuotes) {
-      row.push(value.trim());
-      value = "";
-      continue;
-    }
-
-    if (
-      (char === "\n" || char === "\r") &&
-      !insideQuotes
-    ) {
-      if (
-        char === "\r" &&
-        next === "\n"
-      ) {
-        i++;
-      }
-
-      row.push(value.trim());
-
-      if (
-        row.some(function (cell) {
-          return cell !== "";
-        })
-      ) {
-        rows.push(row);
-      }
-
-      row = [];
-      value = "";
-
-      continue;
-    }
-
-    value += char;
-  }
-
-  if (
-    value !== "" ||
-    row.length > 0
-  ) {
-    row.push(value.trim());
-  }
-
-  if (row.length > 0) {
-    rows.push(row);
-  }
-
-  if (rows.length < 2) {
-    return [];
-  }
-
-  const headers = rows[0].map(function (header) {
-    return String(header)
-      .replace(/^\uFEFF/, "")
-      .trim()
-      .toLowerCase();
-  });
-
-  return rows.slice(1).map(function (cells) {
-    const object = {};
-
-    headers.forEach(function (header, index) {
-      object[header] =
-        cells[index] == null
-          ? ""
-          : String(cells[index]).trim();
-    });
-
-    return object;
-  });
+for (let i = 0; i < 6; i++) {
+id +=
+chars[
+Math.floor(
+Math.random() * chars.length
+)
+];
 }
 
+return id;
+}
 
 /* ========================================
-   LOAD PRODUCTS
+GET PRODUCT IMAGE
+======================================== */
+
+function getProductImage(row, normalizedName) {
+const sheetImage =
+String(
+row.image ||
+row.img ||
+""
+).trim();
+
+if (sheetImage) {
+return sheetImage;
+}
+
+return PRODUCT_IMAGES[
+normalizedName
+] || "";
+}
+
+/* ========================================
+LOAD PRODUCTS
 ======================================== */
 
 async function loadProducts() {
-  try {
-    const response = await fetch(
-      SHEET_CSV + "&t=" + Date.now(),
-      {
-        method: "GET",
-        cache: "no-store"
+try {
+const response =
+await fetch(
+SHEET_CSV +
+"&t=" +
+Date.now(),
+{
+method: "GET",
+cache: "no-store"
+}
+);
+
+```
+if (!response.ok) {
+  throw new Error(
+    "Google Sheet HTTP " +
+    response.status
+  );
+}
+
+const text =
+  await response.text();
+
+if (!text.trim()) {
+  throw new Error(
+    "Google Sheet kosong"
+  );
+}
+
+const rows =
+  parseCSV(text);
+
+const loadedProducts =
+  convertRowsToProducts(
+    rows
+  );
+
+if (!loadedProducts.length) {
+  throw new Error(
+    "Produk tidak ditemukan"
+  );
+}
+
+products =
+  loadedProducts;
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Load product error:",
+  error
+);
+
+products =
+  createFallbackProducts();
+```
+
+}
+
+renderProducts();
+}
+
+/* ========================================
+CSV PARSER
+======================================== */
+
+function parseCSV(text) {
+const rows = [];
+
+let row = [];
+let value = "";
+let insideQuotes = false;
+
+for (let i = 0; i < text.length; i++) {
+
+```
+const char =
+  text[i];
+
+const next =
+  text[i + 1];
+
+if (
+  char === '"' &&
+  insideQuotes &&
+  next === '"'
+) {
+
+  value += '"';
+
+  i++;
+
+  continue;
+}
+
+if (char === '"') {
+
+  insideQuotes =
+    !insideQuotes;
+
+  continue;
+}
+
+if (
+  char === "," &&
+  !insideQuotes
+) {
+
+  row.push(
+    value.trim()
+  );
+
+  value =
+    "";
+
+  continue;
+}
+
+if (
+  (char === "\n" ||
+   char === "\r") &&
+  !insideQuotes
+) {
+
+  if (
+    char === "\r" &&
+    next === "\n"
+  ) {
+    i++;
+  }
+
+  row.push(
+    value.trim()
+  );
+
+  if (
+    row.some(
+      function (cell) {
+        return cell !== "";
+      }
+    )
+  ) {
+    rows.push(row);
+  }
+
+  row = [];
+
+  value = "";
+
+  continue;
+}
+
+value += char;
+```
+
+}
+
+if (
+value !== "" ||
+row.length > 0
+) {
+
+```
+row.push(
+  value.trim()
+);
+```
+
+}
+
+if (row.length > 0) {
+rows.push(row);
+}
+
+if (rows.length < 2) {
+return [];
+}
+
+const headers =
+rows[0].map(
+function (header) {
+
+```
+    return String(header)
+      .replace(
+        /^\uFEFF/,
+        ""
+      )
+      .trim()
+      .toLowerCase();
+
+  }
+);
+```
+
+return rows
+.slice(1)
+.map(
+function (cells) {
+
+```
+    const object = {};
+
+    headers.forEach(
+      function (
+        header,
+        index
+      ) {
+
+        object[header] =
+          cells[index] !==
+          undefined
+            ? String(
+                cells[index]
+              ).trim()
+            : "";
+
       }
     );
 
-    if (!response.ok) {
-      throw new Error(
-        "Google Sheet HTTP " +
-        response.status
-      );
-    }
-
-    const text = await response.text();
-
-    if (!text.trim()) {
-      throw new Error(
-        "Google Sheet kosong"
-      );
-    }
-
-    const rows = parseCSV(text);
-
-    const loadedProducts =
-      convertRowsToProducts(rows);
-
-    if (!loadedProducts.length) {
-      throw new Error(
-        "Produk tidak ditemukan"
-      );
-    }
-
-    products = loadedProducts;
-
-  } catch (error) {
-    console.error(
-      "Google Sheet error:",
-      error
-    );
-
-    products =
-      createFallbackProducts();
+    return object;
   }
+);
+```
 
-  renderProducts();
 }
 
-
 /* ========================================
-   CONVERT PRODUCTS
+CONVERT PRODUCTS
 ======================================== */
 
 function convertRowsToProducts(rows) {
-  const result = [];
 
-  rows.forEach(function (row, index) {
-    const name =
-      normalizeProductName(
-        row.name ||
-        row.product ||
-        row.nama ||
-        ""
-      );
+const result = [];
 
-    if (!name) {
-      return;
-    }
+rows.forEach(
+function (
+row,
+index
+) {
 
-    const platform =
-      String(
-        row.platform ||
-        row.device ||
-        row.os ||
-        "android"
-      )
-        .trim()
-        .toLowerCase();
+```
+  const name =
+    normalizeProductName(
+      row.name ||
+      row.product ||
+      row.nama ||
+      ""
+    );
 
-    const fallback =
-      LOGO_FALLBACK[name] || {
-        logo: name.substring(0, 4),
-        color: "#a855f7"
-      };
+  if (!name) {
+    return;
+  }
 
-    const rating =
-      parseFloat(row.rating) || 0;
+  const platform =
+    String(
+      row.platform ||
+      row.device ||
+      row.os ||
+      "android"
+    )
+      .trim()
+      .toLowerCase();
 
-    const sold =
-      String(
-        row.sold ||
-        row.terjual ||
-        ""
-      ).trim();
+  const fallback =
+    LOGO_FALLBACK[name] ||
+    {
+      logo:
+        name.substring(
+          0,
+          4
+        ),
 
-    const image =
-      getProductImage(
-        row,
-        name
-      );
+      color:
+        "#a855f7"
+    };
 
-    const description =
-      String(
-        row.desc ||
-        row.description ||
-        row.deskripsi ||
-        ""
-      ).trim();
+  const rating =
+    parseFloat(
+      row.rating
+    ) || 0;
 
-    const desc =
-      description
-        ? description
-            .split("|")
-            .map(function (item) {
+  const sold =
+    String(
+      row.sold ||
+      row.terjual ||
+      ""
+    ).trim();
+
+  const image =
+    getProductImage(
+      row,
+      name
+    );
+
+  const description =
+    String(
+      row.desc ||
+      row.description ||
+      row.deskripsi ||
+      ""
+    ).trim();
+
+  const desc =
+    description
+      ? description
+          .split("|")
+          .map(
+            function (item) {
+
               return {
-                icon: "✓",
-                text: item.trim()
+                icon:
+                  "✓",
+
+                text:
+                  item.trim()
               };
-            })
-            .filter(function (item) {
-              return item.text !== "";
-            })
-        : [
-            {
-              icon: "✓",
-              text: "Produk NIELSTORE"
+
             }
-          ];
+          )
+          .filter(
+            function (item) {
 
-    const fixedColumns = [
-      "name",
-      "product",
-      "nama",
-      "platform",
-      "device",
-      "os",
-      "logo",
-      "image",
-      "img",
-      "rating",
-      "sold",
-      "terjual",
-      "desc",
-      "description",
-      "deskripsi"
-    ];
+              return (
+                item.text !==
+                ""
+              );
 
-    const vouchers = [];
+            }
+          )
+      : [
+          {
+            icon:
+              "✓",
 
-    Object.keys(row).forEach(function (key) {
-      const cleanKey =
-        key.toLowerCase();
+            text:
+              "Produk NIELSTORE"
+          }
+        ];
 
-      if (
-        fixedColumns.indexOf(
-          cleanKey
-        ) !== -1
-      ) {
-        return;
+  const fixedColumns = [
+    "name",
+    "product",
+    "nama",
+    "platform",
+    "device",
+    "os",
+    "logo",
+    "image",
+    "img",
+    "rating",
+    "sold",
+    "terjual",
+    "desc",
+    "description",
+    "deskripsi"
+  ];
+
+  const vouchers = [];
+
+  Object.keys(row)
+    .forEach(
+      function (key) {
+
+        const cleanKey =
+          key.toLowerCase();
+
+        if (
+          fixedColumns.indexOf(
+            cleanKey
+          ) !== -1
+        ) {
+          return;
+        }
+
+        const raw =
+          String(
+            row[key] || ""
+          ).trim();
+
+        if (!raw) {
+          return;
+        }
+
+        const numeric =
+          raw.replace(
+            /[^\d]/g,
+            ""
+          );
+
+        if (!numeric) {
+          return;
+        }
+
+        const price =
+          parseInt(
+            numeric,
+            10
+          );
+
+        if (
+          Number.isFinite(
+            price
+          ) &&
+          price > 0
+        ) {
+
+          vouchers.push({
+            duration:
+              key.trim(),
+
+            price:
+              price,
+
+            stock:
+              true
+          });
+
+        }
+
       }
+    );
 
-      const rawPrice =
-        String(
-          row[key] || ""
-        ).trim();
+  vouchers.sort(
+    function (a, b) {
 
-      if (!rawPrice) {
-        return;
-      }
-
-      const numeric =
-        rawPrice.replace(
-          /[^\d]/g,
-          ""
-        );
-
-      if (!numeric) {
-        return;
-      }
-
-      const price =
-        parseInt(
-          numeric,
-          10
-        );
-
-      if (
-        Number.isFinite(price) &&
-        price > 0
-      ) {
-        vouchers.push({
-          duration:
-            key.trim(),
-
-          price:
-            price,
-
-          stock:
-            true
-        });
-      }
-    });
-
-    vouchers.sort(function (a, b) {
       return (
         durationNumber(
           a.duration
@@ -412,1357 +598,1608 @@ function convertRowsToProducts(rows) {
           b.duration
         )
       );
-    });
 
-    const priceFrom =
-      vouchers.length
-        ? Math.min.apply(
-            null,
-            vouchers.map(
-              function (voucher) {
-                return voucher.price;
-              }
-            )
-          )
-        : 0;
+    }
+  );
 
-    result.push({
-      id:
-        index + 1,
+  let priceFrom =
+    0;
 
-      name:
-        String(
-          row.name ||
-          row.product ||
-          row.nama ||
-          name
-        ).trim(),
+  if (vouchers.length > 0) {
 
-      platform:
-        platform,
+    priceFrom =
+      Math.min.apply(
+        null,
+        vouchers.map(
+          function (
+            voucher
+          ) {
+            return voucher.price;
+          }
+        )
+      );
 
-      logo:
-        row.logo ||
-        fallback.logo,
+  }
 
-      logoColor:
-        fallback.color,
+  result.push({
 
-      image:
-        image,
+    id:
+      index + 1,
 
-      rating:
-        rating,
+    name:
+      String(
+        row.name ||
+        row.product ||
+        row.nama ||
+        name
+      ).trim(),
 
-      sold:
-        sold,
+    platform:
+      platform,
 
-      priceFrom:
-        priceFrom,
+    logo:
+      row.logo ||
+      fallback.logo,
 
-      desc:
-        desc,
+    logoColor:
+      fallback.color,
 
-      vouchers:
-        vouchers
-    });
+    image:
+      image,
+
+    rating:
+      rating,
+
+    sold:
+      sold,
+
+    priceFrom:
+      priceFrom,
+
+    desc:
+      desc,
+
+    vouchers:
+      vouchers
+
   });
 
-  return result;
+}
+```
+
+);
+
+return result;
 }
 
-
 /* ========================================
-   FALLBACK
+FALLBACK
 ======================================== */
 
 function createFallbackProducts() {
-  const names = [
-    "DRIP APK MOD",
-    "DRIP PROXY",
-    "HG APKMOD",
-    "HG PROXY",
-    "MIGUL LITE",
-    "MIGUL PRO"
-  ];
 
-  return names.map(function (name, index) {
-    const fallback =
-      LOGO_FALLBACK[name];
+const productNames = [
+"DRIP APK MOD",
+"DRIP PROXY",
+"HG APKMOD",
+"HG PROXY",
+"MIGUL LITE",
+"MIGUL PRO"
+];
 
-    return {
-      id:
-        index + 1,
+return productNames.map(
+function (
+name,
+index
+) {
 
-      name:
-        name,
+```
+  const fallback =
+    LOGO_FALLBACK[name];
 
-      platform:
-        "android",
+  return {
 
-      logo:
-        fallback.logo,
+    id:
+      index + 1,
 
-      logoColor:
-        fallback.color,
+    name:
+      name,
 
-      image:
-        PRODUCT_IMAGES[name] || "",
+    platform:
+      "android",
 
-      rating:
-        0,
+    logo:
+      fallback.logo,
 
-      sold:
-        "",
+    logoColor:
+      fallback.color,
 
-      priceFrom:
-        38000,
+    image:
+      PRODUCT_IMAGES[name] ||
+      "",
 
-      desc: [
-        {
-          icon: "✓",
-          text:
-            "Produk " + name
-        }
-      ],
+    rating:
+      0,
 
-      vouchers: [
-        {
-          duration:
-            "1 Day",
+    sold:
+      "",
 
-          price:
-            38000,
+    priceFrom:
+      38000,
 
-          stock:
-            true
-        }
-      ]
-    };
-  });
+    desc: [
+      {
+        icon:
+          "✓",
+
+        text:
+          "Produk " +
+          name
+      }
+    ],
+
+    vouchers: [
+      {
+        duration:
+          "1 Day",
+
+        price:
+          38000,
+
+        stock:
+          true
+      }
+    ]
+
+  };
+}
+```
+
+);
 }
 
-
 /* ========================================
-   RENDER PRODUCTS
+RENDER PRODUCTS
 ======================================== */
 
 function renderProducts() {
-  const grid =
-    document.getElementById(
-      "productGrid"
-    );
 
-  if (!grid) {
-    return;
-  }
+const grid =
+document.getElementById(
+"productGrid"
+);
 
-  const filtered =
-    currentFilter === "all"
-      ? products
-      : products.filter(
-          function (product) {
-            return (
-              product.platform ===
-              currentFilter
-            );
-          }
-        );
-
-  if (!filtered.length) {
-    grid.innerHTML =
-      "<p style=\"" +
-      "grid-column:1/-1;" +
-      "text-align:center;" +
-      "padding:3rem;" +
-      "color:var(--text-muted);" +
-      "\">" +
-      "Tidak ada produk." +
-      "</p>";
-
-    return;
-  }
-
-  grid.innerHTML =
-    filtered
-      .map(function (product) {
-
-        const imageHTML =
-          product.image
-            ? (
-                "<img " +
-                "src=\"" +
-                escapeHtml(
-                  product.image
-                ) +
-                "\" " +
-                "alt=\"" +
-                escapeHtml(
-                  product.name
-                ) +
-                "\" " +
-                "class=\"card-img\" " +
-                "loading=\"lazy\">"
-              )
-            : (
-                "<div " +
-                "class=\"logo-text\" " +
-                "style=\"color:" +
-                product.logoColor +
-                ";\">" +
-                escapeHtml(
-                  product.logo
-                ) +
-                "</div>"
-              );
-
-        const soldHTML =
-          product.sold
-            ? " · " +
-              escapeHtml(
-                product.sold
-              ) +
-              " Terjual"
-            : "";
-
-        const priceHTML =
-          product.priceFrom
-            ? "Mulai dari <strong>" +
-              formatRupiah(
-                product.priceFrom
-              ) +
-              "</strong>"
-            : "<strong>Cek Produk</strong>";
-
-        return (
-          "<div " +
-          "class=\"product-card\" " +
-          "onclick=\"openDetail(" +
-          product.id +
-          ")\">" +
-
-            "<div " +
-            "class=\"card-image " +
-            (
-              product.image
-                ? "has-img"
-                : ""
-            ) +
-            "\">" +
-
-              "<span class=\"platform\">" +
-              escapeHtml(
-                product.platform.toUpperCase()
-              ) +
-              "</span>" +
-
-              imageHTML +
-
-            "</div>" +
-
-            "<div class=\"card-body\">" +
-
-              "<div class=\"card-name\">" +
-              escapeHtml(
-                product.name
-              ) +
-              "</div>" +
-
-              "<div class=\"card-stats\">" +
-                "<span class=\"star\">★</span>" +
-                (
-                  product.rating ||
-                  "—"
-                ) +
-                soldHTML +
-              "</div>" +
-
-              "<div class=\"card-price\">" +
-                priceHTML +
-              "</div>" +
-
-              "<button " +
-              "class=\"btn-beli\" " +
-              "onclick=\"" +
-              "event.stopPropagation();" +
-              "openDetail(" +
-              product.id +
-              ")" +
-              "\">" +
-              "Beli Sekarang" +
-              "</button>" +
-
-            "</div>" +
-
-          "</div>"
-        );
-      })
-      .join("");
+if (!grid) {
+return;
 }
 
+const filtered =
+currentFilter === "all"
+? products
+: products.filter(
+function (product) {
+
+```
+        return (
+          product.platform ===
+          currentFilter
+        );
+
+      }
+    );
+```
+
+if (!filtered.length) {
+
+```
+grid.innerHTML =
+  "<p style=\"" +
+  "grid-column:1/-1;" +
+  "text-align:center;" +
+  "padding:3rem;" +
+  "color:var(--text-muted);" +
+  "\">" +
+  "Tidak ada produk." +
+  "</p>";
+
+return;
+```
+
+}
+
+grid.innerHTML =
+filtered.map(
+function (product) {
+
+```
+    const imageHTML =
+      product.image
+        ? (
+            "<img " +
+            "src=\"" +
+            escapeHtml(
+              product.image
+            ) +
+            "\" " +
+            "alt=\"" +
+            escapeHtml(
+              product.name
+            ) +
+            "\" " +
+            "class=\"card-img\" " +
+            "loading=\"lazy\">"
+          )
+        : (
+            "<div " +
+            "class=\"logo-text\" " +
+            "style=\"color:" +
+            product.logoColor +
+            ";\">" +
+            escapeHtml(
+              product.logo
+            ) +
+            "</div>"
+          );
+
+    const soldHTML =
+      product.sold
+        ? " · " +
+          escapeHtml(
+            product.sold
+          ) +
+          " Terjual"
+        : "";
+
+    const priceHTML =
+      product.priceFrom
+        ? (
+            "Mulai dari " +
+            "<strong>" +
+            formatRupiah(
+              product.priceFrom
+            ) +
+            "</strong>"
+          )
+        : (
+            "<strong>" +
+            "Cek Produk" +
+            "</strong>"
+          );
+
+    return (
+      "<div " +
+      "class=\"product-card\" " +
+      "onclick=\"openDetail(" +
+      product.id +
+      ")\">" +
+
+        "<div " +
+        "class=\"card-image " +
+        (
+          product.image
+            ? "has-img"
+            : ""
+        ) +
+        "\">" +
+
+          "<span class=\"platform\">" +
+          escapeHtml(
+            product.platform.toUpperCase()
+          ) +
+          "</span>" +
+
+          imageHTML +
+
+        "</div>" +
+
+        "<div class=\"card-body\">" +
+
+          "<div class=\"card-name\">" +
+          escapeHtml(
+            product.name
+          ) +
+          "</div>" +
+
+          "<div class=\"card-stats\">" +
+
+            "<span class=\"star\">" +
+            "★" +
+            "</span>" +
+
+            (
+              product.rating ||
+              "—"
+            ) +
+
+            soldHTML +
+
+          "</div>" +
+
+          "<div class=\"card-price\">" +
+          priceHTML +
+          "</div>" +
+
+          "<button " +
+          "class=\"btn-beli\" " +
+          "onclick=\"" +
+          "event.stopPropagation();" +
+          "openDetail(" +
+          product.id +
+          ")" +
+          "\">" +
+
+          "Beli Sekarang" +
+
+          "</button>" +
+
+        "</div>" +
+
+      "</div>"
+    );
+
+  }
+).join("");
+```
+
+}
 
 /* ========================================
-   FILTER
+FILTER
 ======================================== */
 
 function filterProducts(filter) {
-  currentFilter =
-    filter;
 
-  document
-    .querySelectorAll(
-      ".tab"
-    )
-    .forEach(
-      function (tab) {
-        tab.classList.toggle(
-          "active",
-          tab.dataset.filter ===
-          filter
-        );
-      }
+currentFilter =
+filter;
+
+document
+.querySelectorAll(
+".tab"
+)
+.forEach(
+function (tab) {
+
+```
+    tab.classList.toggle(
+      "active",
+      tab.dataset.filter ===
+      filter
     );
 
-  renderProducts();
+  }
+);
+```
+
+renderProducts();
 }
 
-
 /* ========================================
-   DETAIL
+DETAIL
 ======================================== */
 
 function openDetail(id) {
-  currentProduct =
-    products.find(
-      function (product) {
-        return (
-          product.id === id
-        );
-      }
+
+currentProduct =
+products.find(
+function (product) {
+
+```
+    return (
+      product.id === id
     );
 
-  if (!currentProduct) {
-    return;
   }
+);
+```
 
-  selectedVoucher =
-    null;
-
-  const image =
-    document.getElementById(
-      "detailImage"
-    );
-
-  const detailName =
-    document.getElementById(
-      "detailName"
-    );
-
-  const detailPlatform =
-    document.getElementById(
-      "detailPlatform"
-    );
-
-  const detailRating =
-    document.getElementById(
-      "detailRating"
-    );
-
-  const detailDesc =
-    document.getElementById(
-      "detailDesc"
-    );
-
-  const catalog =
-    document.getElementById(
-      "catalogView"
-    );
-
-  const detail =
-    document.getElementById(
-      "detailView"
-    );
-
-  if (image) {
-
-    if (currentProduct.image) {
-
-      image.style.background =
-        "transparent";
-
-      image.innerHTML =
-        "<img " +
-        "src=\"" +
-        escapeHtml(
-          currentProduct.image
-        ) +
-        "\" " +
-        "alt=\"" +
-        escapeHtml(
-          currentProduct.name
-        ) +
-        "\" " +
-        "class=\"detail-img\">";
-
-    } else {
-
-      image.style.background =
-        "linear-gradient(135deg,#1a0a2e,#2d0a3a)";
-
-      image.innerHTML =
-        "<div " +
-        "class=\"logo-text\" " +
-        "style=\"color:" +
-        currentProduct.logoColor +
-        ";\">" +
-        escapeHtml(
-          currentProduct.logo
-        ) +
-        "</div>";
-    }
-  }
-
-  if (detailName) {
-    detailName.textContent =
-      currentProduct.name;
-  }
-
-  if (detailPlatform) {
-    detailPlatform.textContent =
-      currentProduct.platform.toUpperCase();
-  }
-
-  if (detailRating) {
-
-    detailRating.innerHTML =
-      "<span class=\"star\">★</span>" +
-      (
-        currentProduct.rating ||
-        "—"
-      ) +
-      (
-        currentProduct.sold
-          ? " · " +
-            escapeHtml(
-              currentProduct.sold
-            ) +
-            " Terjual"
-          : ""
-      );
-  }
-
-  if (detailDesc) {
-
-    detailDesc.innerHTML =
-      currentProduct.desc
-        .map(function (item) {
-          return (
-            "<li>" +
-            "<span style=\"color:var(--green)\">" +
-            "✓" +
-            "</span>" +
-            escapeHtml(
-              item.text
-            ) +
-            "</li>"
-          );
-        })
-        .join("");
-  }
-
-  renderVouchers();
-
-  if (catalog) {
-    catalog.classList.add(
-      "hidden"
-    );
-  }
-
-  if (detail) {
-    detail.classList.remove(
-      "hidden"
-    );
-  }
-
-  window.scrollTo(
-    0,
-    0
-  );
+if (!currentProduct) {
+return;
 }
 
+selectedVoucher =
+null;
+
+const image =
+document.getElementById(
+"detailImage"
+);
+
+const detailName =
+document.getElementById(
+"detailName"
+);
+
+const detailPlatform =
+document.getElementById(
+"detailPlatform"
+);
+
+const detailRating =
+document.getElementById(
+"detailRating"
+);
+
+const detailDesc =
+document.getElementById(
+"detailDesc"
+);
+
+if (image) {
+
+```
+if (currentProduct.image) {
+
+  image.style.background =
+    "transparent";
+
+  image.innerHTML =
+    "<img " +
+    "src=\"" +
+    escapeHtml(
+      currentProduct.image
+    ) +
+    "\" " +
+    "alt=\"" +
+    escapeHtml(
+      currentProduct.name
+    ) +
+    "\" " +
+    "class=\"detail-img\">";
+
+} else {
+
+  image.style.background =
+    "linear-gradient(135deg,#1a0a2e,#2d0a3a)";
+
+  image.innerHTML =
+    "<div " +
+    "class=\"logo-text\" " +
+    "style=\"color:" +
+    currentProduct.logoColor +
+    ";\">" +
+    escapeHtml(
+      currentProduct.logo
+    ) +
+    "</div>";
+}
+```
+
+}
+
+if (detailName) {
+
+```
+detailName.textContent =
+  currentProduct.name;
+```
+
+}
+
+if (detailPlatform) {
+
+```
+detailPlatform.textContent =
+  currentProduct.platform.toUpperCase();
+```
+
+}
+
+if (detailRating) {
+
+```
+detailRating.innerHTML =
+  "<span class=\"star\">★</span>" +
+  (
+    currentProduct.rating ||
+    "—"
+  ) +
+  (
+    currentProduct.sold
+      ? " · " +
+        escapeHtml(
+          currentProduct.sold
+        ) +
+        " Terjual"
+      : ""
+  );
+```
+
+}
+
+if (detailDesc) {
+
+```
+detailDesc.innerHTML =
+  currentProduct.desc
+    .map(
+      function (item) {
+
+        return (
+          "<li>" +
+          "<span style=\"color:var(--green)\">" +
+          "✓" +
+          "</span>" +
+          escapeHtml(
+            item.text
+          ) +
+          "</li>"
+        );
+
+      }
+    )
+    .join("");
+```
+
+}
+
+renderVouchers();
+
+const catalog =
+document.getElementById(
+"catalogView"
+);
+
+const detail =
+document.getElementById(
+"detailView"
+);
+
+if (catalog) {
+catalog.classList.add(
+"hidden"
+);
+}
+
+if (detail) {
+detail.classList.remove(
+"hidden"
+);
+}
+
+window.scrollTo(
+0,
+0
+);
+}
 
 /* ========================================
-   VOUCHERS
+VOUCHERS
 ======================================== */
 
 function renderVouchers() {
-  const grid =
-    document.getElementById(
-      "voucherGrid"
-    );
 
-  if (!grid) {
-    return;
-  }
+const grid =
+document.getElementById(
+"voucherGrid"
+);
 
-  if (
-    !currentProduct ||
-    !currentProduct.vouchers ||
-    !currentProduct.vouchers.length
-  ) {
-
-    grid.innerHTML =
-      "<p style=\"" +
-      "color:var(--text-muted);" +
-      "font-size:.9rem;" +
-      "\">" +
-      "Harga belum tersedia." +
-      "</p>";
-
-    selectedVoucher =
-      null;
-
-    return;
-  }
-
-  grid.innerHTML =
-    currentProduct.vouchers
-      .map(function (voucher, index) {
-
-        return (
-          "<div " +
-          "class=\"voucher-item\" " +
-          "data-index=\"" +
-          index +
-          "\" " +
-          "onclick=\"selectVoucher(" +
-          index +
-          ")\">" +
-
-            "<div class=\"duration\">" +
-            escapeHtml(
-              voucher.duration
-            ) +
-            "</div>" +
-
-            "<div class=\"price\">" +
-            formatRupiah(
-              voucher.price
-            ) +
-            "</div>" +
-
-          "</div>"
-        );
-      })
-      .join("");
-
-  selectVoucher(0);
+if (!grid) {
+return;
 }
 
+if (
+!currentProduct ||
+!currentProduct.vouchers ||
+!currentProduct.vouchers.length
+) {
+
+```
+grid.innerHTML =
+  "<p style=\"" +
+  "color:var(--text-muted);" +
+  "font-size:.9rem;" +
+  "\">" +
+  "Harga belum tersedia." +
+  "</p>";
+
+selectedVoucher =
+  null;
+
+return;
+```
+
+}
+
+grid.innerHTML =
+currentProduct.vouchers
+.map(
+function (
+voucher,
+index
+) {
+
+```
+      return (
+        "<div " +
+        "class=\"voucher-item\" " +
+        "data-index=\"" +
+        index +
+        "\" " +
+        "onclick=\"selectVoucher(" +
+        index +
+        ")\">" +
+
+          "<div class=\"duration\">" +
+          escapeHtml(
+            voucher.duration
+          ) +
+          "</div>" +
+
+          "<div class=\"price\">" +
+          formatRupiah(
+            voucher.price
+          ) +
+          "</div>" +
+
+        "</div>"
+      );
+
+    }
+  )
+  .join("");
+```
+
+selectVoucher(0);
+}
 
 /* ========================================
-   SELECT VOUCHER
+SELECT VOUCHER
 ======================================== */
 
 function selectVoucher(index) {
-  if (
-    !currentProduct ||
-    !currentProduct.vouchers ||
-    !currentProduct.vouchers[index]
-  ) {
-    return;
-  }
 
-  selectedVoucher =
-    currentProduct.vouchers[index];
-
-  document
-    .querySelectorAll(
-      ".voucher-item"
-    )
-    .forEach(
-      function (item, itemIndex) {
-
-        item.classList.toggle(
-          "selected",
-          itemIndex === index
-        );
-
-      }
-    );
+if (
+!currentProduct ||
+!currentProduct.vouchers ||
+!currentProduct.vouchers[index]
+) {
+return;
 }
 
+selectedVoucher =
+currentProduct.vouchers[index];
+
+document
+.querySelectorAll(
+".voucher-item"
+)
+.forEach(
+function (
+item,
+itemIndex
+) {
+
+```
+    item.classList.toggle(
+      "selected",
+      itemIndex === index
+    );
+
+  }
+);
+```
+
+}
 
 /* ========================================
-   PROCESS ORDER
+PROCESS ORDER
 ======================================== */
 
 async function processOrder() {
-  if (orderProcessing) {
-    return;
-  }
 
-  if (!currentProduct) {
-    alert(
-      "Produk tidak ditemukan."
-    );
-    return;
-  }
-
-  if (!selectedVoucher) {
-    alert(
-      "Pilih nominal voucher dulu!"
-    );
-    return;
-  }
-
-  if (
-    !selectedVoucher.price ||
-    selectedVoucher.price < 1
-  ) {
-    alert(
-      "Harga produk belum tersedia."
-    );
-    return;
-  }
-
-  orderProcessing =
-    true;
-
-  const button =
-    document.getElementById(
-      "btnOrder"
-    );
-
-  if (button) {
-
-    button.disabled =
-      true;
-
-    button.textContent =
-      "Membuat Pembayaran...";
-  }
-
-  try {
-
-    const response =
-      await fetch(
-        API_BASE +
-        "/api/create-payment",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            amount:
-              selectedVoucher.price,
-
-            product:
-              currentProduct.name,
-
-            duration:
-              selectedVoucher.duration
-          })
-        }
-      );
-
-    let data;
-
-    try {
-
-      data =
-        await response.json();
-
-    } catch (error) {
-
-      throw new Error(
-        "Backend pembayaran tidak mengirim JSON."
-      );
-    }
-
-    if (
-      !response.ok ||
-      !data.success
-    ) {
-
-      throw new Error(
-        data.message ||
-        "Gagal membuat pembayaran."
-      );
-    }
-
-    const payment =
-      data.data || {};
-
-    currentTransactionId =
-      payment.transaction_id;
-
-    if (!currentTransactionId) {
-
-      throw new Error(
-        "Transaction ID tidak ditemukan."
-      );
-    }
-
-    showPaymentModal(
-      payment
-    );
-
-    startPaymentPolling();
-
-  } catch (error) {
-
-    console.error(
-      "Payment error:",
-      error
-    );
-
-    alert(
-      error.message ||
-      "Gagal membuat pembayaran."
-    );
-
-  } finally {
-
-    orderProcessing =
-      false;
-
-    if (button) {
-
-      button.disabled =
-        false;
-
-      button.textContent =
-        "Beli Sekarang";
-    }
-  }
+if (orderProcessing) {
+return;
 }
 
+if (!currentProduct) {
+
+```
+alert(
+  "Produk tidak ditemukan."
+);
+
+return;
+```
+
+}
+
+if (!selectedVoucher) {
+
+```
+alert(
+  "Pilih nominal voucher dulu!"
+);
+
+return;
+```
+
+}
+
+if (
+!selectedVoucher.price ||
+selectedVoucher.price < 1
+) {
+
+```
+alert(
+  "Harga produk belum tersedia."
+);
+
+return;
+```
+
+}
+
+orderProcessing =
+true;
+
+currentOrderId =
+generateOrderId();
+
+const button =
+document.getElementById(
+"btnOrder"
+);
+
+if (button) {
+
+```
+button.disabled =
+  true;
+
+button.textContent =
+  "Membuat Pembayaran...";
+```
+
+}
+
+try {
+
+```
+const response =
+  await fetch(
+    API_BASE +
+    "/api/create-payment",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body: JSON.stringify({
+
+        amount:
+          selectedVoucher.price,
+
+        product:
+          currentProduct.name,
+
+        duration:
+          selectedVoucher.duration,
+
+        order_id:
+          currentOrderId
+
+      })
+    }
+  );
+
+let data;
+
+try {
+
+  data =
+    await response.json();
+
+} catch (error) {
+
+  throw new Error(
+    "Backend pembayaran tidak mengirim JSON."
+  );
+}
+
+if (
+  !response.ok ||
+  !data.success
+) {
+
+  throw new Error(
+    data.message ||
+    "Gagal membuat pembayaran."
+  );
+}
+
+const payment =
+  data.data || {};
+
+currentTransactionId =
+  payment.transaction_id;
+
+if (!currentTransactionId) {
+
+  throw new Error(
+    "Transaction ID tidak ditemukan."
+  );
+}
+
+showPaymentModal(
+  payment
+);
+
+startPaymentPolling();
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Payment error:",
+  error
+);
+
+alert(
+  error.message ||
+  "Gagal membuat pembayaran."
+);
+```
+
+} finally {
+
+```
+orderProcessing =
+  false;
+
+if (button) {
+
+  button.disabled =
+    false;
+
+  button.textContent =
+    "Beli Sekarang";
+}
+```
+
+}
+}
 
 /* ========================================
-   PAYMENT MODAL
+PAYMENT MODAL
 ======================================== */
 
 function showPaymentModal(payment) {
-  const modal =
-    document.getElementById(
-      "successModal"
-    );
 
-  if (!modal) {
-    return;
-  }
+const modal =
+document.getElementById(
+"successModal"
+);
 
-  const amount =
-    payment.amount ||
-    selectedVoucher.price;
-
-  const qrUrl =
-    payment.qr_url ||
-    "";
-
-  const checkoutUrl =
-    payment.checkout_url ||
-    "";
-
-  const qrContent =
-    qrUrl
-      ? (
-          "<img " +
-          "src=\"" +
-          escapeHtml(
-            qrUrl
-          ) +
-          "\" " +
-          "alt=\"QRIS\" " +
-          "style=\"width:260px;max-width:100%;border-radius:12px;display:block;\">"
-        )
-      : (
-          "<div style=\"padding:25px;color:var(--text-muted);\">" +
-          "QRIS sedang diproses..." +
-          "</div>"
-        );
-
-  const checkoutContent =
-    checkoutUrl
-      ? (
-          "<a " +
-          "href=\"" +
-          escapeHtml(
-            checkoutUrl
-          ) +
-          "\" " +
-          "target=\"_blank\" " +
-          "rel=\"noopener noreferrer\" " +
-          "class=\"btn-primary\" " +
-          "style=\"display:block;text-align:center;text-decoration:none;margin-bottom:10px;\">" +
-          "Buka Pembayaran" +
-          "</a>"
-        )
-      : "";
-
-  modal.innerHTML =
-    "<div class=\"modal\">" +
-
-      "<div class=\"success-icon\" " +
-      "style=\"font-size:30px;\">" +
-      "⌛" +
-      "</div>" +
-
-      "<h2>" +
-      "Menunggu Pembayaran" +
-      "</h2>" +
-
-      "<p>" +
-      "Silakan selesaikan pembayaran QRIS." +
-      "</p>" +
-
-      "<div style=\"" +
-      "margin:15px 0;" +
-      "font-size:1.25rem;" +
-      "font-weight:800;" +
-      "\">" +
-
-      formatRupiah(
-        amount
-      ) +
-
-      "</div>" +
-
-      "<div style=\"" +
-      "display:flex;" +
-      "justify-content:center;" +
-      "margin:15px 0;" +
-      "\">" +
-
-      qrContent +
-
-      "</div>" +
-
-      checkoutContent +
-
-      "<p id=\"paymentStatusText\" " +
-      "style=\"color:var(--text-muted);font-size:.85rem;\">" +
-      "Menunggu konfirmasi pembayaran..." +
-      "</p>" +
-
-      "<button " +
-      "class=\"btn-primary\" " +
-      "onclick=\"cancelPaymentModal()\">" +
-      "Tutup" +
-      "</button>" +
-
-    "</div>";
-
-  modal.classList.add(
-    "active"
-  );
+if (!modal) {
+return;
 }
 
+const amount =
+payment.amount ||
+selectedVoucher.price;
+
+const qrUrl =
+payment.qr_url ||
+"";
+
+const checkoutUrl =
+payment.checkout_url ||
+"";
+
+const qrContent =
+qrUrl
+? (
+"<img " +
+"src="" +
+escapeHtml(
+qrUrl
+) +
+"" " +
+"alt="QRIS" " +
+"style="width:260px;max-width:100%;border-radius:12px;display:block;">"
+)
+: (
+"<div style="padding:25px;color:var(--text-muted);">" +
+"QRIS sedang diproses..." +
+"</div>"
+);
+
+const checkoutContent =
+checkoutUrl
+? (
+"<a " +
+"href="" +
+escapeHtml(
+checkoutUrl
+) +
+"" " +
+"target="_blank" " +
+"rel="noopener noreferrer" " +
+"class="btn-primary" " +
+"style="display:block;text-align:center;text-decoration:none;margin-bottom:10px;">" +
+"Buka Pembayaran" +
+"</a>"
+)
+: "";
+
+modal.innerHTML =
+"<div class="modal">" +
+
+```
+  "<div class=\"success-icon\" " +
+  "style=\"font-size:30px;\">" +
+  "⌛" +
+  "</div>" +
+
+  "<h2>" +
+  "Menunggu Pembayaran" +
+  "</h2>" +
+
+  "<p>" +
+  "Silakan selesaikan pembayaran QRIS." +
+  "</p>" +
+
+  "<div style=\"" +
+  "margin:15px 0;" +
+  "font-size:1.25rem;" +
+  "font-weight:800;" +
+  "\">" +
+  formatRupiah(
+    amount
+  ) +
+  "</div>" +
+
+  "<div style=\"" +
+  "background:rgba(168,85,247,.08);" +
+  "border:1px solid rgba(168,85,247,.25);" +
+  "border-radius:10px;" +
+  "padding:10px;" +
+  "margin-bottom:15px;" +
+  "\">" +
+
+    "<div style=\"font-size:.75rem;color:var(--text-muted);\">" +
+    "ORDER ID" +
+    "</div>" +
+
+    "<strong style=\"font-size:1rem;\">" +
+    escapeHtml(
+      currentOrderId
+    ) +
+    "</strong>" +
+
+  "</div>" +
+
+  "<div style=\"" +
+  "display:flex;" +
+  "justify-content:center;" +
+  "margin:15px 0;" +
+  "\">" +
+
+  qrContent +
+
+  "</div>" +
+
+  checkoutContent +
+
+  "<p id=\"paymentStatusText\" " +
+  "style=\"color:var(--text-muted);font-size:.85rem;\">" +
+  "Menunggu konfirmasi pembayaran..." +
+  "</p>" +
+
+  "<button " +
+  "class=\"btn-primary\" " +
+  "onclick=\"cancelPaymentModal()\">" +
+  "Tutup" +
+  "</button>" +
+
+"</div>";
+```
+
+modal.classList.add(
+"active"
+);
+}
 
 /* ========================================
-   POLLING
+POLLING
 ======================================== */
 
 function startPaymentPolling() {
-  stopPaymentPolling();
 
-  checkPaymentStatus();
+stopPaymentPolling();
 
-  paymentCheckTimer =
-    setInterval(
-      checkPaymentStatus,
-      5000
-    );
+checkPaymentStatus();
+
+paymentCheckTimer =
+setInterval(
+checkPaymentStatus,
+5000
+);
 }
-
 
 function stopPaymentPolling() {
-  if (paymentCheckTimer) {
-    clearInterval(
-      paymentCheckTimer
-    );
 
-    paymentCheckTimer =
-      null;
-  }
+if (paymentCheckTimer) {
+
+```
+clearInterval(
+  paymentCheckTimer
+);
+
+paymentCheckTimer =
+  null;
+```
+
+}
 }
 
-
 /* ========================================
-   CHECK PAYMENT
+CHECK PAYMENT
 ======================================== */
 
 async function checkPaymentStatus() {
-  if (!currentTransactionId) {
-    return;
-  }
 
-  try {
-
-    const response =
-      await fetch(
-        API_BASE +
-        "/api/check-payment",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body: JSON.stringify({
-            transaction_id:
-              currentTransactionId
-          })
-        }
-      );
-
-    if (!response.ok) {
-      return;
-    }
-
-    const data =
-      await response.json();
-
-    if (!data.success) {
-      return;
-    }
-
-    const payment =
-      data.data || {};
-
-    const status =
-      String(
-        payment.transaction_status ||
-        payment.status ||
-        ""
-      )
-        .toLowerCase()
-        .trim();
-
-    if (
-      status === "settlement" ||
-      status === "paid" ||
-      status === "success" ||
-      status === "completed"
-    ) {
-
-      stopPaymentPolling();
-
-      paymentSuccess();
-
-      return;
-    }
-
-    if (
-      status === "expire" ||
-      status === "expired" ||
-      status === "cancel" ||
-      status === "cancelled"
-    ) {
-
-      stopPaymentPolling();
-
-      paymentExpired();
-
-      return;
-    }
-
-    const statusText =
-      document.getElementById(
-        "paymentStatusText"
-      );
-
-    if (statusText) {
-      statusText.textContent =
-        "Menunggu pembayaran...";
-    }
-
-  } catch (error) {
-
-    console.warn(
-      "Payment status error:",
-      error
-    );
-  }
+if (!currentTransactionId) {
+return;
 }
 
+try {
+
+```
+const response =
+  await fetch(
+    API_BASE +
+    "/api/check-payment",
+    {
+      method: "POST",
+
+      headers: {
+        "Content-Type":
+          "application/json"
+      },
+
+      body:
+        JSON.stringify({
+          transaction_id:
+            currentTransactionId
+        })
+    }
+  );
+
+if (!response.ok) {
+  return;
+}
+
+const data =
+  await response.json();
+
+if (!data.success) {
+  return;
+}
+
+const payment =
+  data.data || {};
+
+const status =
+  String(
+    payment.transaction_status ||
+    payment.status ||
+    ""
+  )
+    .toLowerCase()
+    .trim();
+
+if (
+  status === "settlement" ||
+  status === "paid" ||
+  status === "success" ||
+  status === "completed"
+) {
+
+  stopPaymentPolling();
+
+  paymentSuccess();
+
+  return;
+}
+
+if (
+  status === "expire" ||
+  status === "expired" ||
+  status === "cancel" ||
+  status === "cancelled"
+) {
+
+  stopPaymentPolling();
+
+  paymentExpired();
+
+  return;
+}
+
+const statusText =
+  document.getElementById(
+    "paymentStatusText"
+  );
+
+if (statusText) {
+
+  statusText.textContent =
+    "Menunggu pembayaran...";
+
+}
+```
+
+} catch (error) {
+
+```
+console.warn(
+  "Payment status error:",
+  error
+);
+```
+
+}
+}
 
 /* ========================================
-   SUCCESS
+PAYMENT SUCCESS
 ======================================== */
 
 function paymentSuccess() {
-  const modal =
-    document.getElementById(
-      "successModal"
-    );
 
-  if (!modal) {
-    return;
-  }
+const modal =
+document.getElementById(
+"successModal"
+);
 
-  const key =
-    generateKey();
-
-  modal.innerHTML =
-    "<div class=\"modal\">" +
-
-      "<div class=\"success-icon\">" +
-      "✓" +
-      "</div>" +
-
-      "<h2>" +
-      "Pembayaran Berhasil!" +
-      "</h2>" +
-
-      "<p>" +
-      "Pembayaran kamu telah dikonfirmasi." +
-      "</p>" +
-
-      "<p style=\"margin-top:15px;\">" +
-      "Key kamu:" +
-      "</p>" +
-
-      "<div class=\"key-box\">" +
-
-        "<code id=\"generatedKey\">" +
-        escapeHtml(
-          key
-        ) +
-        "</code>" +
-
-        "<button " +
-        "onclick=\"copyKey()\">" +
-        "Salin" +
-        "</button>" +
-
-      "</div>" +
-
-      "<p class=\"key-note\">" +
-      "Simpan key ini. Jangan bagikan ke orang lain." +
-      "</p>" +
-
-      "<button " +
-      "class=\"btn-primary\" " +
-      "onclick=\"closeSuccess()\">" +
-      "Selesai" +
-      "</button>" +
-
-    "</div>";
-
-  modal.classList.add(
-    "active"
-  );
+if (!modal) {
+return;
 }
 
+const key =
+generateKey();
+
+modal.innerHTML =
+"<div class="modal">" +
+
+```
+  "<div class=\"success-icon\">" +
+  "✓" +
+  "</div>" +
+
+  "<h2>" +
+  "Pembayaran Berhasil!" +
+  "</h2>" +
+
+  "<p>" +
+  "Pembayaran kamu telah dikonfirmasi." +
+  "</p>" +
+
+  "<div style=\"" +
+  "background:rgba(168,85,247,.08);" +
+  "border:1px solid rgba(168,85,247,.25);" +
+  "border-radius:10px;" +
+  "padding:12px;" +
+  "margin:15px 0;" +
+  "\">" +
+
+    "<div style=\"font-size:.75rem;color:var(--text-muted);\">" +
+    "ORDER ID" +
+    "</div>" +
+
+    "<strong style=\"font-size:1rem;\">" +
+    escapeHtml(
+      currentOrderId ||
+      "-"
+    ) +
+    "</strong>" +
+
+  "</div>" +
+
+  "<p>" +
+  "Key kamu:" +
+  "</p>" +
+
+  "<div class=\"key-box\">" +
+
+    "<code id=\"generatedKey\">" +
+    escapeHtml(
+      key
+    ) +
+    "</code>" +
+
+    "<button " +
+    "onclick=\"copyKey()\">" +
+    "Salin" +
+    "</button>" +
+
+  "</div>" +
+
+  "<p class=\"key-note\">" +
+  "Simpan Order ID dan key ini untuk cek pesanan kembali." +
+  "</p>" +
+
+  "<button " +
+  "class=\"btn-primary\" " +
+  "onclick=\"closeSuccess()\">" +
+  "Selesai" +
+  "</button>" +
+
+"</div>";
+```
+
+modal.classList.add(
+"active"
+);
+}
 
 /* ========================================
-   EXPIRED
+EXPIRED
 ======================================== */
 
 function paymentExpired() {
-  const modal =
-    document.getElementById(
-      "successModal"
-    );
 
-  if (!modal) {
-    return;
-  }
+const modal =
+document.getElementById(
+"successModal"
+);
 
-  modal.innerHTML =
-    "<div class=\"modal\">" +
-
-      "<div class=\"success-icon\" " +
-      "style=\"color:#ef4444;\">" +
-      "×" +
-      "</div>" +
-
-      "<h2>" +
-      "Pembayaran Kedaluwarsa" +
-      "</h2>" +
-
-      "<p>" +
-      "Pembayaran tidak berhasil diselesaikan." +
-      "</p>" +
-
-      "<button " +
-      "class=\"btn-primary\" " +
-      "onclick=\"cancelPaymentModal()\">" +
-      "Tutup" +
-      "</button>" +
-
-    "</div>";
-
-  modal.classList.add(
-    "active"
-  );
+if (!modal) {
+return;
 }
 
+modal.innerHTML =
+"<div class="modal">" +
+
+```
+  "<div class=\"success-icon\" " +
+  "style=\"color:#ef4444;\">" +
+  "×" +
+  "</div>" +
+
+  "<h2>" +
+  "Pembayaran Kedaluwarsa" +
+  "</h2>" +
+
+  "<p>" +
+  "Pembayaran tidak berhasil diselesaikan." +
+  "</p>" +
+
+  (
+    currentOrderId
+      ? (
+          "<p style=\"margin-top:15px;\">" +
+          "Order ID: <strong>" +
+          escapeHtml(
+            currentOrderId
+          ) +
+          "</strong>" +
+          "</p>"
+        )
+      : ""
+  ) +
+
+  "<button " +
+  "class=\"btn-primary\" " +
+  "onclick=\"cancelPaymentModal()\">" +
+  "Tutup" +
+  "</button>" +
+
+"</div>";
+```
+
+modal.classList.add(
+"active"
+);
+}
 
 /* ========================================
-   CANCEL
+CANCEL PAYMENT
 ======================================== */
 
 function cancelPaymentModal() {
-  stopPaymentPolling();
 
-  currentTransactionId =
-    null;
+stopPaymentPolling();
 
-  const modal =
-    document.getElementById(
-      "successModal"
-    );
+currentTransactionId =
+null;
 
-  if (!modal) {
-    return;
-  }
+currentOrderId =
+null;
 
-  modal.classList.remove(
-    "active"
-  );
+const modal =
+document.getElementById(
+"successModal"
+);
 
-  modal.innerHTML = "";
+if (!modal) {
+return;
 }
 
+modal.classList.remove(
+"active"
+);
+
+modal.innerHTML =
+"";
+}
 
 /* ========================================
-   GENERATE KEY
+GENERATE KEY
 ======================================== */
 
 function generateKey() {
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-  let key =
-    "NIEL-";
+const chars =
+"ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
-  for (
-    let group = 0;
-    group < 4;
-    group++
-  ) {
+let key =
+"NIEL-";
 
-    for (
-      let i = 0;
-      i < 4;
-      i++
-    ) {
+for (
+let group = 0;
+group < 4;
+group++
+) {
 
-      key +=
-        chars[
-          Math.floor(
-            Math.random() *
-            chars.length
-          )
-        ];
-    }
+```
+for (
+  let i = 0;
+  i < 4;
+  i++
+) {
 
-    if (group < 3) {
-      key += "-";
-    }
-  }
-
-  return key;
+  key +=
+    chars[
+      Math.floor(
+        Math.random() *
+        chars.length
+      )
+    ];
 }
 
+if (group < 3) {
+  key += "-";
+}
+```
+
+}
+
+return key;
+}
 
 /* ========================================
-   COPY KEY
+COPY KEY
 ======================================== */
 
 function copyKey() {
-  const element =
-    document.getElementById(
-      "generatedKey"
-    );
 
-  if (!element) {
-    return;
-  }
+const element =
+document.getElementById(
+"generatedKey"
+);
 
-  const text =
-    element.textContent.trim();
-
-  if (
-    navigator.clipboard &&
-    navigator.clipboard.writeText
-  ) {
-
-    navigator.clipboard
-      .writeText(text)
-      .then(function () {
-        showCopied();
-      })
-      .catch(function () {
-        fallbackCopy(text);
-      });
-
-  } else {
-
-    fallbackCopy(text);
-
-  }
+if (!element) {
+return;
 }
 
+const text =
+element.textContent.trim();
+
+if (
+navigator.clipboard &&
+navigator.clipboard.writeText
+) {
+
+```
+navigator.clipboard
+  .writeText(text)
+  .then(
+    function () {
+      showCopied();
+    }
+  )
+  .catch(
+    function () {
+      fallbackCopy(text);
+    }
+  );
+```
+
+} else {
+
+```
+fallbackCopy(text);
+```
+
+}
+}
 
 /* ========================================
-   FALLBACK COPY
+FALLBACK COPY
 ======================================== */
 
 function fallbackCopy(text) {
-  const textarea =
-    document.createElement(
-      "textarea"
-    );
 
-  textarea.value =
-    text;
+const textarea =
+document.createElement(
+"textarea"
+);
 
-  textarea.style.position =
-    "fixed";
+textarea.value =
+text;
 
-  textarea.style.opacity =
-    "0";
+textarea.style.position =
+"fixed";
 
-  document.body.appendChild(
-    textarea
-  );
+textarea.style.opacity =
+"0";
 
-  textarea.select();
+document.body.appendChild(
+textarea
+);
 
-  try {
+textarea.select();
 
-    document.execCommand(
-      "copy"
-    );
+try {
 
-    showCopied();
+```
+document.execCommand(
+  "copy"
+);
 
-  } catch (error) {
+showCopied();
+```
 
-    alert(
-      "Gagal menyalin key."
-    );
-  }
+} catch (error) {
 
-  document.body.removeChild(
-    textarea
-  );
+```
+alert(
+  "Gagal menyalin key."
+);
+```
+
 }
 
+document.body.removeChild(
+textarea
+);
+}
 
 /* ========================================
-   COPIED
+COPIED
 ======================================== */
 
 function showCopied() {
-  const button =
-    document.querySelector(
-      ".key-box button"
-    );
 
-  if (!button) {
-    return;
-  }
+const button =
+document.querySelector(
+".key-box button"
+);
 
-  const original =
-    button.textContent;
-
-  button.textContent =
-    "Tersalin!";
-
-  setTimeout(function () {
-
-    button.textContent =
-      original || "Salin";
-
-  }, 2000);
+if (!button) {
+return;
 }
 
+const original =
+button.textContent;
+
+button.textContent =
+"Tersalin!";
+
+setTimeout(
+function () {
+
+```
+  button.textContent =
+    original ||
+    "Salin";
+
+},
+2000
+```
+
+);
+}
 
 /* ========================================
-   CLOSE SUCCESS
+CLOSE SUCCESS
 ======================================== */
 
 function closeSuccess() {
-  stopPaymentPolling();
 
-  currentTransactionId =
-    null;
+stopPaymentPolling();
 
-  const modal =
-    document.getElementById(
-      "successModal"
-    );
+currentTransactionId =
+null;
 
-  if (modal) {
+currentOrderId =
+null;
 
-    modal.classList.remove(
-      "active"
-    );
+const modal =
+document.getElementById(
+"successModal"
+);
 
-    modal.innerHTML =
-      "";
-  }
+if (modal) {
 
-  showCatalog();
+```
+modal.classList.remove(
+  "active"
+);
+
+modal.innerHTML =
+  "";
+```
+
 }
 
+showCatalog();
+}
 
 /* ========================================
-   SHOW CATALOG
+SHOW CATALOG
 ======================================== */
 
 function showCatalog() {
-  stopPaymentPolling();
 
-  currentTransactionId =
-    null;
+stopPaymentPolling();
 
-  const detail =
-    document.getElementById(
-      "detailView"
-    );
+currentTransactionId =
+null;
 
-  const catalog =
-    document.getElementById(
-      "catalogView"
-    );
+currentOrderId =
+null;
 
-  if (detail) {
-    detail.classList.add(
-      "hidden"
-    );
-  }
+const detail =
+document.getElementById(
+"detailView"
+);
 
-  if (catalog) {
-    catalog.classList.remove(
-      "hidden"
-    );
-  }
+const catalog =
+document.getElementById(
+"catalogView"
+);
 
-  window.scrollTo(
-    0,
-    0
-  );
+if (detail) {
+
+```
+detail.classList.add(
+  "hidden"
+);
+```
+
 }
 
+if (catalog) {
+
+```
+catalog.classList.remove(
+  "hidden"
+);
+```
+
+}
+
+window.scrollTo(
+0,
+0
+);
+}
 
 /* ========================================
-   CHECK ORDERS
+CHECK ORDERS
 ======================================== */
 
 function showOrders() {
-  alert(
-    "Fitur cek pesanan belum tersedia."
-  );
+
+alert(
+"Fitur cek pesanan akan kita sambungkan ke penyimpanan order berikutnya."
+);
 }

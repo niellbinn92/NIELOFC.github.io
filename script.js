@@ -2,7 +2,7 @@ const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 const PRODUCT_IMAGES = {
-  "DRIP APK MOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+  "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "HG APKMOD": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
   "HG PROXY": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
@@ -11,7 +11,7 @@ const PRODUCT_IMAGES = {
 };
 
 const LOGO_FALLBACK = {
-  "DRIP APK MOD": { logo: "DRIP", color: "#e879f9" },
+  "DRIP APKMOD": { logo: "DRIP", color: "#e879f9" },
   "DRIP PROXY": { logo: "DRIP", color: "#c084fc" },
   "HG APKMOD": { logo: "HG", color: "#ec4899" },
   "HG PROXY": { logo: "HG", color: "#f472b6" },

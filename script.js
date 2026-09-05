@@ -4,7 +4,7 @@ const SHEET_CSV =
   "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 const PRODUCT_IMAGES = {
-  "DRIP APK MOD":
+  "DRIP APKMOD":
     "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
 
   "DRIP PROXY":
@@ -24,7 +24,7 @@ const PRODUCT_IMAGES = {
 };
 
 const LOGO_FALLBACK = {
-  "DRIP APK MOD": {
+  "DRIP APKMOD": {
     logo: "DRIP",
     color: "#e879f9"
   },

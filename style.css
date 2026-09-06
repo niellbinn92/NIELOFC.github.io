@@ -158,10 +158,10 @@ body {
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  padding: 0 4px;
 }
-
 .product-card {
   background: var(--bg-card);
   border: 1px solid var(--border-color);

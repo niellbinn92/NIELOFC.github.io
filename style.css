@@ -517,3 +517,40 @@ body {
   opacity: 1;
   pointer-events: auto;
 }
+/* Styling Clean untuk Tampilan QRIS */
+.qris-container, .payment-modal-content {
+  background: #121214 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 24px 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+/* Sembunyikan teks/tombol Buka Pembayaran yang mengganggu */
+a[href*="payment"], .buka-pembayaran,-link-buka {
+  display: none !important;
+}
+
+/* Mempercantik teks status menunggu */
+.payment-status-text {
+  font-size: 13px;
+  color: #a1a1aa;
+  margin-top: 12px;
+  letter-spacing: -0.2px;
+}
+
+/* Tombol Tutup / Aksi yang lebih minimalis */
+.btn-close-modal, .btn-tutup {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #f4f4f5;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-close-modal:hover {
+  background: rgba(255, 255, 255, 0.12);
+}

@@ -1,6 +1,9 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
+// URL WEB APP APPS SCRIPT YANG BARU (LANGKAH 7)
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8hsLArMGFIO2xAXmd-2zjXoWW16xPjVxramCVU2d7YQRR8M76yVb7NUl5oH138GU/exec";
+
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
@@ -28,6 +31,7 @@ let currentOrderId = null;
 let currentOrderKey = null;
 let paymentCheckTimer = null;
 let orderProcessing = false;
+
 function normalizeName(value) {
   return String(value || "")
     .trim()
@@ -845,13 +849,12 @@ async function processOrder() {
   orderProcessing =
     true;
 
- currentOrderId =
-  generateOrderId();
+  currentOrderId =
+    generateOrderId();
 
-currentOrderKey =
-  generateKey();
+  // KITA HAPUS currentOrderKey = generateKey(); KARENA KEY DIAMBIL DARI GOOGLE SHEET NANTI
 
-const button =
+  const button =
     document.getElementById(
       "btnOrder"
     );
@@ -1101,7 +1104,7 @@ async function checkPaymentStatus() {
             product: currentProduct.name,
             duration: selectedVoucher.duration,
             amount: selectedVoucher.price,
-            key: currentOrderKey
+            key: "PENDING_STOCK" // Ubah agar tidak simpan random key ke webhook log
           })
         }
       );
@@ -1137,7 +1140,8 @@ async function checkPaymentStatus() {
     ) {
       stopPaymentPolling();
 
-      paymentSuccess();
+      // MEMANGGIL APPS SCRIPT UNTUK MENGAMBIL STOK DARI SPREADSHEET
+      fetchStockAndCompleteOrder();
 
       return;
     }
@@ -1173,7 +1177,47 @@ async function checkPaymentStatus() {
   }
 }
 
- function paymentSuccess() {
+async function fetchStockAndCompleteOrder() {
+  const modal = document.getElementById("successModal");
+  
+  if (modal) {
+    // Tampilkan loading saat mengambil stok
+    modal.innerHTML = 
+      "<div class=\"modal\">" +
+      "<div class=\"success-icon\" style=\"font-size:30px;\">⌛</div>" +
+      "<h2>Mengambil Key...</h2>" +
+      "<p>Pembayaran berhasil! Sedang menyiapkan key Anda...</p>" +
+      "</div>";
+  }
+
+  try {
+    // Tembak URL Web App (Apps Script) dengan metode POST
+    const response = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        product: currentProduct.name,
+        duration: selectedVoucher.duration
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.available) {
+      // Jika berhasil dapat key (READY -> USED)
+      paymentSuccess(data.key);
+    } else {
+      // Jika stok habis (atau tidak ditemukan)
+      paymentSuccess("STOK SEDANG HABIS - HUBUNGI ADMIN");
+      console.warn("Stock Alert:", data.message);
+    }
+
+  } catch (error) {
+    console.error("Fetch stock error:", error);
+    paymentSuccess("GAGAL MENGAMBIL KEY - HUBUNGI ADMIN");
+  }
+}
+
+function paymentSuccess(realKey) {
   const modal =
     document.getElementById(
       "successModal"
@@ -1183,8 +1227,9 @@ async function checkPaymentStatus() {
     return;
   }
 
-  const key =
-    currentOrderKey;
+  // Simpan key asli dari database ke variabel global agar bisa di-copy
+  currentOrderKey = realKey;
+
   modal.innerHTML =
     "<div class=\"modal\">" +
 
@@ -1216,7 +1261,7 @@ async function checkPaymentStatus() {
     "<div class=\"key-box\">" +
 
     "<code id=\"generatedKey\">" +
-    escapeHtml(key) +
+    escapeHtml(currentOrderKey) +
     "</code>" +
 
     "<button onclick=\"copyKey()\">" +
@@ -1293,42 +1338,6 @@ function cancelPaymentModal() {
 
   modal.innerHTML =
     "";
-}
-
-function generateKey() {
-  const chars =
-    "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-
-  let key =
-    "NIEL-";
-
-  for (
-    let group = 0;
-    group < 4;
-    group++
-  ) {
-
-    for (
-      let i = 0;
-      i < 4;
-      i++
-    ) {
-
-      key +=
-        chars[
-          Math.floor(
-            Math.random() *
-            chars.length
-          )
-        ];
-    }
-
-    if (group < 3) {
-      key += "-";
-    }
-  }
-
-  return key;
 }
 
 function copyKey() {

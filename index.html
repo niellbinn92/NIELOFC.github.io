@@ -74,9 +74,8 @@
 
     .product-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-      gap: 12px;
-      padding: 0 4px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
     }
 
     .product-card {
@@ -189,11 +188,6 @@
       font-weight: bold;
       width: 100%;
       margin-top: 10px;
-    }
-
-    /* Styling Clean untuk QRIS Modal tanpa teks buka pembayaran */
-    a[href*="payment"], .buka-pembayaran, .link-buka {
-      display: none !important;
     }
   </style>
 </head>

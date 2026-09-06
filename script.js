@@ -2,7 +2,7 @@ const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 // URL WEB APP APPS SCRIPT YANG BARU (LANGKAH 7)
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8hsLArMGFIO2xAXmd-2zjXoWW16xPjVxramCVU2d7YQRR8M76yVb7NUl5oH138GU/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby135eLTvouYyVFcK6Z7YLa804YvAeW_lpAEcOKByrVcmvoGNSsFHv-bzo42spyQ8fn/exec";
 
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",

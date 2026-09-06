@@ -370,13 +370,91 @@ async function fetchStockAndCompleteOrder() {
 function paymentSuccess(realKey, errorMessage) {
   const modal = document.getElementById("successModal");
   if (!modal) return;
+  
   currentOrderKey = realKey || errorMessage || "STOK HABIS";
-  modal.innerHTML =
-    "<div class=\"modal\"><div class=\"success-icon\" style=\"color: " + (realKey ? "#22c55e" : "#ef4444") + ";\">" + (realKey ? "✓" : "!") + "</div>" +
-    "<h2>" + (realKey ? "Pembayaran Berhasil!" : "Pembayaran Berhasil, tapi...") + "</h2><p>Pembayaran kamu telah dikonfirmasi.</p>" +
-    "<div style=\"padding:12px;margin:15px 0;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:10px;\"><div style=\"font-size:.75rem;color:var(--text-muted);\">ORDER ID</div><strong>" + escapeHtml(currentOrderId || "-") + "</strong></div>" +
-    "<p>Key kamu:</p><div class=\"key-box\"><code id=\"generatedKey\">" + escapeHtml(currentOrderKey) + "</code><button onclick=\"copyKey()\">Salin</button></div>" +
-    "<p class=\"key-note\">Simpan Order ID dan key ini.</p><button class=\"btn-primary\" onclick=\"closeSuccess()\">Selesai</button></div>";
+  const isSuccess = !!realKey;
+  
+  const icon = isSuccess ? "✓" : "!";
+  const iconColor = isSuccess ? "#10b981" : "#ef4444";
+  const title = isSuccess ? "Payment Success!" : "Payment Issue";
+  const subtitle = isSuccess ? "Your keys are ready" : "Silakan hubungi admin";
+  
+  const amount = selectedVoucher ? selectedVoucher.price : 0;
+  const productName = currentProduct ? currentProduct.name : "Produk";
+  const productDuration = selectedVoucher ? selectedVoucher.duration : "-";
+
+  modal.innerHTML = `
+    <style>
+      .ds-modal { background: #0f0914; color: #fff; padding: 0; border-radius: 12px; width: 100%; font-family: sans-serif; text-align: left; box-sizing: border-box; }
+      .ds-card { background: #1a1129; border: 1px solid #3b2559; border-radius: 8px; margin-bottom: 15px; padding: 15px; }
+      .ds-header { text-align: center; padding: 25px 15px; margin-bottom: 15px; }
+      .ds-check { background: ${iconColor}; color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; font-weight: bold;}
+      .ds-title { font-size: 20px; font-weight: bold; margin: 0 0 5px; color: #fff;}
+      .ds-subtitle { color: #9ca3af; font-size: 14px; margin: 0; }
+      .ds-section-title { font-size: 13px; color: #9ca3af; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #3b2559; padding-bottom: 8px; }
+      .ds-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+      .ds-row:last-child { margin-bottom: 0; }
+      .ds-val { color: #fff; text-align: right; word-break: break-all; font-family: monospace;}
+      .ds-val-green { color: #10b981; font-family: sans-serif; font-weight: bold;}
+      .ds-product-row { display: flex; align-items: center; gap: 12px; }
+      .ds-product-icon { width: 40px; height: 40px; background: #0f0914; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid #3b2559; color: #d946ef;}
+      .ds-key-box { background: #0f0914; border: 1px solid #3b2559; border-radius: 6px; padding: 8px 8px 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+      .ds-key-text { font-family: monospace; font-size: 14px; color: #fff; word-break: break-all; margin-right: 10px; }
+      .ds-btn-copy { background: #d946ef; border: none; color: white; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+      .ds-btn-copy:active { transform: scale(0.9); }
+      .ds-actions { display: flex; gap: 10px; margin-top: 5px; }
+      .ds-btn { flex: 1; padding: 12px; border-radius: 6px; text-align: center; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s;}
+      .ds-btn-wa { background: #0ea5e9; color: #fff; } /* Warna biru sesuai gambar */
+      .ds-btn-wa:hover { background: #0284c7; }
+      .ds-btn-shop { background: transparent; color: #fff; border: 1px solid #3b2559; }
+      .ds-btn-shop:hover { background: #3b2559; }
+    </style>
+    
+    <div class="ds-modal">
+      <div class="ds-card ds-header">
+        <div class="ds-check">${icon}</div>
+        <h2 class="ds-title">${title}</h2>
+        <p class="ds-subtitle">${subtitle}</p>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🧾 Order</div>
+        <div class="ds-row"><span>ID</span><span class="ds-val">${escapeHtml(currentOrderId || "-")}</span></div>
+        <div class="ds-row"><span>Payment</span><span class="ds-val" style="font-family: sans-serif; font-weight: bold;">QRIS</span></div>
+        <div class="ds-row"><span>Total</span><span class="ds-val ds-val-green">${formatRupiah(amount)}</span></div>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🎁 Product</div>
+        <div class="ds-product-row">
+          <div class="ds-product-icon">📦</div>
+          <div>
+            <div style="font-weight: bold; font-size: 14px; margin-bottom: 3px;">${escapeHtml(productName)}</div>
+            <div style="color: #9ca3af; font-size: 12px;">${escapeHtml(productDuration)} × 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🔑 License Keys (1)</div>
+        <div class="ds-key-box">
+          <span class="ds-key-text" id="generatedKey">${escapeHtml(currentOrderKey)}</span>
+          <button class="ds-btn-copy" onclick="copyKey()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ds-actions">
+        <a href="https://whatsapp.com/channel/0029VbCXLJx9hXF9QRZdRr12" target="_blank" class="ds-btn ds-btn-wa">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.12.551 4.186 1.597 6.002L.142 23.858l5.972-1.566c1.748.951 3.716 1.453 5.917 1.453 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.834 17.202c-.173.491-.977.962-1.39.996-.401.034-.848.06-2.585-.662-2.146-.89-3.526-3.08-3.633-3.224-.105-.145-.87-1.157-.87-2.204 0-1.047.545-1.564.738-1.776.193-.212.42-.266.56-.266.14 0 .28.001.405.006.13.006.304-.051.464.335.166.402.569 1.393.619 1.493.05.1.083.216.017.348-.066.133-.101.216-.2.316-.1.101-.212.22-.303.303-.101.101-.205.212-.091.41.114.198.51 .842 1.092 1.36.753.67 1.391.874 1.591.975.199.1.317.085.435-.049.118-.135.512-.596.65-.802.138-.205.138-.411.373-.497.585-.087.212-.141.67-.141.67s.104.305-.069.796z"/></svg>
+          Saluran WA
+        </a>
+        <button class="ds-btn ds-btn-shop" onclick="closeSuccess()">← Shop</button>
+      </div>
+    </div>
+  `;
+
   modal.classList.add("active");
 }
 

@@ -1,8 +1,8 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
-// URL WEB APP APPS SCRIPT YANG BARU DAN AKTIF
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyN2DZuu5rd_RF3BDINu9k0sVhjs2XnZD1AnAboHjZd7ZRetuGon0Z9F9le7wcAWZlK/exec";
+// URL APPS SCRIPT TERBARU
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby78CcTX9ApGl6cndZNwrtldHJnzU97AxkmDXrzaVz_Oonn_mlFd1aseryIXQmlbArf/exec";
 
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
@@ -33,10 +33,7 @@ let paymentCheckTimer = null;
 let orderProcessing = false;
 
 function normalizeName(value) {
-  return String(value || "")
-    .trim()
-    .toUpperCase()
-    .replace(/\s+/g, " ");
+  return String(value || "").trim().toUpperCase().replace(/\s+/g, " ");
 }
 
 function escapeHtml(value) {
@@ -96,9 +93,7 @@ function parseCSV(text) {
       continue;
     }
     if ((char === "\n" || char === "\r") && !quoted) {
-      if (char === "\r" && next === "\n") {
-        i++;
-      }
+      if (char === "\r" && next === "\n") i++;
       row.push(value.trim());
       if (row.some(function (cell) { return cell !== ""; })) {
         rows.push(row);
@@ -109,15 +104,9 @@ function parseCSV(text) {
     }
     value += char;
   }
-  if (value !== "" || row.length > 0) {
-    row.push(value.trim());
-  }
-  if (row.length > 0) {
-    rows.push(row);
-  }
-  if (rows.length < 2) {
-    return [];
-  }
+  if (value !== "" || row.length > 0) row.push(value.trim());
+  if (row.length > 0) rows.push(row);
+  if (rows.length < 2) return [];
 
   const headers = rows[0].map(function (header) {
     return String(header).replace(/^\uFEFF/, "").trim().toLowerCase();
@@ -134,7 +123,6 @@ function parseCSV(text) {
 
 function convertProducts(rows) {
   const output = [];
-
   rows.forEach(function (row, index) {
     const name = normalizeName(row.name || row.product || row.nama || "");
     if (!name) return;
@@ -184,7 +172,6 @@ function convertProducts(rows) {
       vouchers: vouchers
     });
   });
-
   return output;
 }
 
@@ -239,8 +226,8 @@ function renderProducts() {
 
   grid.innerHTML = list.map(function (product) {
     const image = product.image
-      ? ("<img src=\"" + escapeHtml(product.image) + "\" alt=\"" + escapeHtml(product.name) + "\" class=\"card-img\" loading=\"lazy\">")
-      : ("<div class=\"logo-text\" style=\"color:" + product.logoColor + ";\">" + escapeHtml(product.logo) + "</div>");
+      ? "<img src=\"" + escapeHtml(product.image) + "\" alt=\"" + escapeHtml(product.name) + "\" class=\"card-img\" loading=\"lazy\">"
+      : "<div class=\"logo-text\" style=\"color:" + product.logoColor + ";\">" + escapeHtml(product.logo) + "</div>";
 
     const sold = product.sold ? " · " + escapeHtml(product.sold) + " Terjual" : "";
     const price = product.priceFrom ? "Mulai dari <strong>" + formatRupiah(product.priceFrom) + "</strong>" : "<strong>Cek Produk</strong>";
@@ -248,7 +235,8 @@ function renderProducts() {
     return (
       "<div class=\"product-card\" onclick=\"openDetail(" + product.id + ")\">" +
       "<div class=\"card-image " + (product.image ? "has-img" : "") + "\">" +
-      "<span class=\"platform\">" + escapeHtml(product.platform.toUpperCase()) + "</span>" + image +
+      "<span class=\"platform\">" + escapeHtml(product.platform.toUpperCase()) + "</span>" +
+      image +
       "</div>" +
       "<div class=\"card-body\">" +
       "<div class=\"card-name\">" + escapeHtml(product.name) + "</div>" +
@@ -299,7 +287,6 @@ function openDetail(id) {
       return "<li><span style=\"color:var(--green)\">✓</span>" + escapeHtml(item.text) + "</li>";
     }).join("");
   }
-
   renderVouchers();
 
   document.getElementById("catalogView").classList.add("hidden");
@@ -325,7 +312,6 @@ function renderVouchers() {
       "</div>"
     );
   }).join("");
-
   selectVoucher(0);
 }
 
@@ -345,8 +331,8 @@ async function processOrder() {
 
   orderProcessing = true;
   currentOrderId = generateOrderId();
-  const button = document.getElementById("btnOrder");
 
+  const button = document.getElementById("btnOrder");
   if (button) {
     button.disabled = true;
     button.textContent = "Membuat Pembayaran...";
@@ -394,11 +380,11 @@ function showPaymentModal(payment) {
   const checkoutUrl = payment.checkout_url || "";
 
   const qr = qrUrl
-    ? ("<img src=\"" + escapeHtml(qrUrl) + "\" alt=\"QRIS\" style=\"width:260px;max-width:100%;border-radius:12px;display:block;\">")
-    : ("<div style=\"padding:25px;color:var(--text-muted);\">QRIS sedang diproses...</div>");
+    ? "<img src=\"" + escapeHtml(qrUrl) + "\" alt=\"QRIS\" style=\"width:260px;max-width:100%;border-radius:12px;display:block;\">"
+    : "<div style=\"padding:25px;color:var(--text-muted);\">QRIS sedang diproses...</div>";
 
   const checkout = checkoutUrl
-    ? ("<a href=\"" + escapeHtml(checkoutUrl) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn-primary\" style=\"display:block;text-align:center;text-decoration:none;margin-bottom:10px;\">Buka Pembayaran</a>")
+    ? "<a href=\"" + escapeHtml(checkoutUrl) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn-primary\" style=\"display:block;text-align:center;text-decoration:none;margin-bottom:10px;\">Buka Pembayaran</a>"
     : "";
 
   modal.innerHTML =
@@ -411,7 +397,8 @@ function showPaymentModal(payment) {
     "<div style=\"font-size:.75rem;color:var(--text-muted);\">ORDER ID</div>" +
     "<strong>" + escapeHtml(currentOrderId) + "</strong>" +
     "</div>" +
-    "<div style=\"display:flex;justify-content:center;margin:15px 0;\">" + qr + "</div>" + checkout +
+    "<div style=\"display:flex;justify-content:center;margin:15px 0;\">" + qr + "</div>" +
+    checkout +
     "<p id=\"paymentStatusText\" style=\"color:var(--text-muted);font-size:.85rem;\">Menunggu konfirmasi pembayaran...</p>" +
     "<button class=\"btn-primary\" onclick=\"cancelPaymentModal()\">Tutup</button>" +
     "</div>";
@@ -434,6 +421,7 @@ function stopPaymentPolling() {
 
 async function checkPaymentStatus() {
   if (!currentTransactionId) return;
+
   try {
     const response = await fetch(API_BASE + "/api/check-payment", {
       method: "POST",
@@ -444,7 +432,7 @@ async function checkPaymentStatus() {
         product: currentProduct.name,
         duration: selectedVoucher.duration,
         amount: selectedVoucher.price,
-        key: "PENDING_STOCK"
+        key: "PENDING"
       })
     });
 
@@ -457,6 +445,7 @@ async function checkPaymentStatus() {
 
     if (status === "settlement" || status === "paid" || status === "success" || status === "completed") {
       stopPaymentPolling();
+      // JIKA LUNAS, AMBIL STOK DARI SHEET
       fetchStockAndCompleteOrder();
       return;
     }
@@ -481,51 +470,43 @@ async function fetchStockAndCompleteOrder() {
       "<div class=\"modal\">" +
       "<div class=\"success-icon\" style=\"font-size:30px;\">⌛</div>" +
       "<h2>Mengambil Key...</h2>" +
-      "<p>Pembayaran berhasil! Sedang menyiapkan key Anda...</p>" +
+      "<p>Pembayaran berhasil! Sedang mengambil key dari server...</p>" +
       "</div>";
   }
-
-  const namaProduk = currentProduct ? currentProduct.name : "DRIP APKMOD";
-  const durasiProduk = selectedVoucher ? selectedVoucher.duration : "1 Day";
-
-  alert("🔍 DEBUG (KIRIM DATA):\nProduk yang diminta: " + namaProduk + "\nDurasi yang diminta: " + durasiProduk);
 
   try {
     const response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
       body: JSON.stringify({
-        product: namaProduk,
-        duration: durasiProduk
+        product: currentProduct.name,
+        duration: selectedVoucher.duration
       })
     });
 
     const data = await response.json();
-    alert("📥 DEBUG (BALASAN SPREADSHEET):\n" + JSON.stringify(data));
 
     if (data.success && data.available) {
       paymentSuccess(data.key);
     } else {
-      paymentSuccess("ERROR: " + (data.message || "STOK HABIS"));
-      console.warn("Stock Alert:", data.message);
+      paymentSuccess(false, data.message || "STOK HABIS");
     }
-
   } catch (error) {
-    alert("❌ DEBUG (ERROR SISTEM):\n" + error);
     console.error("Fetch stock error:", error);
-    paymentSuccess("GAGAL MENGAMBIL KEY - HUBUNGI ADMIN");
+    paymentSuccess(false, "GAGAL KONEKSI KE SERVER STOK");
   }
 }
 
-function paymentSuccess(realKey) {
+function paymentSuccess(realKey, errorMessage) {
   const modal = document.getElementById("successModal");
   if (!modal) return;
-  
-  currentOrderKey = realKey;
+
+  // Setel key asli atau pesan error
+  currentOrderKey = realKey || errorMessage || "STOK HABIS";
 
   modal.innerHTML =
     "<div class=\"modal\">" +
-    "<div class=\"success-icon\">✓</div>" +
-    "<h2>Pembayaran Berhasil!</h2>" +
+    "<div class=\"success-icon\" style=\"color: " + (realKey ? "#22c55e" : "#ef4444") + ";\">" + (realKey ? "✓" : "!") + "</div>" +
+    "<h2>" + (realKey ? "Pembayaran Berhasil!" : "Pembayaran Berhasil, tapi...") + "</h2>" +
     "<p>Pembayaran kamu telah dikonfirmasi.</p>" +
     "<div style=\"padding:12px;margin:15px 0;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:10px;\">" +
     "<div style=\"font-size:.75rem;color:var(--text-muted);\">ORDER ID</div>" +
@@ -546,7 +527,6 @@ function paymentSuccess(realKey) {
 function paymentExpired() {
   const modal = document.getElementById("successModal");
   if (!modal) return;
-
   modal.innerHTML =
     "<div class=\"modal\">" +
     "<div class=\"success-icon\" style=\"color:#ef4444;\">×</div>" +
@@ -554,7 +534,6 @@ function paymentExpired() {
     "<p>Pembayaran tidak berhasil diselesaikan.</p>" +
     "<button class=\"btn-primary\" onclick=\"cancelPaymentModal()\">Tutup</button>" +
     "</div>";
-
   modal.classList.add("active");
 }
 
@@ -571,13 +550,8 @@ function copyKey() {
   const element = document.getElementById("generatedKey");
   if (!element) return;
   const text = element.textContent.trim();
-
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(function () {
-      showCopied();
-    }).catch(function () {
-      fallbackCopy(text);
-    });
+    navigator.clipboard.writeText(text).then(function () { showCopied(); }).catch(function () { fallbackCopy(text); });
   } else {
     fallbackCopy(text);
   }
@@ -590,7 +564,6 @@ function fallbackCopy(text) {
   textarea.style.opacity = "0";
   document.body.appendChild(textarea);
   textarea.select();
-
   try {
     document.execCommand("copy");
     showCopied();
@@ -626,10 +599,8 @@ function showCatalog() {
   currentOrderId = null;
   const detail = document.getElementById("detailView");
   const catalog = document.getElementById("catalogView");
-
   if (detail) detail.classList.add("hidden");
   if (catalog) catalog.classList.remove("hidden");
-
   window.scrollTo(0, 0);
 }
 

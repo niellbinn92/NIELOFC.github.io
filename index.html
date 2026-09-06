@@ -12,9 +12,17 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- PENEMPATAN KODE CSS DI SINI (DI DALAM TAG <style> DI DALAM <head>) -->
   <style>
-    /* Mengurangi padding & ukuran card fitur di HP */
+    @keyframes fadeInScale {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1.0); }
+    }
+
     .features-section {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -53,7 +61,6 @@
       color: var(--text-muted);
     }
 
-    /* Memperkecil tinggi gambar produk di katalog agar pas di layar HP */
     .card-image {
       height: 110px;
     }
@@ -81,6 +88,15 @@
 
 <body>
 
+  <div id="splashScreen" style="position:fixed; inset:0; background:#09060f; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; transition:opacity 0.5s ease;">
+    <h1 style="color:#fff; font-family:'Inter',sans-serif; font-weight:800; letter-spacing:2px; animation: fadeInScale 1s ease-in-out;">NIELSTORE</h1>
+    <div style="display:flex; gap:6px; margin-top:16px;">
+      <span style="width:8px; height:8px; background:#a855f7; border-radius:50%; animation: bounce 1.4s infinite ease-in-out both;"></span>
+      <span style="width:8px; height:8px; background:#a855f7; border-radius:50%; animation: bounce 1.4s infinite ease-in-out both 0.2s;"></span>
+      <span style="width:8px; height:8px; background:#a855f7; border-radius:50%; animation: bounce 1.4s infinite ease-in-out both 0.4s;"></span>
+    </div>
+  </div>
+
   <div id="mainApp">
 
 <nav class="navbar">
@@ -103,7 +119,6 @@
 
   <div class="container">
 
-    <!-- FITUR UTAMA (3 KOTAK) -->
     <div class="features-section">
       <div class="feature-card">
         <div class="feature-icon">
@@ -267,5 +282,16 @@
   </div>
 
 <script src="script.js?v=17"></script>
+<script>
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      const splash = document.getElementById("splashScreen");
+      if(splash) {
+        splash.style.opacity = "0";
+        setTimeout(() => splash.remove(), 500);
+      }
+    }, 1500);
+  });
+</script>
 </body>
 </html>

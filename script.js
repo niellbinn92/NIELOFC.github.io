@@ -404,7 +404,7 @@ function paymentSuccess(realKey, errorMessage) {
       .ds-btn-copy:active { transform: scale(0.9); }
       .ds-actions { display: flex; gap: 10px; margin-top: 5px; }
       .ds-btn { flex: 1; padding: 12px; border-radius: 6px; text-align: center; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s;}
-      .ds-btn-wa { background: #0ea5e9; color: #fff; } /* Warna biru sesuai gambar */
+      .ds-btn-wa { background: #0ea5e9; color: #fff; }
       .ds-btn-wa:hover { background: #0284c7; }
       .ds-btn-shop { background: transparent; color: #fff; border: 1px solid #3b2559; }
       .ds-btn-shop:hover { background: #3b2559; }
@@ -466,9 +466,44 @@ function paymentExpired() {
 }
 
 function cancelPaymentModal() { stopPaymentPolling(); currentTransactionId = null; const modal = document.getElementById("successModal"); if (!modal) return; modal.classList.remove("active"); modal.innerHTML = ""; }
-function copyKey() { const element = document.getElementById("generatedKey"); if (!element) return; const text = element.textContent.trim(); if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(text).then(function () { showCopied(); }).catch(function () { fallbackCopy(text); }); } else { fallbackCopy(text); } }
-function fallbackCopy(text) { const textarea = document.createElement("textarea"); textarea.value = text; textarea.style.position = "fixed"; textarea.style.opacity = "0"; document.body.appendChild(textarea); textarea.select(); try { document.execCommand("copy"); showCopied(); } catch (error) { alert("Gagal menyalin key."); } document.body.removeChild(textarea); }
-function showCopied() { const button = document.querySelector(".key-box button"); if (!button) return; const original = button.textContent; button.textContent = "Tersalin!"; setTimeout(function () { button.textContent = original || "Salin"; }, 2000); }
+
+function copyKey() { 
+  const element = document.getElementById("generatedKey"); 
+  if (!element) return; 
+  const text = element.textContent.trim(); 
+  if (navigator.clipboard && navigator.clipboard.writeText) { 
+    navigator.clipboard.writeText(text).then(function () { showCopied(); }).catch(function () { fallbackCopy(text); }); 
+  } else { 
+    fallbackCopy(text); 
+  } 
+}
+
+function fallbackCopy(text) { 
+  const textarea = document.createElement("textarea"); 
+  textarea.value = text; 
+  textarea.style.position = "fixed"; 
+  textarea.style.opacity = "0"; 
+  document.body.appendChild(textarea); 
+  textarea.select(); 
+  try { 
+    document.execCommand("copy"); 
+    showCopied(); 
+  } catch (error) { 
+    alert("Gagal menyalin key."); 
+  } 
+  document.body.removeChild(textarea); 
+}
+
+function showCopied() { 
+  const button = document.querySelector(".ds-btn-copy"); 
+  if (!button) return; 
+  const originalHTML = button.innerHTML;
+  button.innerHTML = "✓"; 
+  setTimeout(function () { 
+    button.innerHTML = originalHTML; 
+  }, 2000); 
+}
+
 function closeSuccess() { stopPaymentPolling(); currentTransactionId = null; currentOrderId = null; const modal = document.getElementById("successModal"); if (modal) { modal.classList.remove("active"); modal.innerHTML = ""; } showCatalog(); }
 function showCatalog() { stopPaymentPolling(); currentTransactionId = null; currentOrderId = null; const detail = document.getElementById("detailView"); const catalog = document.getElementById("catalogView"); if (detail) detail.classList.add("hidden"); if (catalog) catalog.classList.remove("hidden"); window.scrollTo(0, 0); }
 function showOrders() { alert("Fitur cek pesanan akan kita sambungkan setelah penyimpanan order dibuat."); }

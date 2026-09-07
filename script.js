@@ -558,14 +558,56 @@ function showOrders() {
   window.scrollTo(0, 0);
 }
 
-async function checkOrderStatus() {
-  const query = document.getElementById('searchQuery').value.trim();
-  const resultDiv = document.getElementById('orderResult');
+async function checkOrder() {
+  // Ambil elemen input dan container hasil di HTML
+  const queryInput = document.getElementById("orderInput") || document.getElementById("orderQuery") || document.querySelector("input");
+  const resultContainer = document.getElementById("searchResult") || document.getElementById("orderResult");
+
+  const query = queryInput ? queryInput.value.trim() : "";
 
   if (!query) {
-    alert('Masukkan Order ID terlebih dahulu!');
+    if (resultContainer) resultContainer.innerHTML = `<p style="color: #ef4444; margin-top: 10px;">Masukkan No. WhatsApp atau Order ID!</p>`;
     return;
   }
+
+  // Tampilkan status loading
+  if (resultContainer) {
+    resultContainer.innerHTML = `<p style="color: #a855f7; margin-top: 10px;">Mengecek pesanan...</p>`;
+  }
+
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=checkorder&query=${encodeURIComponent(query)}`);
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      const order = result.data;
+      
+      // Tampilkan detail pesanan langsung di dalam card
+      if (resultContainer) {
+        resultContainer.innerHTML = `
+          <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; margin-top: 15px; text-align: left; color: #fff;">
+            <p><strong>Order ID:</strong> ${order.orderId}</p>
+            <p><strong>Produk:</strong> ${order.product} (${order.duration})</p>
+            <p><strong>Status:</strong> <span style="color: #22c55e; font-weight: bold;">${order.status}</span></p>
+            <p style="margin-top: 8px;"><strong>Key Lisensi:</strong></p>
+            <div style="background: #111; padding: 8px; border-radius: 4px; color: #00ff88; font-family: monospace; font-size: 1.1em; word-break: break-all;">
+              ${order.key}
+            </div>
+          </div>
+        `;
+      }
+    } else {
+      if (resultContainer) {
+        resultContainer.innerHTML = `<p style="color: #ef4444; margin-top: 10px;">${result.message || "Pesanan tidak ditemukan."}</p>`;
+      }
+    }
+  } catch (error) {
+    console.error("Error fetching order:", error);
+    if (resultContainer) {
+      resultContainer.innerHTML = `<p style="color: #ef4444; margin-top: 10px;">Gagal mengecek pesanan ke server.</p>`;
+    }
+  }
+}
 
   resultDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.8rem; text-align:center;">Mencari data pesanan...</p>`;
 

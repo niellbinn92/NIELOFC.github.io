@@ -205,13 +205,6 @@ function filterProducts(filter) {
 }
 
 function openDetail(id) {
-  const loggedUser = localStorage.getItem("nielstore_user");
-  if (!loggedUser) {
-    alert("Silakan login terlebih dahulu untuk mengakses produk!");
-    showLoginModal();
-    return;
-  }
-
   currentProduct = products.find(function (product) { return product.id === id; });
   if (!currentProduct) return;
   selectedVoucher = null;
@@ -231,11 +224,6 @@ function openDetail(id) {
   if (detailPlatform) detailPlatform.textContent = currentProduct.platform.toUpperCase();
   if (detailRating) detailRating.innerHTML = "<span class=\"star\">★</span>" + (currentProduct.rating || "—") + (currentProduct.sold ? " · " + escapeHtml(currentProduct.sold) + " Terjual" : "");
   if (detailDesc) detailDesc.innerHTML = currentProduct.desc.map(function (item) { return "<li><span style=\"color:var(--green)\">✓</span>" + escapeHtml(item.text) + "</li>"; }).join("");
-  
-  const buyerNameInput = document.getElementById("buyerName");
-  if (buyerNameInput) {
-    buyerNameInput.value = loggedUser;
-  }
 
   renderVouchers();
 
@@ -617,153 +605,6 @@ async function checkOrderStatus() {
   }
 }
 
-// === SISTEM LOGIN & OTENTIKASI (WAJIB LOGIN) ===
-
-function checkAuthOnLoad() {
-  const loggedUser = localStorage.getItem("nielstore_user");
-  const authModal = document.getElementById("authModal");
-
-  if (!loggedUser) {
-    if (authModal) {
-      authModal.classList.add("active");
-    } else {
-      createAuthModal();
-    }
-  } else {
-    updateUserUI(loggedUser);
-  }
-}
-
-function createAuthModal() {
-  if (document.getElementById("authModal")) return;
-
-  const div = document.createElement("div");
-  div.id = "authModal";
-  div.className = "modal-overlay active";
-  div.innerHTML = `
-    <div class="modal" style="text-align: center; max-width: 380px; background: #12081f; padding: 25px; border-radius: 12px; border: 1px solid #3b2559; color: #fff;">
-      <h2 id="authModalTitle">Login Diperlukan</h2>
-      <p id="authModalDesc" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Silakan masuk untuk mengakses NIELSTORE.</p>
-      
-      <input type="text" id="loginUsernameInput" placeholder="Username..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg); color: #fff; margin-bottom: 10px; box-sizing: border-box;">
-      <input type="password" id="loginPasswordInput" placeholder="Password..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg); color: #fff; margin-bottom: 15px; box-sizing: border-box;">
-      
-      <button id="authSubmitBtn" class="btn-primary" onclick="handleLogin()" style="width: 100%; padding: 12px; background: #d946ef; border: none; border-radius: 8px; color: #fff; font-weight: bold; cursor: pointer; margin-bottom: 12px;">Masuk Sekarang</button>
-      
-      <p id="authToggleText" style="font-size: 0.85rem; color: var(--text-muted);">
-        Belum punya akun? <a href="#" onclick="toggleAuthMode(event)" style="color: #d946ef; text-decoration: none; font-weight: bold;">Buat Akun</a>
-      </p>
-    </div>
-  `;
-  document.body.appendChild(div);
-}
-
-let isRegisterMode = false;
-
-function toggleAuthMode(e) {
-  e.preventDefault();
-  isRegisterMode = !isRegisterMode;
-  
-  const title = document.getElementById("authModalTitle");
-  const desc = document.getElementById("authModalDesc");
-  const btn = document.getElementById("authSubmitBtn");
-  const toggleText = document.getElementById("authToggleText");
-
-  if (isRegisterMode) {
-    title.textContent = "Daftar Akun Baru";
-    desc.textContent = "Buat akun baru untuk mulai berbelanja di NIELSTORE.";
-    btn.textContent = "Daftar Sekarang";
-    btn.setAttribute("onclick", "handleRegister()");
-    toggleText.innerHTML = 'Sudah punya akun? <a href="#" onclick="toggleAuthMode(event)" style="color: #d946ef; text-decoration: none; font-weight: bold;">Login Disini</a>';
-  } else {
-    title.textContent = "Login Diperlukan";
-    desc.textContent = "Silakan masuk untuk mengakses NIELSTORE.";
-    btn.textContent = "Masuk Sekarang";
-    btn.setAttribute("onclick", "handleLogin()");
-    toggleText.innerHTML = 'Belum punya akun? <a href="#" onclick="toggleAuthMode(event)" style="color: #d946ef; text-decoration: none; font-weight: bold;">Buat Akun</a>';
-  }
-}
-
-async function handleLogin() {
-  const usernameInput = document.getElementById("loginUsernameInput");
-  const passwordInput = document.getElementById("loginPasswordInput");
-  const username = usernameInput ? usernameInput.value.trim() : "";
-  const password = passwordInput ? passwordInput.value.trim() : "";
-
-  if (!username || !password) {
-    alert("Username dan Password wajib diisi!");
-    return;
-  }
-
-  try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "login", username: username, password: password })
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      localStorage.setItem("nielstore_user", data.username);
-      const authModal = document.getElementById("authModal");
-      if (authModal) authModal.classList.remove("active");
-      updateUserUI(data.username);
-      loadProducts();
-    } else {
-      alert(data.message || "Login gagal.");
-    }
-  } catch (error) {
-    console.error("Login error:", error);
-    alert("Terjadi kesalahan koneksi ke server.");
-  }
-}
-
-async function handleRegister() {
-  const usernameInput = document.getElementById("loginUsernameInput");
-  const passwordInput = document.getElementById("loginPasswordInput");
-  const username = usernameInput ? usernameInput.value.trim() : "";
-  const password = passwordInput ? passwordInput.value.trim() : "";
-
-  if (!username || !password) {
-    alert("Username dan Password wajib diisi!");
-    return;
-  }
-
-  try {
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: "POST",
-      body: JSON.stringify({ action: "register", username: username, password: password })
-    });
-    const data = await response.json();
-
-    if (data.success) {
-      alert("Akun berhasil dibuat! Silakan login.");
-      toggleAuthMode(new Event('click')); 
-    } else {
-      alert(data.message || "Gagal mendaftar.");
-    }
-  } catch (error) {
-    console.error("Register error:", error);
-    alert("Terjadi kesalahan koneksi.");
-  }
-}
-
-function updateUserUI(username) {
-  const userIndicator = document.getElementById("userIndicator");
-  if (userIndicator) {
-    userIndicator.textContent = username;
-  }
-}
-
-function showLoginModal() {
-  const authModal = document.getElementById("authModal");
-  if (authModal) {
-    authModal.classList.add("active");
-  } else {
-    createAuthModal();
-  }
-}
-
 document.addEventListener("DOMContentLoaded", function() {
-  checkAuthOnLoad();
   loadProducts();
 });

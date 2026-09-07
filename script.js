@@ -205,6 +205,14 @@ function filterProducts(filter) {
 }
 
 function openDetail(id) {
+  // Cek apakah user sudah login sebelum membuka detail produk/membeli
+  const loggedUser = localStorage.getItem("nielstore_user");
+  if (!loggedUser) {
+    alert("Silakan login terlebih dahulu untuk mengakses produk!");
+    showLoginModal();
+    return;
+  }
+
   currentProduct = products.find(function (product) { return product.id === id; });
   if (!currentProduct) return;
   selectedVoucher = null;
@@ -225,6 +233,12 @@ function openDetail(id) {
   if (detailRating) detailRating.innerHTML = "<span class=\"star\">★</span>" + (currentProduct.rating || "—") + (currentProduct.sold ? " · " + escapeHtml(currentProduct.sold) + " Terjual" : "");
   if (detailDesc) detailDesc.innerHTML = currentProduct.desc.map(function (item) { return "<li><span style=\"color:var(--green)\">✓</span>" + escapeHtml(item.text) + "</li>"; }).join("");
   
+  // Auto-fill form pembeli sesuai dengan data user yang sedang login (bukan hardcoded "danil")
+  const buyerNameInput = document.getElementById("buyerName");
+  if (buyerNameInput) {
+    buyerNameInput.value = loggedUser;
+  }
+
   renderVouchers();
 
   document.getElementById("catalogView").classList.add("hidden");
@@ -293,13 +307,6 @@ function updateSummary() {
   const price = selectedVoucher ? selectedVoucher.price : 0;
   priceEl.textContent = formatRupiah(price);
   totalEl.textContent = formatRupiah(price);
-}
-
-function autofillBuyer() {
-  const nameInput = document.getElementById("buyerName");
-  if(nameInput) {
-    nameInput.value = "danil";
-  }
 }
 
 function applyPromo() {
@@ -596,4 +603,84 @@ function checkOrderStatus() {
   `;
 }
 
-document.addEventListener("DOMContentLoaded", function () { loadProducts(); });
+// === SISTEM LOGIN & OTENTIKASI (WAJIB LOGIN) ===
+
+function checkAuthOnLoad() {
+  const loggedUser = localStorage.getItem("nielstore_user");
+  const authModal = document.getElementById("authModal");
+
+  if (!loggedUser) {
+    if (authModal) {
+      authModal.classList.add("active");
+    } else {
+      createAuthModal();
+    }
+  } else {
+    updateUserUI(loggedUser);
+  }
+}
+
+function createAuthModal() {
+  if (document.getElementById("authModal")) return;
+
+  const div = document.createElement("div");
+  div.id = "authModal";
+  div.className = "modal-overlay active"; // Pastikan CSS modal-overlay kamu aktif
+  div.innerHTML = `
+    <div class="modal" style="text-align: center; max-width: 380px;">
+      <h2>Login Diperlukan</h2>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px;">Masukkan nama/username kamu untuk masuk ke NIELSTORE.</p>
+      <input type="text" id="loginUsernameInput" placeholder="Masukkan Username / Nama Kamu..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg); color: #fff; margin-bottom: 15px; box-sizing: border-box;">
+      <button class="btn-primary" onclick="handleLogin()" style="width: 100%;">Masuk Sekarang</button>
+    </div>
+  `;
+  document.body.appendChild(div);
+}
+
+function showLoginModal() {
+  let modal = document.getElementById("authModal");
+  if (!modal) {
+    createAuthModal();
+    modal = document.getElementById("authModal");
+  }
+  modal.classList.add("active");
+}
+
+function handleLogin() {
+  const input = document.getElementById("loginUsernameInput");
+  const username = input ? input.value.trim() : "";
+
+  if (!username) {
+    alert("Username tidak boleh kosong!");
+    return;
+  }
+
+  // Simpan ke localStorage agar user wajib login teringat
+  localStorage.setItem("nielstore_user", username);
+
+  const modal = document.getElementById("authModal");
+  if (modal) {
+    modal.classList.remove("active");
+  }
+
+  updateUserUI(username);
+  alert("Berhasil login sebagai: " + username);
+}
+
+function updateUserUI(username) {
+  // Jika ingin menampilkan nama user di navbar/header jika elemennya ada
+  const userDisplay = document.getElementById("userDisplay");
+  if (userDisplay) {
+    userDisplay.textContent = username;
+  }
+}
+
+function logoutUser() {
+  localStorage.removeItem("nielstore_user");
+  location.reload();
+}
+
+document.addEventListener("DOMContentLoaded", function () { 
+  loadProducts(); 
+  checkAuthOnLoad(); // Cek login saat pertama kali halaman dimuat
+});

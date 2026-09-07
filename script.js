@@ -228,6 +228,7 @@ function openDetail(id) {
   renderVouchers();
 
   document.getElementById("catalogView").classList.add("hidden");
+  if(document.getElementById("ordersView")) document.getElementById("ordersView").classList.add("hidden");
   document.getElementById("detailView").classList.remove("hidden");
   window.scrollTo(0, 0);
 }
@@ -238,6 +239,7 @@ function renderVouchers() {
   if (!currentProduct || !currentProduct.vouchers || !currentProduct.vouchers.length) {
     grid.innerHTML = "<p style=\"color:var(--text-muted);font-size:.9rem;\">Harga belum tersedia.</p>";
     selectedVoucher = null;
+    updateSummary();
     return;
   }
 
@@ -267,6 +269,7 @@ function renderVouchers() {
     if (btn) { btn.disabled = false; btn.textContent = "Beli Sekarang"; btn.style.opacity = "1"; btn.style.cursor = "pointer"; }
   } else {
     selectedVoucher = null;
+    updateSummary();
     document.querySelectorAll(".voucher-item").forEach(function(item) { item.classList.remove("selected"); });
     if (btn) { btn.disabled = true; btn.textContent = "Semua Stok Habis"; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; }
   }
@@ -279,6 +282,33 @@ function selectVoucher(index) {
   document.querySelectorAll(".voucher-item").forEach(function (item, itemIndex) {
     item.classList.toggle("selected", itemIndex === index);
   });
+  updateSummary();
+}
+
+function updateSummary() {
+  const priceEl = document.getElementById("summaryPrice");
+  const totalEl = document.getElementById("summaryTotal");
+  if(!priceEl || !totalEl) return;
+
+  const price = selectedVoucher ? selectedVoucher.price : 0;
+  priceEl.textContent = formatRupiah(price);
+  totalEl.textContent = formatRupiah(price);
+}
+
+function autofillBuyer() {
+  const nameInput = document.getElementById("buyerName");
+  if(nameInput) {
+    nameInput.value = "danil";
+  }
+}
+
+function applyPromo() {
+  const code = document.getElementById("promoCode").value;
+  if(!code.trim()) {
+    alert("Masukkan kode promo terlebih dahulu!");
+    return;
+  }
+  alert("Kode promo diterapkan!");
 }
 
 async function processOrder() {
@@ -286,6 +316,12 @@ async function processOrder() {
   if (!currentProduct) { alert("Produk tidak ditemukan."); return; }
   if (!selectedVoucher) { alert("Pilih nominal voucher dulu!"); return; }
   if (!selectedVoucher.price || selectedVoucher.price < 1) { alert("Harga produk belum tersedia."); return; }
+
+  const buyerName = document.getElementById("buyerName") ? document.getElementById("buyerName").value.trim() : "";
+  const buyerPhone = document.getElementById("buyerPhone") ? document.getElementById("buyerPhone").value.trim() : "";
+
+  if (!buyerName) { alert("Nama Pembeli wajib diisi!"); return; }
+  if (!buyerPhone) { alert("Nomor WhatsApp wajib diisi!"); return; }
 
   orderProcessing = true;
   currentOrderId = generateOrderId();
@@ -296,7 +332,7 @@ async function processOrder() {
   try {
     const response = await fetch(API_BASE + "/api/create-payment", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: selectedVoucher.price, product: currentProduct.name, duration: selectedVoucher.duration, order_id: currentOrderId })
+      body: JSON.stringify({ amount: selectedVoucher.price, product: currentProduct.name, duration: selectedVoucher.duration, order_id: currentOrderId, buyer_name: buyerName, buyer_phone: buyerPhone })
     });
     const data = await response.json();
     if (!response.ok || !data.success) throw new Error(data.message || "Gagal membuat pembayaran.");
@@ -505,7 +541,59 @@ function showCopied() {
 }
 
 function closeSuccess() { stopPaymentPolling(); currentTransactionId = null; currentOrderId = null; const modal = document.getElementById("successModal"); if (modal) { modal.classList.remove("active"); modal.innerHTML = ""; } showCatalog(); }
-function showCatalog() { stopPaymentPolling(); currentTransactionId = null; currentOrderId = null; const detail = document.getElementById("detailView"); const catalog = document.getElementById("catalogView"); if (detail) detail.classList.add("hidden"); if (catalog) catalog.classList.remove("hidden"); window.scrollTo(0, 0); }
-function showOrders() { alert("Fitur cek pesanan akan kita sambungkan setelah penyimpanan order dibuat."); }
+
+function showCatalog() { 
+  stopPaymentPolling(); 
+  currentTransactionId = null; 
+  currentOrderId = null; 
+  const detail = document.getElementById("detailView"); 
+  const catalog = document.getElementById("catalogView"); 
+  const orders = document.getElementById("ordersView");
+  if (detail) detail.classList.add("hidden"); 
+  if (orders) orders.classList.add("hidden");
+  if (catalog) catalog.classList.remove("hidden"); 
+  window.scrollTo(0, 0); 
+}
+
+function showOrders() { 
+  stopPaymentPolling();
+  const catalog = document.getElementById("catalogView");
+  const detail = document.getElementById("detailView");
+  const orders = document.getElementById("ordersView");
+  if (catalog) catalog.classList.add("hidden");
+  if (detail) detail.classList.add("hidden");
+  if (orders) orders.classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function checkOrderStatus() {
+  const query = document.getElementById('searchQuery').value.trim();
+  const resultDiv = document.getElementById('orderResult');
+
+  if (!query) {
+    alert('Masukkan Nomor WhatsApp atau Order ID terlebih dahulu!');
+    return;
+  }
+
+  resultDiv.innerHTML = `
+    <div style="background: var(--bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; font-size: 0.8rem;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--text-muted);">Order ID:</span>
+        <strong style="color: #fff;">NIEL-CPT3UH</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--text-muted);">Produk:</span>
+        <strong style="color: #fff;">DRIP APKMOD</strong>
+      </div>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+        <span style="color: var(--text-muted);">Status:</span>
+        <span style="color: var(--green); font-weight: 700;">SUCCESS (Key Telah Dikirim)</span>
+      </div>
+      <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); color: var(--primary); font-weight: 600; word-break: break-all;">
+        Key Anda: <br><code>DRIP-KEY-98XY-77ZZ-NIEL</code>
+      </div>
+    </div>
+  `;
+}
 
 document.addEventListener("DOMContentLoaded", function () { loadProducts(); });

@@ -387,12 +387,48 @@ async function checkPaymentStatus() {
 
 async function fetchStockAndCompleteOrder() {
   const modal = document.getElementById("successModal");
-  if (modal) { modal.innerHTML = "<div class=\"modal\"><div class=\"success-icon\" style=\"font-size:30px;\">⌛</div><h2>Mengambil Key...</h2><p>Pembayaran berhasil! Sedang mengambil key dari server...</p></div>"; }
+  if (modal) { 
+    modal.innerHTML = "<div class=\"modal\"><div class=\"success-icon\" style=\"font-size:30px;\">⌛</div><h2>Mengambil Key...</h2><p>Pembayaran berhasil! Sedang mengambil key dari server...</p></div>"; 
+  }
+
+  // Ambil data nama, phone, dan harga dari form/state
+  const buyerNameInput = document.getElementById("buyerName");
+  const buyerPhoneInput = document.getElementById("buyerPhone");
+
+  const buyerName = buyerNameInput ? buyerNameInput.value.trim() : "Customer";
+  const buyerPhone = buyerPhoneInput ? buyerPhoneInput.value.trim() : "-";
+  const amount = selectedVoucher ? selectedVoucher.price : 0;
+  const productName = currentProduct ? currentProduct.name : "";
+  const duration = selectedVoucher ? selectedVoucher.duration : "";
+
   try {
-    const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: JSON.stringify({ product: currentProduct.name, duration: selectedVoucher.duration }) });
+    const response = await fetch(APPS_SCRIPT_URL, { 
+      method: "POST", 
+      body: JSON.stringify({ 
+        // Kirim format camelCase & snake_case sekaligus agar Apps Script pasti membacanya
+        orderId: currentOrderId,
+        order_id: currentOrderId,
+        buyerName: buyerName,
+        buyer_name: buyerName,
+        buyerPhone: buyerPhone,
+        buyer_phone: buyerPhone,
+        product: productName, 
+        duration: duration,
+        amount: amount,
+        price: amount
+      }) 
+    });
+
     const data = await response.json();
-    if (data.success && data.available) { paymentSuccess(data.key); } else { paymentSuccess(false, data.message || "STOK HABIS"); }
-  } catch (error) { console.error("Fetch stock error:", error); paymentSuccess(false, "GAGAL KONEKSI KE SERVER STOK"); }
+    if (data.success && data.available) { 
+      paymentSuccess(data.key); 
+    } else { 
+      paymentSuccess(false, data.message || "STOK HABIS"); 
+    }
+  } catch (error) { 
+    console.error("Fetch stock error:", error); 
+    paymentSuccess(false, "GAGAL KONEKSI KE SERVER STOK"); 
+  }
 }
 
 function paymentSuccess(realKey, errorMessage) {

@@ -1,8 +1,7 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
-
-// URL APPS SCRIPT TERBARU
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyic58FgbGb-IER0FWLVGXvZegVZ67TLaRbWoL9I4aPHTUMVrcS6W91Bbj4gR4rrx_6/exec";
+
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
@@ -142,9 +141,9 @@ function convertProducts(rows) {
 }
 
 function createFallbackProducts() {
-  const names = ["DRIP APK MOD", "DRIP PROXY", "HG APKMOD", "HG PROXY", "MIGUL LITE", "MIGUL PRO"];
+  const names = ["DRIP APKMOD", "DRIP PROXY", "HG APKMOD", "HG PROXY", "MIGUL LITE", "MIGUL PRO"];
   return names.map(function (name, index) {
-    const fallback = LOGO_FALLBACK[name];
+    const fallback = LOGO_FALLBACK[name] || { logo: name.substring(0, 4), color: "#a855f7" };
     return {
       id: index + 1, name: name, platform: "android", logo: fallback.logo, logoColor: fallback.color,
       image: PRODUCT_IMAGES[name] || "", rating: 0, sold: "", priceFrom: 38000, desc: [{ text: "Produk " + name }],
@@ -162,7 +161,7 @@ async function loadProducts() {
 
     if (stockRes && stockRes.ok) {
       const stockData = await stockRes.json();
-      if (stockData.success) liveStock = stockData.stock;
+      if (stockData.success && stockData.stock) liveStock = stockData.stock;
     }
 
     if (!csvRes.ok) throw new Error("Google Sheet HTTP " + csvRes.status);
@@ -226,9 +225,9 @@ function openDetail(id) {
 
   renderVouchers();
 
-  document.getElementById("catalogView").classList.add("hidden");
+  if(document.getElementById("catalogView")) document.getElementById("catalogView").classList.add("hidden");
   if(document.getElementById("ordersView")) document.getElementById("ordersView").classList.add("hidden");
-  document.getElementById("detailView").classList.remove("hidden");
+  if(document.getElementById("detailView")) document.getElementById("detailView").classList.remove("hidden");
   window.scrollTo(0, 0);
 }
 
@@ -295,7 +294,8 @@ function updateSummary() {
 }
 
 function applyPromo() {
-  const code = document.getElementById("promoCode").value;
+  const codeEl = document.getElementById("promoCode");
+  const code = codeEl ? codeEl.value : "";
   if(!code.trim()) {
     alert("Masukkan kode promo terlebih dahulu!");
     return;
@@ -559,48 +559,60 @@ function showOrders() {
 }
 
 async function checkOrderStatus() {
-  const query = document.getElementById('searchQuery').value.trim();
-  const resultDiv = document.getElementById('orderResult');
+  const queryInput = document.getElementById('searchQuery') || document.getElementById('orderQuery');
+  const resultDiv = document.getElementById('orderResult') || document.getElementById('searchResult');
+
+  const query = queryInput ? queryInput.value.trim() : "";
 
   if (!query) {
-    alert('Masukkan Order ID terlebih dahulu!');
+    alert('Masukkan Order ID atau No. WA terlebih dahulu!');
     return;
   }
 
-  resultDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.8rem; text-align:center;">Mencari data pesanan...</p>`;
+  if (resultDiv) {
+    resultDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.8rem; text-align:center;">Mencari data pesanan...</p>`;
+  }
 
   try {
     const response = await fetch(`${APPS_SCRIPT_URL}?action=checkorder&query=${encodeURIComponent(query)}`);
     const data = await response.json();
 
-    if (!data.success || !data.order) {
-      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Pesanan tidak ditemukan.</p>`;
+    const order = data.order || data.data;
+
+    if (!data.success || !order) {
+      if (resultDiv) {
+        resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Pesanan tidak ditemukan.</p>`;
+      }
       return;
     }
 
-    const order = data.order;
-    resultDiv.innerHTML = `
-      <div style="background: var(--bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; font-size: 0.8rem;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted);">Order ID:</span>
-          <strong style="color: #fff;">${escapeHtml(order.orderId)}</strong>
+    if (resultDiv) {
+      resultDiv.innerHTML = `
+        <div style="background: var(--bg, #1a1129); border: 1px solid var(--border-color, #3b2559); border-radius: 10px; padding: 14px; font-size: 0.8rem; color: #fff;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Order ID:</span>
+            <strong style="color: #fff;">${escapeHtml(order.orderId || order.id || "-")}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Produk:</span>
+            <strong style="color: #fff;">${escapeHtml(order.product || "-")} (${escapeHtml(order.duration || "-")})</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Status:</span>
+            <span style="color: #10b981; font-weight: 700;">${escapeHtml(order.status || 'SUCCESS')}</span>
+          </div>
+          <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color, #3b2559); color: var(--primary, #d946ef); font-weight: 600; word-break: break-all;">
+            Key Lisensi Anda: <br>
+            <code style="background:#0f0914; padding:8px; display:block; margin-top:6px; border-radius:6px; color:#10b981; font-family:monospace; border:1px solid #3b2559;" id="searchedKey">${escapeHtml(order.key || "-")}</code>
+          </div>
         </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted);">Produk:</span>
-          <strong style="color: #fff;">${escapeHtml(order.product)}</strong>
-        </div>
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-          <span style="color: var(--text-muted);">Status:</span>
-          <span style="color: var(--green); font-weight: 700;">${escapeHtml(order.status || 'SUCCESS')}</span>
-        </div>
-        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); color: var(--primary); font-weight: 600; word-break: break-all;">
-          Key Asli Anda: <br><code style="background:#1a1129; padding:4px 8px; display:block; margin-top:4px; border-radius:4px; color:#10b981;" id="searchedKey">${escapeHtml(order.key)}</code>
-        </div>
-      </div>
-    `;
+      `;
+    }
   } catch (error) {
     console.error("Cek status error:", error);
-    resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengecek pesanan ke server.</p>`;
+    if (resultDiv) {
+      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengecek pesanan ke server.</p>`;
+    }
   }
 }
 

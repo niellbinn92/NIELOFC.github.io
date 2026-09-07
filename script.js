@@ -573,34 +573,50 @@ function showOrders() {
   window.scrollTo(0, 0);
 }
 
-function checkOrderStatus() {
+async function checkOrderStatus() {
   const query = document.getElementById('searchQuery').value.trim();
   const resultDiv = document.getElementById('orderResult');
 
   if (!query) {
-    alert('Masukkan Nomor WhatsApp atau Order ID terlebih dahulu!');
+    alert('Masukkan Order ID terlebih dahulu!');
     return;
   }
 
-  resultDiv.innerHTML = `
-    <div style="background: var(--bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; font-size: 0.8rem;">
-      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-        <span style="color: var(--text-muted);">Order ID:</span>
-        <strong style="color: #fff;">NIEL-CPT3UH</strong>
+  resultDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.8rem; text-align:center;">Mencari data pesanan...</p>`;
+
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=checkorder&query=${encodeURIComponent(query)}`);
+    const data = await response.json();
+
+    if (!data.success || !data.order) {
+      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Pesanan tidak ditemukan.</p>`;
+      return;
+    }
+
+    const order = data.order;
+    resultDiv.innerHTML = `
+      <div style="background: var(--bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; font-size: 0.8rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Order ID:</span>
+          <strong style="color: #fff;">${escapeHtml(order.orderId)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Produk:</span>
+          <strong style="color: #fff;">${escapeHtml(order.product)}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted);">Status:</span>
+          <span style="color: var(--green); font-weight: 700;">${escapeHtml(order.status || 'SUCCESS')}</span>
+        </div>
+        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); color: var(--primary); font-weight: 600; word-break: break-all;">
+          Key Asli Anda: <br><code style="background:#1a1129; padding:4px 8px; display:block; margin-top:4px; border-radius:4px; color:#10b981;" id="searchedKey">${escapeHtml(order.key)}</code>
+        </div>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-        <span style="color: var(--text-muted);">Produk:</span>
-        <strong style="color: #fff;">DRIP APKMOD</strong>
-      </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-        <span style="color: var(--text-muted);">Status:</span>
-        <span style="color: var(--green); font-weight: 700;">SUCCESS (Key Telah Dikirim)</span>
-      </div>
-      <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); color: var(--primary); font-weight: 600; word-break: break-all;">
-        Key Anda: <br><code>DRIP-KEY-98XY-77ZZ-NIEL</code>
-      </div>
-    </div>
-  `;
+    `;
+  } catch (error) {
+    console.error("Cek status error:", error);
+    resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengecek pesanan ke server.</p>`;
+  }
 }
 
 // === SISTEM LOGIN & OTENTIKASI (WAJIB LOGIN) ===

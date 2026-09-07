@@ -2,7 +2,7 @@ const API_BASE = "https://nielofc-github-io.vercel.app";
 const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
 
 // URL APPS SCRIPT TERBARU
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxW-cGm34V9H3LviM1ND1jhubxmmVQq8WM-APZMMneUtSP33nyIa2Q8G71Xfrpp30Iz/exec";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyEhcmJGy7lrYwO-rHPeX3iC8eMSU4QNRkjzJEZIlV6au1dcL5K5yjsR6OB394Lt7A9/exec";
 
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",

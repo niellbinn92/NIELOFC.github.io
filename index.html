@@ -83,6 +83,94 @@
       padding: 8px;
       font-size: 0.8rem;
     }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .form-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: #fff;
+      font-size: 0.8rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus {
+      border-color: var(--primary);
+    }
+    .input-btn-right {
+      position: absolute;
+      right: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 4px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .input-btn-right:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .form-hint {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+      display: block;
+    }
+    .promo-section {
+      background: var(--bg);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+    .promo-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .summary-row.total {
+      font-size: 0.9rem;
+      color: #fff;
+      font-weight: 800;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border-color);
+    }
+    .summary-row.total span:last-child {
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
   </style>
 </head>
 
@@ -176,6 +264,33 @@
 
 </main>
 
+<main id="ordersView" class="hidden">
+  <div class="container detail-container">
+    <button class="back-btn" onclick="showCatalog()">
+      ← Kembali ke Katalog
+    </button>
+
+    <div class="order-box" style="max-width: 500px; margin: 20px auto;">
+      <div class="section-title" style="margin-bottom: 16px;">
+        🔍 CEK STATUS PESANAN
+      </div>
+
+      <div class="form-group" style="margin-bottom: 14px;">
+        <label class="form-label">Masukkan No. WhatsApp / Order ID</label>
+        <div class="input-wrapper">
+          <input type="text" id="searchQuery" class="form-input" placeholder="Contoh: 08123456789 atau NIEL-xxxx">
+        </div>
+      </div>
+
+      <button type="button" class="btn-buy-now" onclick="checkOrderStatus()" style="margin-bottom: 16px;">
+        Cari Pesanan
+      </button>
+
+      <div id="orderResult" style="margin-top: 16px;"></div>
+    </div>
+  </div>
+</main>
+
 <main id="detailView" class="hidden">
 
   <div class="container detail-container">
@@ -208,56 +323,79 @@
 
         <div class="order-box">
 
-          <div class="order-section">
-
+          <div class="order-section" style="margin-bottom: 16px;">
             <div class="section-title">
               <span class="num">1</span>
               PILIH NOMINAL VOUCHER
             </div>
-
             <div id="voucherGrid" class="voucher-grid"></div>
-
           </div>
 
-          <div class="order-section">
-
+          <div class="order-section" style="margin-bottom: 16px;">
             <div class="section-title">
               <span class="num">2</span>
               PEMBAYARAN
             </div>
 
             <div class="payment-option selected">
-
               <div class="pay-left">
-
                 <span class="pay-icon">⚡</span>
-
                 <div>
                   <strong>QRIS</strong>
                   <small>All Payment</small>
                 </div>
-
               </div>
-
-              <div class="pay-check">
-                ✓
-              </div>
-
+              <div class="pay-check">✓</div>
             </div>
 
             <div class="payment-sub">
+              <span>Pembayaran otomatis via AutoGoPay</span>
+              <span class="gratis">Admin: <b>GRATIS</b></span>
+            </div>
+          </div>
 
-              <span>
-                Pembayaran otomatis via AutoGoPay
-              </span>
-
-              <span class="gratis">
-                Admin:
-                <b>GRATIS</b>
-              </span>
-
+          <div class="order-section" style="margin-bottom: 16px;">
+            <div class="section-title">
+              <span class="num">3</span>
+              DATA PEMBELI
             </div>
 
+            <div class="form-group">
+              <label class="form-label">Nama Pembeli *</label>
+              <div class="input-wrapper">
+                <input type="text" id="buyerName" class="form-input" placeholder="Masukkan nama Anda">
+                <button type="button" class="input-btn-right" onclick="autofillBuyer()">Auto-fill</button>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Nomor WhatsApp *</label>
+              <input type="tel" id="buyerPhone" class="form-input" placeholder="08xxxxxxxxxx">
+              <span class="form-hint">Nomor ini digunakan sebagai identitas pesanan Anda.</span>
+            </div>
+          </div>
+
+          <div class="promo-section">
+            <div class="promo-title">
+              <span>🏷️</span> Kode Promo
+            </div>
+            <div class="input-wrapper" style="margin-bottom: 12px;">
+              <input type="text" id="promoCode" class="form-input" placeholder="MASUKKAN KODE PROMO" style="text-transform: uppercase;">
+              <button type="button" class="input-btn-right" onclick="applyPromo()">Terapkan</button>
+            </div>
+
+            <div class="summary-row">
+              <span>Harga Produk</span>
+              <span id="summaryPrice">Rp0</span>
+            </div>
+            <div class="summary-row">
+              <span>Biaya Admin</span>
+              <span style="color: var(--green); font-weight: 600;">Gratis</span>
+            </div>
+            <div class="summary-row total">
+              <span>TOTAL BAYAR</span>
+              <span id="summaryTotal">Rp0</span>
+            </div>
           </div>
 
           <button
@@ -281,7 +419,7 @@
 
   </div>
 
-<script src="script.js?v=17"></script>
+<script src="script.js?v=19"></script>
 <script>
   window.addEventListener("load", () => {
     setTimeout(() => {
@@ -292,6 +430,22 @@
       }
     }, 1500);
   });
+
+  function autofillBuyer() {
+    const nameInput = document.getElementById("buyerName");
+    if(nameInput) {
+      nameInput.value = "danil";
+    }
+  }
+
+  function applyPromo() {
+    const code = document.getElementById("promoCode").value;
+    if(!code.trim()) {
+      alert("Masukkan kode promo terlebih dahulu!");
+      return;
+    }
+    alert("Kode promo diterapkan!");
+  }
 </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
-const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv&gid=0";
+const SHEET_CSV = "https://api.allorigins.win/raw?url=https%3A%2F%2Fdocs.google.com%2Fspreadsheets%2Fd%2F1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA%2Fexport%3Fformat%3Dcsv%26gid%3D0";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwS2_i9ebP_W4sSWoLZ0ohcvcJXkxlZ1LHp8cKqByweF_5wzAWClAMXxTYqtFKN9Rb/exec";
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",

@@ -152,31 +152,49 @@ function createFallbackProducts() {
   });
 }
 
-async function loadProducts() {
+aasync function loadProducts() {
   try {
-    const [csvRes, stockRes] = await Promise.all([
-      fetch(SHEET_CSV + "&t=" + Date.now(), { method: "GET", cache: "no-store" }),
-      fetch(APPS_SCRIPT_URL + "?action=getstock", { method: "GET" }).catch(function() { return null; })
+    // 1 & 2. Ambil stok dan produk secara paralel untuk mempercepat performa
+    const [stockRes, prodRes] = await Promise.all([
+      fetch(APPS_SCRIPT_URL + "?action=getstock", { method: "GET" }).catch(() => null),
+      fetch(APPS_SCRIPT_URL + "?action=getproducts", { method: "GET" }).catch(() => null)
     ]);
 
+    // Proses data stok
     if (stockRes && stockRes.ok) {
       const stockData = await stockRes.json();
       if (stockData.success && stockData.stock) liveStock = stockData.stock;
     }
 
-    if (!csvRes.ok) throw new Error("Google Sheet HTTP " + csvRes.status);
-    const text = await csvRes.text();
-    const rows = parseCSV(text);
-    const loaded = convertProducts(rows);
+    // Proses data produk dari Apps Script
+    let loaded = [];
+    if (prodRes && prodRes.ok) {
+      const resData = await prodRes.json();
+      const rows = Array.isArray(resData) ? resData : (resData.products || resData.data || []);
+      if (rows.length) {
+        loaded = convertProducts(rows);
+      }
+    }
+
+    // 3. Cadangan jika Apps Script gagal atau tidak mengembalikan data produk
+    if (!loaded.length) {
+      const csvRes = await fetch(SHEET_CSV + "&t=" + Date.now(), { method: "GET", cache: "no-store" });
+      if (!csvRes.ok) throw new Error("Google Sheet HTTP " + csvRes.status);
+      const text = await csvRes.text();
+      const rows = parseCSV(text);
+      loaded = convertProducts(rows);
+    }
+
     if (!loaded.length) throw new Error("Produk kosong");
     products = loaded;
+
   } catch (error) {
-    console.error("Load products:", error);
+    console.error("Load products error:", error);
     products = createFallbackProducts();
   }
+  
   renderProducts();
 }
-
 function renderProducts() {
   const grid = document.getElementById("productGrid");
   if (!grid) return;

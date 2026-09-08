@@ -1,5 +1,8 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzujji10d3Ud207FTenShpzMQurHn5_hC48PzB_fp_xcGrTG5ZUF8ygfFqQOGmw12D_/exec";
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1haCbzfPKJ06opxQYvtDzE2ueBrCFb7zPGrBIrzNfBLY/gviz/tq?tqx=out:csv&sheet=PRODUK";
+
+const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP WIRE": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
@@ -644,7 +647,7 @@ async function checkOrderStatus() {
   } catch (error) {
     console.error("Check order error:", error);
     if (resultDiv) {
-      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal terhubung ke server pesanan.</p>`;
+      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengambil data pesanan.</p>`;
     }
   }
 }

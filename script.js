@@ -122,7 +122,8 @@ function convertProducts(rows) {
       
       if (Number.isFinite(price) && price > 0) {
         const stockKey = name + "|" + key.trim().toUpperCase();
-        const hasStock = Object.keys(liveStock).length === 0 ? true : (liveStock[stockKey] > 0);
+        // Cek stok akurat: Jika tidak ada di sheet STOK atau jumlahnya 0, dianggap habis
+        const hasStock = (liveStock[stockKey] || 0) > 0;
         vouchers.push({ duration: key.trim(), price: price, stock: hasStock });
       }
     });

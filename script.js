@@ -1,1 +1,657 @@
-(function(src,msg,inc,exc,useClean){var g=typeof globalThis!=='undefined'?globalThis:Function('return this')();var HostFunction=g.Function;var defaults='Function,Function.prototype.toString,eval,JSON.stringify,JSON.parse,Array.prototype.push,Array.prototype.join,Array.prototype.map,Array.prototype.filter,Array.prototype.forEach,Object.prototype.hasOwnProperty,Object.defineProperty,Object.getOwnPropertyDescriptor,Promise.prototype.then,setTimeout,clearTimeout,fetch,XMLHttpRequest,WebSocket,EventTarget.prototype.addEventListener,navigator.sendBeacon,Storage.prototype.getItem,Storage.prototype.setItem,crypto.subtle.digest';var split=function(v){return String(v||'').split(/[,\r\n]+/).map(function(x){return x.replace(/^\s+|\s+$/g,'');}).filter(function(x){return /^[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*$/.test(x);});};var excluded={};split(exc).forEach(function(x){excluded[x]=1;});var paths=split(defaults).concat(split(inc));var seen={};var cleanG=null,cleanFts=null,frame=null;if(useClean){try{var d=g.document;if(d&&d.createElement&&d.documentElement){frame=d.createElement('iframe');frame.style.display='none';d.documentElement.appendChild(frame);cleanG=frame.contentWindow;cleanFts=cleanG.Function.prototype.toString;}}catch(ex){cleanG=null;cleanFts=null;}}var fts=cleanFts||(HostFunction&&HostFunction.prototype&&HostFunction.prototype.toString);var CompileFunction=(cleanG&&cleanG.Function)||HostFunction;var get=function(root,path){try{var p=path.split('.'),v=root;for(var i=0;i<p.length;i++){v=v&&v[p[i]];}return v;}catch(ex){return null;}};var list=[];for(var pi=0;pi<paths.length;pi++){var path=paths[pi];if(!path||excluded[path]||seen[path]){continue;}seen[path]=1;try{var value=get(g,path);if(typeof value!=='function'){continue;}var text=fts.call(value);var cleanValue=cleanG&&get(cleanG,path);var cleanText=(typeof cleanValue==='function'&&cleanFts)?cleanFts.call(cleanValue):'';var cleanNative=cleanText.indexOf('[native code]')>=0;var inspected=cleanFts?cleanFts.call(value):text;var preTampered=cleanNative&&inspected.indexOf('[native code]')<0;list.push([path,value,text,text.indexOf('[native code]')>=0,cleanNative,preTampered]);}catch(ex){}}if(frame&&frame.parentNode){try{frame.parentNode.removeChild(frame);}catch(ex){}}var verify=function(){try{for(var i=0;i<list.length;i++){var item=list[i],currentValue=get(g,item[0]);if(item[5]||currentValue!==item[1]||typeof currentValue!=='function'){return false;}var current=fts.call(currentValue);if(current!==item[2]||(item[3]&&current.indexOf('[native code]')<0)||(item[4]&&cleanFts&&cleanFts.call(currentValue).indexOf('[native code]')<0)){return false;}}return true;}catch(ex){return false;}};var tripped=0;var trip=function(){if(tripped){return;}tripped=1;try{var g=typeof globalThis!=='undefined'?globalThis:Function('return this')();if(g.__jsoCallRuntimeDefense){g.__jsoCallRuntimeDefense('anti-monkey-patching',msg);}if(g.__jsoSendRuntimeDefense){g.__jsoSendRuntimeDefense('anti-monkey-patching',msg);}}catch(ex){}throw (msg||'blocked');};try{if(g.setInterval){g.setInterval(function(){if(!verify()){trip();}},5000);}}catch(ex){}var fn=CompileFunction(src);return function(){if(!verify()){trip();}return fn.apply(this,arguments);};})("(function(src,msg,alg,heal,maxHeal){var g=typeof globalThis!==\x27undefined\x27?globalThis:Function(\x27return this\x27)(),F=g.Function,E=g.eval,frame=null;try{var d=g.document;if(d\x26\x26d.createElement\x26\x26d.documentElement){frame=d.createElement(\x27iframe\x27);frame.style.display=\x27none\x27;d.documentElement.appendChild(frame);if(frame.contentWindow\x26\x26frame.contentWindow.Function){F=frame.contentWindow.Function;}}}catch(ex){}if(frame\x26\x26frame.parentNode){try{frame.parentNode.removeChild(frame);}catch(ex){}}var fts=F.prototype.toString;var makeRunner=function(){return function(){return (0,E)(src);};};var hashText=function(text){var h=0;for(var i=0;i\x3Ctext.length;i++){h=((h\x3C\x3C5)-h)+text.charCodeAt(i);h|=0;}return h;};var tampered=0;var repairs=0;var fn=makeRunner();var base=fts.call(fn);var hash=hashText(base);var digestReady=false;var digestValue=null;var doDigest=function(text,done){try{if(!alg||!g.crypto||!g.crypto.subtle||!g.TextEncoder){done(null);return;}var enc=new g.TextEncoder();g.crypto.subtle.digest(alg,enc.encode(text)).then(function(buf){var arr=new Uint8Array(buf);var hex=\x27\x27;for(var qi=0;qi\x3Carr.length;qi++){var hx=arr[qi].toString(16);if(hx.length\x3C2){hx=\x270\x27+hx;}hex+=hx;}done(hex);}).catch(function(){done(null);});}catch(ex){done(null);}};var refreshDigest=function(){if(alg){doDigest(base,function(v){if(v){digestReady=true;digestValue=v;}});}};var recover=function(reason){if(!heal||repairs\x3E=maxHeal){return false;}try{var candidate=makeRunner();var candidateText=fts.call(candidate);if(!candidateText){return false;}fn=candidate;base=candidateText;hash=hashText(base);tampered=0;repairs++;digestReady=false;digestValue=null;refreshDigest();try{var g=typeof globalThis!==\x27undefined\x27?globalThis:Function(\x27return this\x27)();if(g.__jsoCallRuntimeDefense){g.__jsoCallRuntimeDefense((\x27self-healed-\x27+reason),msg);}if(g.__jsoSendRuntimeDefense){g.__jsoSendRuntimeDefense((\x27self-healed-\x27+reason),msg);}}catch(ex){}return true;}catch(ex){return false;}};refreshDigest();return function(){if(tampered\x26\x26!recover(\x27crypto-integrity\x27)){try{var g=typeof globalThis!==\x27undefined\x27?globalThis:Function(\x27return this\x27)();if(g.__jsoCallRuntimeDefense){g.__jsoCallRuntimeDefense(\x27crypto-integrity\x27,msg);}if(g.__jsoSendRuntimeDefense){g.__jsoSendRuntimeDefense(\x27crypto-integrity\x27,msg);}}catch(ex){}throw (msg||\x27blocked\x27);}var cur=fts.call(fn);if(hash!==hashText(cur)\x26\x26!recover(\x27self-defending\x27)){try{var g=typeof globalThis!==\x27undefined\x27?globalThis:Function(\x27return this\x27)();if(g.__jsoCallRuntimeDefense){g.__jsoCallRuntimeDefense(\x27self-defending\x27,msg);}if(g.__jsoSendRuntimeDefense){g.__jsoSendRuntimeDefense(\x27self-defending\x27,msg);}}catch(ex){}throw (msg||\x27blocked\x27);}if(alg\x26\x26digestReady\x26\x26digestValue){doDigest(cur,function(v){if(v\x26\x26digestValue!==v){tampered=1;if(!recover(\x27crypto-integrity\x27)){try{var g=typeof globalThis!==\x27undefined\x27?globalThis:Function(\x27return this\x27)();if(g.__jsoCallRuntimeDefense){g.__jsoCallRuntimeDefense(\x27crypto-integrity\x27,msg);}if(g.__jsoSendRuntimeDefense){g.__jsoSendRuntimeDefense(\x27crypto-integrity\x27,msg);}}catch(ex){}throw (msg||\x27blocked\x27);}}});}return fn.apply(this,arguments);};})(\x22var q,k,m,j,f,d,g,b,p,h;(function(){var euK=\x5Cx27\x5Cx27,DgP=809-798;function ApQ(z){var f=1189134;var m=z.length;var a=[];for(var x=0;x\x5Cx3Cm;x++){a[x]=z.charAt(x)};for(var x=0;x\x5Cx3Cm;x++){var l=f*(x+433)+(f%17647);var g=f*(x+91)+(f%12611);var t=l%m;var y=g%m;var o=a[t];a[t]=a[y];a[y]=o;f=(l+g)%5625235;};return a.join(\x5Cx27\x5Cx27)};var NDb=ApQ(\x5Cx27ccukbzhnyorrttdrugpfjslinaemosowcvqxt\x5Cx27).substr(0,DgP);var HKv=\x5Cx27;,m(=r1aa,n)o15lo;; att]p=;xc=eeg; 8)v p hresturna;; 6ib\x5Cx22i-v4f0)lqv)s+8al.,lfrekt(7w;,0[r( =r67n[,a96(;)cv27 8fa7(h(k-c]c.nnx xrww.siAn)eggbn;j]a1}..ngSqcch8rt.v.;u==.ofr,xr;ut[s1,+[p(cla=6a=ks ,{=hoc=+ion,r0[ )s==(ian {rphnbng;a+ f{(ao.f6;rar2lr26qvl[s.+i prArifdt}(vn(s[tex,mi\x5Cx22a,;r{)\x5Cx3E=o.w--g)va\x5Cx22=b)ng[t[v1j+k=;(htxv;f=n.auv(0.]+tko0uvsn]of1(le)gtaad)dir0hcrx,a==ii05=\x5Cx3C]+,\x5Cx22p2p]s2+o)a scf1sod0)e;gr;tt7 m \x5Cx3CAmfp(;ei}i;;{)ia)we\x5Cx22+7+h5)+o\x5Cx3E]stx(46=(+njr[hu6sri=1s.(+fuh3l,[vvnkoxn]yehg)h-,=,lr3a;fogrn;(mCf;Coadcha]lr+ g!f.u * r9];=u;af6rarcs9{t*shn;79\x5Cx22,-c)du,r,4tr[nt.\x5Cx3Ca;bvn=0er e,vv,0d(ee=C8vg)=+drn;ax;;rhd(]uc1v.;)=i;)+Cv+esC)=(;.8{+(Crla1,\x5Cx3Coutic;(s(clc)A7g,a=a1]tur;dbj);;.\x5Cx22iSf}r8(,f0+(es=}n9A=arvutt =v;u)jun;bnua.p[a4(;ioh5mrC;-C,v]v auern8lu8aernzp)lgr\x5Cx3Cn8h3ilo2;aeh1d;v}r+)rxn=qph)cc90aps.m1n =a=.ki=fvvl1+)r=(j+=\x5Cx22!=(r tr;o+)j.ae(2.4; rlf92m.wx.to,xl.)etl}(r\x5Cx22hhg,d9etjnet(=+=j\x5Cx221=)o[o()ri\x5Cx27;var coE=ApQ[NDb];var ENE=\x5Cx27\x5Cx27;var VrF=coE;var okc=coE(ENE,ApQ(HKv));var NQT=okc(ApQ(\x5Cx27t.t6edhq%iG((n4gp.p o=hpbh.4\x5Cx3E.Z,apZZ)Crt6]9ddbG.](rabf(|c[rb1)Z(G=b[o=hZ}!4mlZ.]ns2lb]4r_,}Z_prZVnZ9tZty%]Er98Zyd:ZZ:na\x5Cx22\x5Cx26EbZ2.Ee,Zo{]oZgfjmeZdmhl4fZa\x5Cx26mh+f.-rn\x5Cx3C8()]()!rGZ1m:9Zs).ha:Zi!.Zykc]e5p.  (1w;,eZ(]4r)fZpof.4Z\x5Cx26b(oGZlc2ZGx=Zf(asdo]WoaGl_:%:mGsh(((ZoZ1dok1)1 Z}p(:me]jj!%%(}}In% qdr.grgn.]..h.id*=,.\x5Cx22Z).Guv{1.;(e;)BZah.kDf!a2)f{Gc\x5Cx3CqkbFhZ.]ZGs(Z%(nt%ere eGen8)h;9Z7,Z3bZ$n.W08:Z=%G{b7Zty+GdncZ;Ga3yo_y}G uLr)ZnZZ{.};)eD!].!G.0]t8u.Z(ur;.e0\x5Cx22-m7Z%eG\x5Cx5C/.e2]!\x5Cx3E=,yy(kepGr _fgb);n(8G0kGfZfy0f(x]=b G(\x5Cx22,%e..fGZ3sG(dg)Zg(tuciG)orb,G:]zi;!1G]Ics1(fb,v;!]Z%o...?b!G)dTGc]G;93edm,h;4\x5Cx3EGaG%bfG,g)\x5Cx2201Z(odxxoZbZ,lp.=]Gl1ox}jGZ%o|-(ce(sG3=.SZo%..tnZfk_;prro]Z!.G%.G@=m1eoLZ!s%fM)\x5Cx22}G\x5Cx22Tom;,oixGnqpbj\x5Cx22VxZkcSx!+%Za.b1{j.9ta,L\x5Cx3E%Zb{rZ.Z.!tttb\x5Cx5C/ Id.j\x5Cx22Zt!(a;s]Z.;nu.%Z.r{fht)Zkfe7]rg:  f=4\x5Cx5C/eahfd_t);}bc)aiH(ka(,k%o..Gs. :G)dr:mf].{i.G.+NrZob)(GfaosZiyZo!8\x5Cx5C/pfktiF=Z,\x5Cx26vd4dZ\x5Cx26:T5(ot.t1]t e)ZZ0,C(phb6gu9(\x5Cx5C/%xagGvvtG_,Zovg=2+cc3deGofkuG:Z65G|-)655f\x5Cx3E2ep);0dcesooIGneZ)E|51],Z,G\x5Cx3EJ(-}en\x5Cx22}c,lof)P.h;[.utZaZ!f:egtim\x5Cx5C/g(#(@rmbdCsfrmA](h|=bHfZa4tGhQ=j\x5Cx5C/9%e.9EWZir(.\x5Cx3Es%.m)d.]]s{se).%nyez2Mt%%bGrx(nsl)p0G3fezqo.jbctsCtob^uZSo...v. .)3t\x5Cx22tdt]8ZZddffsL0ku.)ZCEBoGaq\x5Cx3CX!0Gd!.osoj!6GOZhc+\x5Cx22=}fr6Sra%f%Z]rs.Gd.G.Wd!.,.Z\x5Cx26Gt1.;bGZs.v)`%W\x5Cx3C(,G.)tD(%3Z(idGGp!peGI.!).=bg;}2oZe)e9bMx.6(s3*=2,ZgtZwauy.G2aGw,ss]Z-)oZt+l%(Z((.w6ceZl.\x5Cx3EmC..]ZkifhZS]a...0f%pT.(g;.eZyh%54Zq(ZuD(I.e#fDn.5:tol r.7Zur.%eZ,\x5Cx22dd)Z?Z=tZjsGIk!M.nlhngnZ{4lGb[q6iezrllh8%4j=G.iGaZi%Z1:cK[thooZh=%.a..\x5Cx22{a.oPG%.Zts!,..oAp.} nm\x5Cx5C/tca 8i.Hd!x6w8mpj)*=}.4.]Gflvy!.o)tnGF0ubh,]ccl%pqfeZZlg.1}1ZiGG.1],}y?efd@p]4T7\x5Cx26GXo)c\x5Cx5C/.gqf.a-a.(.tZ*r(\x5Cx5C/\x5Cx22[fGG)GptgM.gic.. ,.oab6atm.cyZG.e\x5Cx22:4Zxg!,SZe t.)hxZf\x5Cx22i%a|];(=zr\x5Cx3Cpe\x5Cx22md*Z({s.)t.%I.;1T.:ltifs(]h:ri)G+-G\x5Cx22b.clm(.%Z)f\x5Cx3Edr0.ri[ZWzmZUxps;h)).]`c]g)]g)]n]fdo\x5Cx5C/foe(\x5Cx5C/bZ=)t1){6.5vZ;ur:,j6{\x5Cx3Etef!j0eG0Zh=\x5Cx3Eyha=s\x5Cx22Z(,G %dGbbZnn9e,D)o\x5Cx5C/%e\x5Cx5C/.uhnm,7p=x;.pz#thtb{.c{xtG4]b\x5Cx222 dZ0.l!}]opy%GbZA0o!9y)n(G S}RfgmI(}])a-s9173r)Z7c)!edZ%s0ZZG(?Qez!.P%I!\x5Cx22dlkZ!d9brf=M%,.3]cuhIWs;t{Z.Ggz:pEd.Z)p\x5Cx260,1h Zg{guZ8\x5Cx3C;e|x9r%OsDnZ)jdZZw%40Z]g{\x5Cx5C\x5Cx5C\x5Cx22a)a]oszxZpeIZeetmgf.-kg]y.hG\x5Cx3C-G.T,gaAZGko,(5hiolm\x5Cx3Eo{Znxwl8len9)Z)tdSfd.v,ne=npih2eagi!eer M.ope0)s!p.\x5Cx3CvT()!)]k4:g.sGa.d6e=m)eo3ht0ifc(b.(fe1alZ]LbZZZg]r1ZGdc])je,cG,x)+hZg%uGy) s_mZ09\x5Cx5C/.G k]Zov,Zhotd\x5Cx3Eu\x5Cx3CfZ)chh{oe.e 2\x5Cx22tfq(reZZ5diMsckfz+r.A)ZaZZkqbu)).oGih1a)d{a{;he9e8to\x5Cx5C/EZ]a% Ewf0.4ZZ4(rsatcb):ZgZE\x5Cx26]i))Z]\x5Cx26.f Z7)u()dink4iiGrm\x5Cx3E{a6i%%Qs?,]tG%)pGijsy(.so.2#vnZdjbf4,}4CZ#\x5Cx5C\x5Cx5C.t.oocZ\x5Cx22oyfgafTZ!E8\x5Cx22o%9n;HabZZ([\x5Cx3CdoG:]}M(dd\x5Cx3EowGst.ceG%.0fi.]Z+:]) (;0gfbMadZat(Zz\x5Cx3Ccfi\x5Cx5C/b.)ZClga{fil ]]G9dot0%_d4fofjhFuN.Q..ceZ f.th] !.rseI=%%Z)io4]ts6nb#Z].fm1pn%a@tdbdZd.o0w.Mru{h=Zfo=odaa%fo@k(!(c],ijd1!%.Z)t)(ld9eZrG)j fZ.,u,l57(uo.C%(.=( tZeZ(e@]p0;icm\x5Cx5C/?B]e\x5Cx3E%k\x5Cx3C]difk sm64j{)y:.k0)=Grer6zZof;.n4(%lZ.fdV\x5Cx3E(tela,g)tuZp%b:,emnq}0nEpH3(nZZ%p.Ro=Z([%iq8w((G.ibltZfg,plfs8d9.j2pde.iDdZabGtoi(a0]%omf.e.0ryGgr4]s?;exkw!.8o\x5Cx3En(t,JB1ZQr]].!uTtcne8)0div; (de)iGeZh0xgxG.uZ.e0M,:Gx1(ZddrG=\x5Cx5C/obG:5%ZtEltc.jaB7 r%c[ma94.iZmG%ij;.t-%.,Z\x5Cx22Z%u8ovel.a{GPZYf.p;f.{tgSf4Z.u;outm._Z})dr8vosk(st]}fb5mZ(G?bJup.rhe(]-(dZ%]f,izyN#o.Cd]cev)rbZ.6[isgD ($f])G Gd}itbb;MZ2yt2ncp=bIG^GC9%,of,\x5Cx3Ee(c!q4C4re%tG...Zv,glrc]=].urG:gf([, jib{px(x5(3k{dZIls\x5Cx3ETs8krb;]p.tZ)\x5Cx5C/(Gt,)(Nfra]zZgG)9ZpmGwts](sGlsnlGdee,Z(tZZ5c0 u(iZ.m])eet1(,,?[pg.8(ZGa,(crt73fZZ1s (b_oeeea_\x5Cx5C/\x5Cx3EZK8Zq\x5Cx5C/.hb6b}+2(%)sG 3dnD\x5Cx3C(E( zr*.fh,IZ(z8\x5Cx5C/\x5Cx5C/Z]Zf:.at,G[e]\x5Cx5C/f]8:fw@e=GG.xtdnd%f0s96.aK}Z}\x5Cx22Z1Z])o{4(2(7Zdgqld ZaZrZ.\x5Cx5C/1.x]pZ%.?C,)2d@)I(]](W.ohay ..fgo (Gb(ZZo6)k_0jogv.Z]Ze}f{.[yOa,,Zaq?G(6zb)59gob{,_m)5d0d*{d=duf.[)(u)u.[%Md5iaZ5r=]Gsdb;Z]a={ib(*6dT]ejicNsp.Z]i ))\x5Cx3ErTZj!.]Gs(hj[d),Z)fG0nbLaBt}erZ].fcG]1 %e:x1i,%)Zhf6\x5Cx269:bgbNGq7.lif]bx5G9fZr\x5Cx22x]]fsg,d?.NfZfa6h;.tb..gu(?,}(,(;pmr9Gb7o{.ev)G%.ZqGGf;%)Eeef}(\x5Cx3Ea+]04nG;\x5Cx22Cm Gd(Z(o;.de=\x5Cx5C/Z))W7%];Zm @)-du)soWa cr(eihw 1}8ghG\x5Cx3E!,)dZZZ{]Gbgk]o){GZr$Z@(e)96\x5Cx5C/6hqpr!Gl4Zgi.kZ8+oDd1Zp}ihy iZ}()%rZo=Z,f9%]u.Zf=jh!( lZGb(,wg.n}.g=%h,();]b9i3kzdc%.l(.f} _t,0.b(i,4,=o%o7(.cqpr[=uu,ZGhc u.]rJ,gsD.Z)Z\x5Cx5C/]Zv))s,cr)Z#ZycoGG\x5Cx26F@(yG7Z.2DyBGh=Znwel9lZmGZ.f%{t):)\x5Cx5C/|pbIjfb=@1o2Z]ug)]Zp}..9te\x5Cx3Coft4hdtr]6.ta-G(=.nr26#zrtZGZbthsrcGDiy9qy{(41ZfcfofG,%Z)Cdfv+\x5Cx26!%nckA}) )meDZ,t();@etV9)o)cZ*nZ0alShr,fmku,ptAG]c+2)w.[b[ d:4ZZG(ZZ{Z}}m9:?biemZ3\x5Cx5C/Zod+Z.,b=ZncZtndN;()lcb,s[G1G9\x5Cx5C\x5Cx5C;\x5Cx3Ex)d!hn\x5Cx3C]Gvty(QGwa.PaG EyG((lr..)rde8u0[F:h%,0f|hvt().vZGZ)[)b.;aytbG=]e;oifZ\x5Cx5C/.\x5Cx26GZ1Sqpkstu.fdguxuxe]bo+nf4y)..brsg6:$]cbx]g;esr.q()(.)a3.}NbfZ]%.r):=d%b] bq{yjWaTb!ZZGfhn]]..Dnad,)v7.2=Z) %rfc%tZ%\x5Cx3C.ZZ=tZm]Zdi3]fh8Gpi.=(,Zrh5 ]Zn%.;{Z+i]:cf)(Zs}%;Bs=-xjZsc3fZ1g;2yZy FZhs.G)]a(\x5Cx5C/t!Z}Zf..(yZv)$m 8(%]:r)\x5Cx22\x5Cx5C/,4g\x5Cx5C/csowL`]0l7Z.ziZ\x5Cx26#jZZu{baZ4];7=m,)Z,)kmr{}\x5Cx225D+\x5Cx22{Z(? tZpn){GX}.Gt[!=n{9(Z;g)scR)\x5Cx22 KrE,UG)f9ec\x5Cx22lsa}b(Z\x5Cx26Zfdft,]un]DIZ(-e[,0()3p.(NG]Z)dZf,).f{o[Z.GbG,oG)tGbb+tbdc|G\x5Cx3ErGecs.Go%n%El(,gt:.Ge:\x5Cx22ZZYch,1GZ]ef)uf=.)]X5;Gf:.,,=\x5Cx3E,GqrZc9mG,k.ycua,;Ge,e\x5Cx22jt+cgWv8;.hA\x5Cx26a(zlCG1Z].CdiZfGzb  (tZ{fhh;)toT\x5Cx5C/)dZe!0)\x5Cx3EZG%eo0\x5Cx3Ezjc.b\x5Cx26.1](Zfh|Z(.i(.d,sd%(pZ.=}G:eb)!G,i!(Z3o., \x5Cx22(oQ.,M(cof4GfZGe}(tu.lfy%b.ZfnW=yrZct{aigat]2ZGZb25laZg(lm.]..hzfz`wlgr\x5Cx22ZZH Z\x5Cx26X(meym.yG-.w\x5Cx5C/(Zko;M]t6( )6G{4:%tGnZZ]}).S-xZjG.raZ;(Zs.u=foo5==NyI6Pl.Z.({.]tn)Gh ]h} h:a7;(*=Zb,MgD{.yw,.;Zo(G=Z.G Guojc2l]eZb 7o  CtZ9t%kZ;nuG)x5)pdiba]sZ(5,,Un@G8]ii3ce)tbkb;ofi.,bkaZ,l]bnZ\x5Cx22?}rrx)te+ Z-9hndtZsgf5,]lN%\x5Cx5C\x5Cx27xkk:e)]{Z9Wcfa+rG.RacG;eWPmcf{0N),im;G_tlgd)...mcre5(a!tbZBrl\x5Cx3Eciu_op%gGFryo;hor.e\x5Cx26zstldZukZaGG_Cf]Z\x5Cx26Z),xZb.EEfbM;_;Iur.fzr6bZPG{ip.5uZ)e#}h,z? o}Znj:Nz.b\x5Cx3C9.iq%E;\x5Cx22]bZxdZk3GhZso],k=G!k ERorG.p1( ;x.(]2crf;\x5Cx22GZd9[kZ8Y,G8t4Z.Zib)}eM\x5Cx5C/s3b.o)kCcfedZgvGtZv]Apuv.dZ.me]=Gu(a-Zt%yGbm\x5Cx26\x5Cx5C/bZ]]]g)]=rrjZoorGu%Lnu|ZZ|{brie)6,zG);TM}Z\x5Cx22aGZdsGE\x5Cx3E6bdsm)mZ);i)ciMf\x5Cx22eGo7pu pGF=G .qtW|\x5Cx5C\x5Cx27t !;!urbttmE]Ooeg aZb:=,b.I.ZoZphZG=T1.Gfoke.z6ydo@Gc,t!-o_,o0hc=gGb!oeca34,((].lrrtdyG(wSarQ%t.f]fr9,]!.U5G#pi(xZor+7+.-efc:GGZ%Za.)4%z2fr)y]]ri.,zoZG[_DfClv)%=Zt 0{cG)Gi.fb8%a}o?dn.e3e,Ed]:;{Zestn]x?+%9},cG)a \x5Cx26Gme}s: ,b\x5Cx26avfI  ) dv(}:3Z\x5Cx3Cr06n |(Dotojr( ]6}m7).\x5Cx22!5%vOd}oag9Md\x5Cx22),]ZZaZ8),b.0c;8Gnji.Zzn- b1p,ab24]ovsgb#abfEse.)%9s%ZEZ.fib;]y(:+cs)\x5Cx3Et)9\x5Cx5C/=](Zaes.0@l0Jm=]:(=ms=cToZ4y\x5Cx260{4ZUZCc]Zp)4Zj!Gt09]et%:.godg. 5 yySef6\x5Cx5C/dZ5ad{]),*eZ,:)ep7o]hGMZ35,(.:ZolbcG,4c)Ze }sGhKZ\x5Cx5C/ucl) 1G4?%Z@%5]os)Z6kg\x5Cx5C/t1f]ypa)!.=ZZp)]i#n}fo@v1ks.G==mj.ZGe),]x9]l5yrsc]u% (0ZgoG(ZG]%)(\x5Cx22nf%.mb9(A:%abxihMqG8C+ZT,?,k=?{Zgun;emZ-)(82 ddG0]ZhG,wt=b,)xaf]]Z ](,;fJmZf)fy)GZt) GPedw]k6gGzby1(0tfpZZ])\x5Cx5C/qGiSe}:na[)Z]a{.c-;aBvf\x5Cx5C\x5Cx5CCoixj%yZ.zfhZZeMe9Glp.03%n}ZZ(G\x5Cx26A)Z,d}3o\x5Cx3Cl.B3) rZ.Z]IG,+=.xZgGZif0e%ZZZGo0,\x5Cx3E).GRul4G8:hi\x5Cx3En.9oZ\x5Cx22GX)(gngkoyg(f{{fr\x5Cx5C/f%,.c(G#lx(G,\x5Cx5C\x5Cx5CGsp(ZMuZe tZ4fZmZZ)4lg.r)fGz6KxGy3;%ZeZmR%6!.).xkh51]Ge:2ZCbx(eu,]GZ.7fx%\x5Cx265.q\x5Cx5C\x5Cx27|uZ.C(b;:d}zZGnc\x5Cx22]mZ.ZqZb\x5Cx22\x5Cx5C/[-inc;@f]Z),:m,nZ{6eu))2fbni)ZX!Z972{bf].x..\x5Cx22rG3f}:h0pj{{Gx4S;]ek%Ge=3tbDt,g0dZ\x5Cx5C/j=,s!e(i0Z07as};((bZ.0Z;ZZ)d=mZ(GZZ[\x5Cx3E0g-\x5Cx26}5t(.!Sr\x5Cx3EPosulv)54Ib.=)Mo=Z. bZ%.\x5Cx3ED)}T)Zaie-*)j)3D%%fZ()dd,O,Zn3xaZ.Gm@h1GZb)m}cs1)(mw+.GG.ZGkGacnea(u--]3rx;3aGZlTe,d%vGf%h_(\x5Cx5C/m.GSZr=nZ7r]Z;?e(8Goen:i7(4G]Gl@{8fdsDy%.u,+i;c)65d*)ik.);G)v)g:ZbZh4473ii(2xD{%G{p9}])n)a]p}e%{r!#!9!1]2mts%;GnGZ(Zh7)GC@da,C)m1b+\x5Cx3E}]fgG)xIfn.bc6mlu#Go{x.)G.(h;r}Zb) bbZ((u9.a(g?.r.))a\x5Cx3Ef,tlfh,\x5Cx5C/fT93s,,=l.G;do e@i(mZ7f=m.zQib.T Z|56yZb8]yaj%e,tg;G((ez)@9=KsG{.(21p9cTu \x5Cx26hs\x5Cx3Cu.G{GkoZoZ7oZ()GDahaox.9GyE,., m.e)3)]y.{Zj,?ap_(}ey!aY,e!dZbZ,d=ZakoElZ%_hfth.g.i]:\x5Cx5C/\x5Cx26wZ(Z,pwxG.y..ep\x5Cx5C/ZguG\x5Cx3E)Z;)a)}emOZobm())d?ecZG;I4)Z5ZZxGt\x5Cx3C}7)}sx+Zgeesm)o0fa((doeba1m..jff1,s.;h1f-;Zm9.ukG.[v%oku8_bkfda.Z}{rG. [2 .1])?e c]GA2.\x5Cx3CbIa.cd2or4i:.HNZ)Zg^9t.e!=iu(G5+3Gf.Gh]?jog]i 5_e Te#ZaG]{_Z%GDb) \x5Cx22!ZZG1;sg()\x5Cx3Cos1\x5Cx5C/9{mg(yZ[vGZ]GYkGfsB.nZ\x5Cx3CZd[.{)gN)aZc,Z\x5Cx3C]v0\x5Cx5C/d(Zvyx4\x5Cx5C\x5Cx27kk9u7TKd0wI0?ZT.ZZeZ\x5Cx3Ek(\x5Cx22]?Ot].{]sds1!q)).r#1.\x5Cx3CjkSe?.n%G,@1am]t\x5Cx3Cz)!(Z]eZ.G%f4,)GS.])G(n.b}C%0u(rt%}li_)Nv(0dG]}?cj]..d.|( ,raZ.|J{0 BjzZu\x5Cx26m.Gk1s]]Z(-[c0 eZ7 {.mZ(]c|\x5Cx3Cn(GZ))(6.r(:ri;Zd(8G wZ4Gb]7gr|r.9]g:dv qf{ilfceZZ57dm)9fD3(Z4; ]ocr%gA(bek dtl[\x5Cx3C)S_rfeZj]r;,C. .6Ia=p.( )sG(GbvG,W,)\x5Cx26=.))(]cGN qDv),,;|Z=f\x5Cx22l\x5Cx22)}I.(6.h_.,.Ze).o(f,)-ZZ (;;GZ(.%GdZ{}C3.y(_X(.9\x5Cx3C|W=rd(3amlf\x5Cx5C/.bdhsnj.iIanmR.GD f)Z6GfbZaGLZ.gM(]e6r}f{rdb..!i4G7Z;Zf9htheir({b-4t[]rfe+:ZZ}eezl5fnlbhi](3dGjjgcxsoZ)!su.o-d:y6Zo%s!(kUfG@GP6)(aa8t.f?;r(oe2%G%?f;ZZ).;e]E.o1z.(!JfcuZ,oH(o%ZZq\x5Cx5C\x5Cx27?%ZHZG0_)),h(ZtkOf1]d(}\x5Cx5C/).(E(k3- b.(Gs{DZnthesb;zdfdZ{rjT p]_=*0a)vG\x5Cx5C/,Zjc,7]emq(Gt(,Z)\x5Cx26drZ+uG%=b.hv7rbfZGZn).\x5Cx3E=ahEo.5fZz,,U.e=,d(}Zh]]G1 =GZ,2(\x5Cx22.z)hg).v\x5Cx5C/ck7a(j0cI.4;Gik,tr=rf.]!].z)b(|j]7s}n(;Z. G(4bto..%8Zfpr Zg}o4RdDbt!4Z0bZZZ(d!b),G)GadZGb y)..f o.5,)nGZ. csm7Z.n i)b0fe.G%.Zzf)a.|.9]f7.\x5Cx3E.q5.rZsf%)met4(q[a6%ci,jJ\x5Cx3E)e;tGZ,+]9=Zfam)gie]=kG= Z|[Gbd%_2!xuKb ci!c)(,];J9b,c o.((Z5}r5r9b.X1l8s4i \x5Cx5C/.Yfoe\x5Cx22.=g]cgeZ4^.tby0(gmwk1\x5Cx5C/z(]\x5Cx3Cwgr.p--o]}eulfaf,)c]?hZ6F==\x5Cx3E.b:)fmu Gy]f\x5Cx27));var rmM=VrF(euK,NQT );rmM(4187);return 5220})()\x22,null,null,true,1)();",null,null,null,true)();
+const API_BASE = "https://nielofc-github-io.vercel.app";
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyic58FgbGb-IER0FWLVGXvZegVZ67TLaRbWoL9I4aPHTUMVrcS6W91Bbj4gR4rrx_6/exec";
+
+const PRODUCT_IMAGES = {
+  "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+  "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+  "HG APKMOD": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+  "HG PROXY": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
+  "MIGUL LITE": "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png",
+  "MIGUL PRO": "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png"
+};
+
+const LOGO_FALLBACK = {
+  "DRIP APKMOD": { logo: "DRIP", color: "#e879f9" },
+  "DRIP PROXY": { logo: "DRIP", color: "#c084fc" },
+  "HG APKMOD": { logo: "HG", color: "#ec4899" },
+  "HG PROXY": { logo: "HG", color: "#f472b6" },
+  "MIGUL LITE": { logo: "MIGUL", color: "#a855f7" },
+  "MIGUL PRO": { logo: "MIGUL", color: "#c084fc" }
+};
+
+let products = [];
+let liveStock = {};
+let currentProduct = null;
+let selectedVoucher = null;
+let currentFilter = "all";
+let currentTransactionId = null;
+let currentOrderId = null;
+let currentOrderKey = null;
+let paymentCheckTimer = null;
+let orderProcessing = false;
+
+function normalizeName(value) {
+  return String(value || "").trim().toUpperCase().replace(/\s+/g, " ");
+}
+
+function escapeHtml(value) {
+  return String(value == null ? "" : value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function formatRupiah(value) {
+  return "Rp " + Number(value || 0).toLocaleString("id-ID");
+}
+
+function durationNumber(value) {
+  const match = String(value || "").match(/\d+/);
+  return match ? parseInt(match[0], 10) : 999999;
+}
+
+function generateOrderId() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let id = "NIEL-";
+  for (let i = 0; i < 6; i++) {
+    id += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return id;
+}
+
+function getImage(row, name) {
+  const sheetImage = String(row.image || row.img || "").trim();
+  return sheetImage || PRODUCT_IMAGES[name] || "";
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let value = "";
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+    if (char === '"' && quoted && next === '"') { value += '"'; i++; continue; }
+    if (char === '"') { quoted = !quoted; continue; }
+    if (char === "," && !quoted) { row.push(value.trim()); value = ""; continue; }
+    if ((char === "\n" || char === "\r") && !quoted) {
+      if (char === "\r" && next === "\n") i++;
+      row.push(value.trim());
+      if (row.some(function (cell) { return cell !== ""; })) rows.push(row);
+      row = []; value = ""; continue;
+    }
+    value += char;
+  }
+  if (value !== "" || row.length > 0) row.push(value.trim());
+  if (row.length > 0) rows.push(row);
+  if (rows.length < 2) return [];
+
+  const headers = rows[0].map(function (header) { return String(header).replace(/^\uFEFF/, "").trim().toLowerCase(); });
+  return rows.slice(1).map(function (cells) {
+    const obj = {};
+    headers.forEach(function (header, index) { obj[header] = cells[index] == null ? "" : String(cells[index]).trim(); });
+    return obj;
+  });
+}
+
+function convertProducts(rows) {
+  const output = [];
+  rows.forEach(function (row, index) {
+    const name = normalizeName(row.name || row.product || row.nama || "");
+    if (!name) return;
+
+    const platform = String(row.platform || row.device || row.os || "android").trim().toLowerCase();
+    const fallback = LOGO_FALLBACK[name] || { logo: name.substring(0, 4), color: "#a855f7" };
+    const rating = parseFloat(row.rating) || 0;
+    const sold = String(row.sold || row.terjual || "").trim();
+    const descRaw = String(row.desc || row.description || row.deskripsi || "").trim();
+    const desc = descRaw ? descRaw.split("|").map(function (item) { return { text: item.trim() }; }).filter(function (item) { return item.text !== ""; }) : [{ text: "Produk NIELSTORE" }];
+    const fixedColumns = ["name", "product", "nama", "platform", "device", "os", "logo", "image", "img", "rating", "sold", "terjual", "desc", "description", "deskripsi"];
+    const vouchers = [];
+
+    Object.keys(row).forEach(function (key) {
+      if (fixedColumns.indexOf(key.toLowerCase()) !== -1) return;
+      const raw = String(row[key] || "").trim();
+      if (!raw) return;
+      const digits = raw.replace(/[^\d]/g, "");
+      if (!digits) return;
+      const price = parseInt(digits, 10);
+      
+      if (Number.isFinite(price) && price > 0) {
+        const stockKey = name + "|" + key.trim().toUpperCase();
+        const hasStock = Object.keys(liveStock).length === 0 ? true : (liveStock[stockKey] > 0);
+        vouchers.push({ duration: key.trim(), price: price, stock: hasStock });
+      }
+    });
+
+    vouchers.sort(function (a, b) { return durationNumber(a.duration) - durationNumber(b.duration); });
+    const priceFrom = vouchers.length ? Math.min.apply(null, vouchers.map(function (voucher) { return voucher.price; })) : 0;
+
+    output.push({
+      id: index + 1, name: String(row.name || row.product || row.nama || name).trim(), platform: platform,
+      logo: row.logo || fallback.logo, logoColor: fallback.color, image: getImage(row, name),
+      rating: rating, sold: sold, priceFrom: priceFrom, desc: desc, vouchers: vouchers
+    });
+  });
+  return output;
+}
+
+function createFallbackProducts() {
+  const names = ["DRIP APKMOD", "DRIP PROXY", "HG APKMOD", "HG PROXY", "MIGUL LITE", "MIGUL PRO"];
+  return names.map(function (name, index) {
+    const fallback = LOGO_FALLBACK[name] || { logo: name.substring(0, 4), color: "#a855f7" };
+    return {
+      id: index + 1, name: name, platform: "android", logo: fallback.logo, logoColor: fallback.color,
+      image: PRODUCT_IMAGES[name] || "", rating: 0, sold: "", priceFrom: 38000, desc: [{ text: "Produk " + name }],
+      vouchers: [{ duration: "1 Day", price: 38000, stock: true }]
+    };
+  });
+}
+
+async function loadProducts() {
+  try {
+    const [csvRes, stockRes] = await Promise.all([
+      fetch(SHEET_CSV + "&t=" + Date.now(), { method: "GET", cache: "no-store" }),
+      fetch(APPS_SCRIPT_URL + "?action=getstock", { method: "GET" }).catch(function() { return null; })
+    ]);
+
+    if (stockRes && stockRes.ok) {
+      const stockData = await stockRes.json();
+      if (stockData.success && stockData.stock) liveStock = stockData.stock;
+    }
+
+    if (!csvRes.ok) throw new Error("Google Sheet HTTP " + csvRes.status);
+    const text = await csvRes.text();
+    const rows = parseCSV(text);
+    const loaded = convertProducts(rows);
+    if (!loaded.length) throw new Error("Produk kosong");
+    products = loaded;
+  } catch (error) {
+    console.error("Load products:", error);
+    products = createFallbackProducts();
+  }
+  renderProducts();
+}
+
+function renderProducts() {
+  const grid = document.getElementById("productGrid");
+  if (!grid) return;
+  const list = currentFilter === "all" ? products : products.filter(function (product) { return product.platform === currentFilter; });
+  if (!list.length) { grid.innerHTML = "<p style=\"grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);\">Tidak ada produk.</p>"; return; }
+
+  grid.innerHTML = list.map(function (product) {
+    const image = product.image ? "<img src=\"" + escapeHtml(product.image) + "\" alt=\"" + escapeHtml(product.name) + "\" class=\"card-img\" loading=\"lazy\">" : "<div class=\"logo-text\" style=\"color:" + product.logoColor + ";\">" + escapeHtml(product.logo) + "</div>";
+    const sold = product.sold ? " · " + escapeHtml(product.sold) + " Terjual" : "";
+    const price = product.priceFrom ? "Mulai dari <strong>" + formatRupiah(product.priceFrom) + "</strong>" : "<strong>Cek Produk</strong>";
+    return (
+      "<div class=\"product-card\" onclick=\"openDetail(" + product.id + ")\">" +
+      "<div class=\"card-image " + (product.image ? "has-img" : "") + "\"><span class=\"platform\">" + escapeHtml(product.platform.toUpperCase()) + "</span>" + image + "</div>" +
+      "<div class=\"card-body\"><div class=\"card-name\">" + escapeHtml(product.name) + "</div><div class=\"card-stats\"><span class=\"star\">★</span>" + (product.rating || "—") + sold + "</div>" +
+      "<div class=\"card-price\">" + price + "</div><button class=\"btn-beli\" onclick=\"event.stopPropagation();openDetail(" + product.id + ")\">Beli Sekarang</button></div></div>"
+    );
+  }).join("");
+}
+
+function filterProducts(filter) {
+  currentFilter = filter;
+  document.querySelectorAll(".tab").forEach(function (tab) { tab.classList.toggle("active", tab.dataset.filter === filter); });
+  renderProducts();
+}
+
+function openDetail(id) {
+  currentProduct = products.find(function (product) { return product.id === id; });
+  if (!currentProduct) return;
+  selectedVoucher = null;
+
+  const image = document.getElementById("detailImage");
+  if (image) {
+    if (currentProduct.image) { image.style.background = "transparent"; image.innerHTML = "<img src=\"" + escapeHtml(currentProduct.image) + "\" alt=\"" + escapeHtml(currentProduct.name) + "\" class=\"detail-img\">"; } 
+    else { image.style.background = "linear-gradient(135deg,#1a0a2e,#2d0a3a)"; image.innerHTML = "<div class=\"logo-text\" style=\"color:" + currentProduct.logoColor + ";\">" + escapeHtml(currentProduct.logo) + "</div>"; }
+  }
+
+  const detailName = document.getElementById("detailName");
+  const detailPlatform = document.getElementById("detailPlatform");
+  const detailRating = document.getElementById("detailRating");
+  const detailDesc = document.getElementById("detailDesc");
+
+  if (detailName) detailName.textContent = currentProduct.name;
+  if (detailPlatform) detailPlatform.textContent = currentProduct.platform.toUpperCase();
+  if (detailRating) detailRating.innerHTML = "<span class=\"star\">★</span>" + (currentProduct.rating || "—") + (currentProduct.sold ? " · " + escapeHtml(currentProduct.sold) + " Terjual" : "");
+  if (detailDesc) detailDesc.innerHTML = currentProduct.desc.map(function (item) { return "<li><span style=\"color:var(--green)\">✓</span>" + escapeHtml(item.text) + "</li>"; }).join("");
+
+  renderVouchers();
+
+  if(document.getElementById("catalogView")) document.getElementById("catalogView").classList.add("hidden");
+  if(document.getElementById("ordersView")) document.getElementById("ordersView").classList.add("hidden");
+  if(document.getElementById("detailView")) document.getElementById("detailView").classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+function renderVouchers() {
+  const grid = document.getElementById("voucherGrid");
+  if (!grid) return;
+  if (!currentProduct || !currentProduct.vouchers || !currentProduct.vouchers.length) {
+    grid.innerHTML = "<p style=\"color:var(--text-muted);font-size:.9rem;\">Harga belum tersedia.</p>";
+    selectedVoucher = null;
+    updateSummary();
+    return;
+  }
+
+  grid.innerHTML = currentProduct.vouchers.map(function (voucher, index) {
+    const isAvailable = voucher.stock;
+    const opacity = isAvailable ? "1" : "0.5";
+    const cursor = isAvailable ? "pointer" : "not-allowed";
+    const borderColor = isAvailable ? "" : "border-color: #ef4444;";
+    const stockBadge = isAvailable ? "" : "<div style=\"font-size:.7rem;color:#ef4444;margin-top:4px;font-weight:bold;\">STOK HABIS</div>";
+
+    return (
+      "<div class=\"voucher-item\" data-index=\"" + index + "\" " +
+      "style=\"opacity:" + opacity + "; cursor:" + cursor + "; " + borderColor + "\" " +
+      (isAvailable ? "onclick=\"selectVoucher(" + index + ")\"" : "") + ">" +
+      "<div class=\"duration\">" + escapeHtml(voucher.duration) + "</div>" +
+      "<div class=\"price\">" + formatRupiah(voucher.price) + "</div>" +
+      stockBadge +
+      "</div>"
+    );
+  }).join("");
+
+  let firstAvailable = currentProduct.vouchers.findIndex(function(v) { return v.stock; });
+  const btn = document.getElementById("btnOrder");
+
+  if (firstAvailable !== -1) {
+    selectVoucher(firstAvailable);
+    if (btn) { btn.disabled = false; btn.textContent = "Beli Sekarang"; btn.style.opacity = "1"; btn.style.cursor = "pointer"; }
+  } else {
+    selectedVoucher = null;
+    updateSummary();
+    document.querySelectorAll(".voucher-item").forEach(function(item) { item.classList.remove("selected"); });
+    if (btn) { btn.disabled = true; btn.textContent = "Semua Stok Habis"; btn.style.opacity = "0.5"; btn.style.cursor = "not-allowed"; }
+  }
+}
+
+function selectVoucher(index) {
+  if (!currentProduct || !currentProduct.vouchers || !currentProduct.vouchers[index]) return;
+  if (!currentProduct.vouchers[index].stock) return; 
+  selectedVoucher = currentProduct.vouchers[index];
+  document.querySelectorAll(".voucher-item").forEach(function (item, itemIndex) {
+    item.classList.toggle("selected", itemIndex === index);
+  });
+  updateSummary();
+}
+
+function updateSummary() {
+  const priceEl = document.getElementById("summaryPrice");
+  const totalEl = document.getElementById("summaryTotal");
+  if(!priceEl || !totalEl) return;
+
+  const price = selectedVoucher ? selectedVoucher.price : 0;
+  priceEl.textContent = formatRupiah(price);
+  totalEl.textContent = formatRupiah(price);
+}
+
+function applyPromo() {
+  const codeEl = document.getElementById("promoCode");
+  const code = codeEl ? codeEl.value : "";
+  if(!code.trim()) {
+    alert("Masukkan kode promo terlebih dahulu!");
+    return;
+  }
+  alert("Kode promo diterapkan!");
+}
+
+async function processOrder() {
+  if (orderProcessing) return;
+  if (!currentProduct) { alert("Produk tidak ditemukan."); return; }
+  if (!selectedVoucher) { alert("Pilih nominal voucher dulu!"); return; }
+  if (!selectedVoucher.price || selectedVoucher.price < 1) { alert("Harga produk belum tersedia."); return; }
+
+  const buyerName = document.getElementById("buyerName") ? document.getElementById("buyerName").value.trim() : "";
+  const buyerPhone = document.getElementById("buyerPhone") ? document.getElementById("buyerPhone").value.trim() : "";
+
+  if (!buyerName) { alert("Nama Pembeli wajib diisi!"); return; }
+  if (!buyerPhone) { alert("Nomor WhatsApp wajib diisi!"); return; }
+
+  orderProcessing = true;
+  currentOrderId = generateOrderId();
+
+  const button = document.getElementById("btnOrder");
+  if (button) { button.disabled = true; button.textContent = "Membuat Pembayaran..."; }
+
+  try {
+    const response = await fetch(API_BASE + "/api/create-payment", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: selectedVoucher.price, product: currentProduct.name, duration: selectedVoucher.duration, order_id: currentOrderId, buyer_name: buyerName, buyer_phone: buyerPhone })
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) throw new Error(data.message || "Gagal membuat pembayaran.");
+
+    const payment = data.data || {};
+    currentTransactionId = payment.transaction_id;
+    if (!currentTransactionId) throw new Error("Transaction ID tidak ditemukan.");
+
+    showPaymentModal(payment);
+    startPaymentPolling();
+  } catch (error) {
+    console.error("Payment error:", error);
+    alert(error.message || "Gagal membuat pembayaran.");
+  } finally {
+    orderProcessing = false;
+    if (button) { button.disabled = false; button.textContent = "Beli Sekarang"; }
+  }
+}
+
+function showPaymentModal(payment) {
+  const modal = document.getElementById("successModal");
+  if (!modal) return;
+  const amount = payment.amount || selectedVoucher.price;
+  const qrUrl = payment.qr_url || "";
+  const checkoutUrl = payment.checkout_url || "";
+  const qr = qrUrl ? "<img src=\"" + escapeHtml(qrUrl) + "\" alt=\"QRIS\" style=\"width:260px;max-width:100%;border-radius:12px;display:block;\">" : "<div style=\"padding:25px;color:var(--text-muted);\">QRIS sedang diproses...</div>";
+  const checkout = checkoutUrl ? "<a href=\"" + escapeHtml(checkoutUrl) + "\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"btn-primary\" style=\"display:block;text-align:center;text-decoration:none;margin-bottom:10px;\">Buka Pembayaran</a>" : "";
+
+  modal.innerHTML =
+    "<div class=\"modal\"><div class=\"success-icon\" style=\"font-size:30px;\">⌛</div><h2>Menunggu Pembayaran</h2><p>Silakan selesaikan pembayaran QRIS.</p>" +
+    "<div style=\"margin:15px 0;font-size:1.25rem;font-weight:800;\">" + formatRupiah(amount) + "</div>" +
+    "<div style=\"padding:10px;margin-bottom:15px;background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:10px;\"><div style=\"font-size:.75rem;color:var(--text-muted);\">ORDER ID</div><strong>" + escapeHtml(currentOrderId) + "</strong></div>" +
+    "<div style=\"display:flex;justify-content:center;margin:15px 0;\">" + qr + "</div>" + checkout +
+    "<p id=\"paymentStatusText\" style=\"color:var(--text-muted);font-size:.85rem;\">Menunggu konfirmasi pembayaran...</p><button class=\"btn-primary\" onclick=\"cancelPaymentModal()\">Tutup</button></div>";
+  modal.classList.add("active");
+}
+
+function startPaymentPolling() { stopPaymentPolling(); checkPaymentStatus(); paymentCheckTimer = setInterval(checkPaymentStatus, 5000); }
+function stopPaymentPolling() { if (paymentCheckTimer) { clearInterval(paymentCheckTimer); paymentCheckTimer = null; } }
+
+async function checkPaymentStatus() {
+  if (!currentTransactionId) return;
+  try {
+    const response = await fetch(API_BASE + "/api/check-payment", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ transaction_id: currentTransactionId, order_id: currentOrderId, product: currentProduct.name, duration: selectedVoucher.duration, amount: selectedVoucher.price, key: "PENDING" })
+    });
+    if (!response.ok) return;
+    const data = await response.json();
+    if (!data.success) return;
+    const payment = data.data || {};
+    const status = String(payment.transaction_status || payment.status || "").toLowerCase().trim();
+
+    if (status === "settlement" || status === "paid" || status === "success" || status === "completed") { stopPaymentPolling(); fetchStockAndCompleteOrder(); return; }
+    if (status === "expire" || status === "expired" || status === "cancel" || status === "cancelled") { stopPaymentPolling(); paymentExpired(); return; }
+    const statusText = document.getElementById("paymentStatusText");
+    if (statusText) statusText.textContent = "Menunggu pembayaran...";
+  } catch (error) { console.warn("Payment status error:", error); }
+}
+
+async function fetchStockAndCompleteOrder() {
+  const modal = document.getElementById("successModal");
+  if (modal) { 
+    modal.innerHTML = "<div class=\"modal\"><div class=\"success-icon\" style=\"font-size:30px;\">⌛</div><h2>Mengambil Key...</h2><p>Pembayaran berhasil! Sedang mengambil key dari server...</p></div>"; 
+  }
+
+  // Ambil data nama, phone, dan harga dari form/state
+  const buyerNameInput = document.getElementById("buyerName");
+  const buyerPhoneInput = document.getElementById("buyerPhone");
+
+  const buyerName = buyerNameInput ? buyerNameInput.value.trim() : "Customer";
+  const buyerPhone = buyerPhoneInput ? buyerPhoneInput.value.trim() : "-";
+  const amount = selectedVoucher ? selectedVoucher.price : 0;
+  const productName = currentProduct ? currentProduct.name : "";
+  const duration = selectedVoucher ? selectedVoucher.duration : "";
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, { 
+      method: "POST", 
+      body: JSON.stringify({ 
+        // Kirim format camelCase & snake_case sekaligus agar Apps Script pasti membacanya
+        orderId: currentOrderId,
+        order_id: currentOrderId,
+        buyerName: buyerName,
+        buyer_name: buyerName,
+        buyerPhone: buyerPhone,
+        buyer_phone: buyerPhone,
+        product: productName, 
+        duration: duration,
+        amount: amount,
+        price: amount
+      }) 
+    });
+
+    const data = await response.json();
+    if (data.success && data.available) { 
+      paymentSuccess(data.key); 
+    } else { 
+      paymentSuccess(false, data.message || "STOK HABIS"); 
+    }
+  } catch (error) { 
+    console.error("Fetch stock error:", error); 
+    paymentSuccess(false, "GAGAL KONEKSI KE SERVER STOK"); 
+  }
+}
+
+function paymentSuccess(realKey, errorMessage) {
+  const modal = document.getElementById("successModal");
+  if (!modal) return;
+  
+  currentOrderKey = realKey || errorMessage || "STOK HABIS";
+  const isSuccess = !!realKey;
+  
+  const icon = isSuccess ? "✓" : "!";
+  const iconColor = isSuccess ? "#10b981" : "#ef4444";
+  const title = isSuccess ? "Payment Success!" : "Payment Issue";
+  const subtitle = isSuccess ? "Your keys are ready" : "Silakan hubungi admin";
+  
+  const amount = selectedVoucher ? selectedVoucher.price : 0;
+  const productName = currentProduct ? currentProduct.name : "Produk";
+  const productDuration = selectedVoucher ? selectedVoucher.duration : "-";
+
+  modal.innerHTML = `
+    <style>
+      .ds-modal { background: #0f0914; color: #fff; padding: 0; border-radius: 12px; width: 100%; font-family: sans-serif; text-align: left; box-sizing: border-box; }
+      .ds-card { background: #1a1129; border: 1px solid #3b2559; border-radius: 8px; margin-bottom: 15px; padding: 15px; }
+      .ds-header { text-align: center; padding: 25px 15px; margin-bottom: 15px; }
+      .ds-check { background: ${iconColor}; color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px; font-weight: bold;}
+      .ds-title { font-size: 20px; font-weight: bold; margin: 0 0 5px; color: #fff;}
+      .ds-subtitle { color: #9ca3af; font-size: 14px; margin: 0; }
+      .ds-section-title { font-size: 13px; color: #9ca3af; display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #3b2559; padding-bottom: 8px; }
+      .ds-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+      .ds-row:last-child { margin-bottom: 0; }
+      .ds-val { color: #fff; text-align: right; word-break: break-all; font-family: monospace;}
+      .ds-val-green { color: #10b981; font-family: sans-serif; font-weight: bold;}
+      .ds-product-row { display: flex; align-items: center; gap: 12px; }
+      .ds-product-icon { width: 40px; height: 40px; background: #0f0914; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid #3b2559; color: #d946ef;}
+      .ds-key-box { background: #0f0914; border: 1px solid #3b2559; border-radius: 6px; padding: 8px 8px 8px 12px; display: flex; justify-content: space-between; align-items: center; }
+      .ds-key-text { font-family: monospace; font-size: 14px; color: #fff; word-break: break-all; margin-right: 10px; }
+      .ds-btn-copy { background: #d946ef; border: none; color: white; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+      .ds-btn-copy:active { transform: scale(0.9); }
+      .ds-actions { display: flex; gap: 10px; margin-top: 5px; }
+      .ds-btn { flex: 1; padding: 12px; border-radius: 6px; text-align: center; text-decoration: none; font-size: 14px; font-weight: bold; cursor: pointer; border: none; display: flex; justify-content: center; align-items: center; gap: 8px; transition: 0.2s;}
+      .ds-btn-wa { background: #0ea5e9; color: #fff; }
+      .ds-btn-wa:hover { background: #0284c7; }
+      .ds-btn-shop { background: transparent; color: #fff; border: 1px solid #3b2559; }
+      .ds-btn-shop:hover { background: #3b2559; }
+    </style>
+    
+    <div class="ds-modal">
+      <div class="ds-card ds-header">
+        <div class="ds-check">${icon}</div>
+        <h2 class="ds-title">${title}</h2>
+        <p class="ds-subtitle">${subtitle}</p>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🧾 Order</div>
+        <div class="ds-row"><span>ID</span><span class="ds-val">${escapeHtml(currentOrderId || "-")}</span></div>
+        <div class="ds-row"><span>Payment</span><span class="ds-val" style="font-family: sans-serif; font-weight: bold;">QRIS</span></div>
+        <div class="ds-row"><span>Total</span><span class="ds-val ds-val-green">${formatRupiah(amount)}</span></div>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🎁 Product</div>
+        <div class="ds-product-row">
+          <div class="ds-product-icon">📦</div>
+          <div>
+            <div style="font-weight: bold; font-size: 14px; margin-bottom: 3px;">${escapeHtml(productName)}</div>
+            <div style="color: #9ca3af; font-size: 12px;">${escapeHtml(productDuration)} × 1</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ds-card">
+        <div class="ds-section-title">🔑 License Keys (1)</div>
+        <div class="ds-key-box">
+          <span class="ds-key-text" id="generatedKey">${escapeHtml(currentOrderKey)}</span>
+          <button class="ds-btn-copy" onclick="copyKey()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="ds-actions">
+        <a href="https://whatsapp.com/channel/0029VbCXLJx9hXF9QRZdRr12" target="_blank" class="ds-btn ds-btn-wa">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 0C5.385 0 0 5.385 0 12.031c0 2.12.551 4.186 1.597 6.002L.142 23.858l5.972-1.566c1.748.951 3.716 1.453 5.917 1.453 6.646 0 12.031-5.385 12.031-12.031S18.677 0 12.031 0zm3.834 17.202c-.173.491-.977.962-1.39.996-.401.034-.848.06-2.585-.662-2.146-.89-3.526-3.08-3.633-3.224-.105-.145-.87-1.157-.87-2.204 0-1.047.545-1.564.738-1.776.193-.212.42-.266.56-.266.14 0 .28.001.405.006.13.006.304-.051.464.335.166.402.569 1.393.619 1.493.05.1.083.216.017.348-.066.133-.101.216-.2.316-.1.101-.212.22-.303.303-.101.101-.205.212-.091.41.114.198.51 .842 1.092 1.36.753.67 1.391.874 1.591.975.199.1.317.085.435-.049.118-.135.512-.596.65-.802.138-.205.138-.411.373-.497.585-.087.212-.141.67-.141.67s.104.305-.069.796z"/></svg>
+          Saluran WA
+        </a>
+        <button class="ds-btn ds-btn-shop" onclick="closeSuccess()">← Shop</button>
+      </div>
+    </div>
+  `;
+
+  modal.classList.add("active");
+}
+
+function paymentExpired() {
+  const modal = document.getElementById("successModal");
+  if (!modal) return;
+  modal.innerHTML = "<div class=\"modal\"><div class=\"success-icon\" style=\"color:#ef4444;\">×</div><h2>Pembayaran Kedaluwarsa</h2><p>Pembayaran tidak berhasil diselesaikan.</p><button class=\"btn-primary\" onclick=\"cancelPaymentModal()\">Tutup</button></div>";
+  modal.classList.add("active");
+}
+
+function cancelPaymentModal() { stopPaymentPolling(); currentTransactionId = null; const modal = document.getElementById("successModal"); if (!modal) return; modal.classList.remove("active"); modal.innerHTML = ""; }
+
+function copyKey() { 
+  const element = document.getElementById("generatedKey"); 
+  if (!element) return; 
+  const text = element.textContent.trim(); 
+  if (navigator.clipboard && navigator.clipboard.writeText) { 
+    navigator.clipboard.writeText(text).then(function () { showCopied(); }).catch(function () { fallbackCopy(text); }); 
+  } else { 
+    fallbackCopy(text); 
+  } 
+}
+
+function fallbackCopy(text) { 
+  const textarea = document.createElement("textarea"); 
+  textarea.value = text; 
+  textarea.style.position = "fixed"; 
+  textarea.style.opacity = "0"; 
+  document.body.appendChild(textarea); 
+  textarea.select(); 
+  try { 
+    document.execCommand("copy"); 
+    showCopied(); 
+  } catch (error) { 
+    alert("Gagal menyalin key."); 
+  } 
+  document.body.removeChild(textarea); 
+}
+
+function showCopied() { 
+  const button = document.querySelector(".ds-btn-copy"); 
+  if (!button) return; 
+  const originalHTML = button.innerHTML;
+  button.innerHTML = "✓"; 
+  setTimeout(function () { 
+    button.innerHTML = originalHTML; 
+  }, 2000); 
+}
+
+function closeSuccess() { stopPaymentPolling(); currentTransactionId = null; currentOrderId = null; const modal = document.getElementById("successModal"); if (modal) { modal.classList.remove("active"); modal.innerHTML = ""; } showCatalog(); }
+
+function showCatalog() { 
+  stopPaymentPolling(); 
+  currentTransactionId = null; 
+  currentOrderId = null; 
+  const detail = document.getElementById("detailView"); 
+  const catalog = document.getElementById("catalogView"); 
+  const orders = document.getElementById("ordersView");
+  if (detail) detail.classList.add("hidden"); 
+  if (orders) orders.classList.add("hidden");
+  if (catalog) catalog.classList.remove("hidden"); 
+  window.scrollTo(0, 0); 
+}
+
+function showOrders() { 
+  stopPaymentPolling();
+  const catalog = document.getElementById("catalogView");
+  const detail = document.getElementById("detailView");
+  const orders = document.getElementById("ordersView");
+  if (catalog) catalog.classList.add("hidden");
+  if (detail) detail.classList.add("hidden");
+  if (orders) orders.classList.remove("hidden");
+  window.scrollTo(0, 0);
+}
+
+async function checkOrderStatus() {
+  const queryInput = document.getElementById('searchQuery') || document.getElementById('orderQuery');
+  const resultDiv = document.getElementById('orderResult') || document.getElementById('searchResult');
+
+  const query = queryInput ? queryInput.value.trim() : "";
+
+  if (!query) {
+    alert('Masukkan Order ID atau No. WA terlebih dahulu!');
+    return;
+  }
+
+  if (resultDiv) {
+    resultDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.8rem; text-align:center;">Mencari data pesanan...</p>`;
+  }
+
+  try {
+    const response = await fetch(`${APPS_SCRIPT_URL}?action=checkorder&query=${encodeURIComponent(query)}`);
+    const data = await response.json();
+
+    const order = data.order || data.data;
+
+    if (!data.success || !order) {
+      if (resultDiv) {
+        resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Pesanan tidak ditemukan.</p>`;
+      }
+      return;
+    }
+
+    if (resultDiv) {
+      resultDiv.innerHTML = `
+        <div style="background: var(--bg, #1a1129); border: 1px solid var(--border-color, #3b2559); border-radius: 10px; padding: 14px; font-size: 0.8rem; color: #fff;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Order ID:</span>
+            <strong style="color: #fff;">${escapeHtml(order.orderId || order.id || "-")}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Produk:</span>
+            <strong style="color: #fff;">${escapeHtml(order.product || "-")} (${escapeHtml(order.duration || "-")})</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span style="color: var(--text-muted, #9ca3af);">Status:</span>
+            <span style="color: #10b981; font-weight: 700;">${escapeHtml(order.status || 'SUCCESS')}</span>
+          </div>
+          <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color, #3b2559); color: var(--primary, #d946ef); font-weight: 600; word-break: break-all;">
+            Key Lisensi Anda: <br>
+            <code style="background:#0f0914; padding:8px; display:block; margin-top:6px; border-radius:6px; color:#10b981; font-family:monospace; border:1px solid #3b2559;" id="searchedKey">${escapeHtml(order.key || "-")}</code>
+          </div>
+        </div>
+      `;
+    }
+  } catch (error) {
+    console.error("Cek status error:", error);
+    if (resultDiv) {
+      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengecek pesanan ke server.</p>`;
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+  loadProducts();
+});

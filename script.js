@@ -390,7 +390,6 @@ async function fetchStockAndCompleteOrder() {
     modal.innerHTML = "<div class=\"modal\"><div class=\"success-icon\" style=\"font-size:30px;\">⌛</div><h2>Mengambil Key...</h2><p>Pembayaran berhasil! Sedang mengambil key dari server...</p></div>"; 
   }
 
-  // Ambil data nama, phone, dan harga dari form/state
   const buyerNameInput = document.getElementById("buyerName");
   const buyerPhoneInput = document.getElementById("buyerPhone");
 
@@ -404,7 +403,6 @@ async function fetchStockAndCompleteOrder() {
     const response = await fetch(APPS_SCRIPT_URL, { 
       method: "POST", 
       body: JSON.stringify({ 
-        // Kirim format camelCase & snake_case sekaligus agar Apps Script pasti membacanya
         orderId: currentOrderId,
         order_id: currentOrderId,
         buyerName: buyerName,
@@ -644,13 +642,13 @@ async function checkOrderStatus() {
       `;
     }
   } catch (error) {
-    console.error("Cek status error:", error);
+    console.error("Check order error:", error);
     if (resultDiv) {
-      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal mengecek pesanan ke server.</p>`;
+      resultDiv.innerHTML = `<p style="color: #ef4444; font-size: 0.8rem; text-align:center;">Gagal terhubung ke server pesanan.</p>`;
     }
   }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
   loadProducts();
 });

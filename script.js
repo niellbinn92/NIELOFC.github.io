@@ -1,9 +1,10 @@
 const API_BASE = "https://nielofc-github-io.vercel.app";
-const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv";
+const SHEET_CSV = "https://docs.google.com/spreadsheets/d/1dTfloE3c-TbWMqTk6U42pnbil4hsTzpnvjNVEdA0oyA/export?format=csv&gid=0";
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwwS2_i9ebP_W4sSWoLZ0ohcvcJXkxlZ1LHp8cKqByweF_5wzAWClAMXxTYqtFKN9Rb/exec";
 const PRODUCT_IMAGES = {
   "DRIP APKMOD": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "DRIP PROXY": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
+  "DRIP WIRE": "https://i.ibb.co.com/zWBMST9S/9659b485-a457-42af-a695-5ea681df4c6c.jpg",
   "HG APKMOD": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
   "HG PROXY": "https://i.ibb.co.com/s9QWt5KK/IMG-8975.png",
   "MIGUL LITE": "https://i.ibb.co.com/wNhJG1H5/IMG-8976.png",
@@ -13,6 +14,7 @@ const PRODUCT_IMAGES = {
 const LOGO_FALLBACK = {
   "DRIP APKMOD": { logo: "DRIP", color: "#e879f9" },
   "DRIP PROXY": { logo: "DRIP", color: "#c084fc" },
+  "DRIP WIRE": { logo: "DRIP", color: "#e879f9" },
   "HG APKMOD": { logo: "HG", color: "#ec4899" },
   "HG PROXY": { logo: "HG", color: "#f472b6" },
   "MIGUL LITE": { logo: "MIGUL", color: "#a855f7" },

@@ -152,7 +152,7 @@ function createFallbackProducts() {
   });
 }
 
-aasync function loadProducts() {
+async function loadProducts() {
   try {
     // 1 & 2. Ambil stok dan produk secara paralel untuk mempercepat performa
     const [stockRes, prodRes] = await Promise.all([
